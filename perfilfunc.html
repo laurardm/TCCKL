@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Perfil do Funcionário</title>
+  <link rel="stylesheet" href="/css/perfilprof.css"/>
+
+</head>
+<body>
+  <!-- container principal -->
+  <div class="form-container">
+    <form id="perfilForm">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" disabled>
+
+      <label for="data">Data de nascimento</label>
+      <input type="date" id="data" disabled>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" disabled>
+
+      <label for="celular">Celular</label>
+      <input type="tel" id="celular" disabled>
+
+      <label for="turmas">Turmas</label>
+      <input type="text" id="turmas" disabled>
+
+      <label for="cargo">Cargo</label>
+      <select id="cargo" disabled>
+        <option value="feminino">Professor</option>
+        <option value="masculino">Estagiário</option>
+        <option value="outro">Diretor</option>
+      </select>
+    </form>
+  </div>
+  
+  <button id="editar">Editar</button>
+
+  <script>
+    // Carrega os dados do localStorage e preenche os campos
+    const perfil = JSON.parse(localStorage.getItem('perfil')) || {};
+
+    document.getElementById('nome').value = perfil.nome || '';
+    document.getElementById('email').value = perfil.email || '';
+    document.getElementById('celular').value = perfil.celular || '';
+    document.getElementById('data').value = perfil.dataNascimento || '';
+    document.getElementById('turmas').value = perfil.turmas || '';
+    document.getElementById('cargo').value = perfil.cargo || '';
+
+    // Evento para ir para a tela de edição
+    document.getElementById('editar').addEventListener('click', () => {
+      // Redirecionar para a página de edição
+      window.location.href = 'editarfunc.html';
+    });
+  </script>
+</body>
+</html>

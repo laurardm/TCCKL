@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Perfil</title>
+  <link rel="stylesheet" href="/css/perfilprof.css" />
+</head>
+<body>
+  <div class="form-container">
+    <form id="editarForm">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome">
+
+      <label for="data">Data de nascimento</label>
+      <input type="date" id="data" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email">
+
+      <label for="celular">Celular</label>
+      <input type="tel" id="celular">
+
+      <label for="turmas">Turmas</label>
+      <input type="text" id="turmas">
+
+      <label for="cargo">Cargo</label>
+      <select id="cargo">
+        <option value="feminino">Professor</option>
+        <option value="masculino">Estagiário</option>
+        <option value="outro">Diretor</option>
+      </select>
+
+      <button type="submit" id="concluir">Salvar</button>
+    </form>
+  </div>
+
+  <script>
+    const perfil = JSON.parse(localStorage.getItem('perfil')) || {};
+
+    document.getElementById('nome').value = perfil.nome || '';
+    document.getElementById('email').value = perfil.email || '';
+    document.getElementById('celular').value = perfil.celular || '';
+    document.getElementById('data').value = perfil.dataNascimento || '';
+    document.getElementById('turmas').value = perfil.turmas || '';
+    document.getElementById('cargo').value = perfil.cargo || '';
+
+    document.getElementById('editarForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const novoPerfil = {
+        nome: document.getElementById('nome').value,
+        dataNascimento: document.getElementById('data').value,
+        email: document.getElementById('email').value,
+        celular: document.getElementById('celular').value,
+        turmas: document.getElementById('turmas').value,
+        cargo: document.getElementById('cargo').value,
+      };
+
+      localStorage.setItem('perfil', JSON.stringify(novoPerfil));
+      window.location.href = "perfilfunc.html"; // redireciona para a tela de perfil
+    });
+  </script>
+
+</body>
+</html>

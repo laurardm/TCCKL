@@ -1,0 +1,54 @@
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap');
+   
+   body {
+      margin: 0;
+      font-family: "Questrial", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      background-image: url('../imagens/fotofundo2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .caixabotao {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 30px 20px;
+      width: 300px;
+      text-align: center;
+      overflow: auto;
+      height: 350px;
+      border: 1px solid #ccc; 
+      
+    }
+
+    .botao {
+      background: #f0f0f0;
+      border: none;
+      border-radius: 30px;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 1.2em;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .botoesacao {
+      background: #fddde6;
+      color: black;
+      border-radius: 15px;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }

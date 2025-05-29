@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Questrial', sans-serif;
+  background: url('/imagens/fotofundo2.jpg') no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.form-container {
+  background-color: #ffffff;
+  border-radius: 40px;
+  padding: 40px;
+  width: 500px;
+  max-width: 95%;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border: 3px solid #c3c9c7;
+  border-radius: 30px;
+  font-size: 16px;
+  font-family: 'Questrial', sans-serif;
+  box-sizing: border-box;
+  margin-top: 5px;
+  color: #333;
+}
+
+input:focus {
+  outline: none;
+  border-color: #ffa7c6;
+  box-shadow: 0 0 5px #ffa7c6;
+}
+
+button#salvar {
+  background-color: #ffa7c6;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  width: 150px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 50px;
+}
+
+button#salvar:hover {
+  transform: scale(1.05);
+  background-color: #f48db8;
+}

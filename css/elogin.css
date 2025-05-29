@@ -1,0 +1,181 @@
+/* Importa as fontes do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
+
+/* Estilo global do corpo da página */
+body {
+    font-family: 'Questrial', sans-serif; /* Fonte principal */
+    margin: 0;
+    padding: 0;
+    color: #023047; /* Azul escuro para o texto */
+}
+
+/* Container principal da tela de login */
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('/imagens/fotofundo.png'); /* Imagem de fundo */
+}
+
+/* Estilo do formulário de login */
+.formLogin {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 50px;
+    padding: 10px 20px;
+    margin-bottom: 90px;
+    box-shadow: 0px 0px 40px rgb(10, 10, 10); 
+    align-items: center;
+    text-align: center;
+}
+
+/* Título do formulário (se houver) */
+.formLogin h1 {
+    margin: 0 0 20px;
+    font-weight: 500;
+    font-size: 2.3em;
+}
+
+/* Estilo para os campos de email e senha */
+.formLogin input[type="email"],
+.formLogin input[type="password"] {
+    padding: 10px;
+    font-size: 14px;
+    width: 300px;
+    text-align: left;
+    border: 3px solid #b3babb;
+    margin: 5px 0 7px 0;
+    border-radius: 50px;
+    outline: none;
+}
+
+/* Mantém a mesma borda ao focar nos campos */
+.formLogin input[type="email"]:focus,
+.formLogin input[type="password"]:focus {
+    border: 3px solid #b3babb;
+}
+
+/* Botão de envio do formulário (Entrar) */
+.formLogin input[type="submit"] {
+    background-color: #ffa7c6; /* Rosa suave */
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    width: 150px;
+    border: none !important;
+    transition: all linear 160ms;
+    cursor: pointer;
+    margin: 20px auto 1px;
+    padding: 10px;
+    border-radius: 50px;
+    text-align: center;
+    display: block;
+}
+
+/* Efeito de escala ao passar o mouse no botão */
+.formLogin input[type="submit"]:hover {
+    transform: scale(1.05);
+}
+
+/* Link "Esqueceu a senha?" */
+.link-esqueci {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    transition: all linear 160ms;
+    text-align: left;
+    width: 100%;
+    margin: 10px 0;
+    padding-left: 10px;
+    padding-bottom: 1px;
+    text-decoration: none;
+}
+
+/* Efeito hover no link de esqueci a senha */
+.link-esqueci:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* Parágrafo com o link de cadastro */
+.cadastro-texto {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 15px;
+    color: #555;
+    width: 100%;
+    padding-left: 10px;
+}
+
+/* Link "Cadastre-se!" dentro do parágrafo */
+.link-cadastro {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.link-cadastro:hover {
+    text-decoration: underline;
+}
+
+/*logo*/
+img {
+    width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    padding-bottom: 8px;
+}
+
+/*rodape fixo com carrossel de frases*/
+.rodape {
+    background-color: #ffa7c6;
+    color: #1a1a1a;
+    font-size: 16px;
+    font-family: 'Comic Neue', cursive; 
+    text-align: center;
+    padding: 30px 0;
+    font-weight: 500;
+    position: absolute;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*area do carrossel dentro do rodape*/
+.carrossel {
+    max-width: 90%;
+    overflow: hidden;
+    padding-left: 200px;
+    padding-right: 200px;
+    font-size: 18px;
+    font-family: 'Comic Neue', cursive; 
+}
+
+/* frase no carrossel*/
+#frase {
+    display: inline-block;
+    animation: trocaFrase 6s infinite;
+}
+
+/*animação de fade in/fade out para a frase*/
+@keyframes trocaFrase {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    40% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 0; }
+}
