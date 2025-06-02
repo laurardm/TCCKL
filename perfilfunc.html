@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Perfil do Funcionário</title>
   <link rel="stylesheet" href="/css/perfilprof.css"/>
-
 </head>
 <body>
   <!-- container principal -->
@@ -33,9 +32,13 @@
         <option value="outro">Diretor</option>
       </select>
     </form>
+
+    <div class="botoes">
+      <a href="telafunc.html"><button id="voltar">Voltar</button></a>
+      <button id="editar">Editar</button>
+      <button id="salvar">Salvar</button>
+    </div>
   </div>
-  
-  <button id="editar">Editar</button>
 
   <script>
     // Carrega os dados do localStorage e preenche os campos
@@ -48,10 +51,43 @@
     document.getElementById('turmas').value = perfil.turmas || '';
     document.getElementById('cargo').value = perfil.cargo || '';
 
-    // Evento para ir para a tela de edição
-    document.getElementById('editar').addEventListener('click', () => {
-      // Redirecionar para a página de edição
-      window.location.href = 'editarfunc.html';
+    const editarBtn = document.getElementById('editar');
+    const salvarBtn = document.getElementById('salvar');
+    const voltarBtn = document.getElementById('voltar');
+
+    // Esconde o botão salvar inicialmente
+    salvarBtn.style.display = 'none';
+
+    editarBtn.addEventListener('click', () => {
+      const inputs = document.querySelectorAll('#perfilForm input, #perfilForm select');
+      inputs.forEach(input => input.disabled = false);
+      editarBtn.style.display = 'none';
+      salvarBtn.style.display = 'inline-block';
+    });
+
+    salvarBtn.addEventListener('click', () => {
+      const perfilAtualizado = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        celular: document.getElementById('celular').value,
+        dataNascimento: document.getElementById('data').value,
+        turmas: document.getElementById('turmas').value,
+        cargo: document.getElementById('cargo').value
+      };
+
+      localStorage.setItem('perfil', JSON.stringify(perfilAtualizado));
+
+      const inputs = document.querySelectorAll('#perfilForm input, #perfilForm select');
+      inputs.forEach(input => input.disabled = true);
+
+      salvarBtn.style.display = 'none';
+      editarBtn.style.display = 'inline-block';
+
+      alert('Alterações salvas com sucesso!');
+    });
+
+    voltarBtn.addEventListener('click', () => {
+      window.history.back();
     });
   </script>
 </body>

@@ -21,19 +21,19 @@
       transform: translate(-50%, 0);
       background: white;
       border-radius: 25px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 40px rgba(0,0,0,10);
       padding: 30px 20px;
-      width: 300px;
+      width: 490px;
       text-align: center;
       overflow: auto;
       height: 350px;
-      border: 1px solid #ccc; 
+      border: 2px solid #d6d6d6; 
       
     }
 
     .botao {
-      background: #f0f0f0;
-      border: none;
+      background: #f6f6f6;
+      border: 3px solid #d9d9d9;
       border-radius: 30px;
       padding: 15px;
       margin: 10px 0;
@@ -42,12 +42,12 @@
       cursor: pointer;
     }
 
-    .botoesacao {
+    .botaodevoltar {
       background: #fddde6;
       color: black;
-      border-radius: 15px;
-      border: none;
-      padding: 10px 20px;
+      border-radius: 30px;
+      border: 2px solid #d9d9d9;
+      padding: 10px 30px;
       margin-top: 10px;
       font-weight: bold;
       cursor: pointer;
