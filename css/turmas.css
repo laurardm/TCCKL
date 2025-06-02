@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap');
 
 body {
-  margin: 0;
-  font-family: "Questrial", sans-serif;
-  background: linear-gradient(to bottom, #f8d6e3 40%, #fff7e1 60%);
-  background-image: url('../imagens/fotofundo2.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 80px;
-}
+   margin: 0;
+   font-family: "Questrial", sans-serif;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+   overflow: hidden;
+   background-image: url('../imagens/fotofundo2.jpg');
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+ }
 
 .turma-titulo {
   background: white;
@@ -21,6 +21,8 @@ body {
   font-size: 1.5em;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   margin-bottom: 20px;
+  align-items: center;
+  display: block;
 }
 
 .grade-alunos {
@@ -51,7 +53,8 @@ body {
   font-weight: bold;
 }
 
-.fotos-turma {
+.fotos-turma,
+.addaluno {
   margin-top: 30px;
   background: #dff3ff;
   border: none;
