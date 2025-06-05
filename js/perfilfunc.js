@@ -62,3 +62,15 @@ salvarBtn.addEventListener('click', () => {
 voltarBtn.addEventListener('click', () => {
   window.history.back();
 });
+
+document.getElementById('nome').addEventListener('input', function () {
+      const nomeDigitado = this.value.trim();
+      document.getElementById('nomeDisplay').textContent = nomeDigitado || "Nome";
+    });
+
+    // Habilita campos ao clicar em "Editar"
+    document.getElementById('editar').addEventListener('click', function () {
+      document.querySelectorAll('#perfilForm input, #perfilForm select').forEach(el => {
+        el.disabled = false;
+      });
+    });

@@ -1,22 +1,27 @@
 .logo-container {
-  position: fixed;
+  position: absolute;
   top: 20px;
-  left: 0px;
-  background-color: #ffa7c6;
-  border-radius: 20px;
-  padding: 7px 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height:70px;
+  left: 20px;
+  z-index: 10;
 }
 
 .logo {
-  width: 230px;
-  height: 70px;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  background-color: #ffa7c6;
+  border-radius: 40px;
+  padding-left: 100px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-left: -75px;
+}
+
+.logo img {
+  width: 400px;
+  height: 150px;
   object-fit: cover;
-  background-image: url('/imagens/logo.png');
+  border-radius: 40px;
 }
