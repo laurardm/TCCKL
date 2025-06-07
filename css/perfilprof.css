@@ -2,26 +2,69 @@
 
 body {
   margin: 0;
-  padding: 0;
-  font-family: 'Questrial', sans-serif;
-  background: url('/imagens/fotofundo2.jpg') no-repeat center center/cover;
+  font-family: "Questrial", sans-serif;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  overflow: hidden;
+  background-image: url('../imagens/fotofundo2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Container principal do formulário */
+/* Wrapper que engloba imagem e formulário lado a lado */
+.foto {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 40px;
+  
+}
+
+/* Estilo do quadro com a imagem e nome */
+.fotoperfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 40px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border: solid 3px #d9d9d9;
+}
+
+/* Imagem do avatar */
+.fotoperfil img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  margin-bottom: 15px;
+}
+
+/* Nome abaixo da imagem */
+#nomeDisplay {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+/* Container do formulário */
 .form-container {
   background-color: #ffffff;
   border-radius: 40px;
   padding: 20px 40px 20px 40px;
-  width: 500px; 
+  width: 500px;
   max-width: 95%;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
   text-align: left;
-  margin-top: 10px;
+  margin-bottom: 50px;
   border: 3px solid #d9d9d9;
 }
 
@@ -33,7 +76,7 @@ label {
   display: block;
 }
 
-/* Inputs */
+/* Inputs e select */
 input[type="text"],
 input[type="email"],
 input[type="tel"],
@@ -50,9 +93,10 @@ select {
   margin-top: 2px;
   transition: 0.2s ease;
   font-family: 'Questrial', sans-serif;
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
 }
 
+/* Foco nos inputs */
 input:focus,
 select:focus {
   border-color: none;
@@ -68,7 +112,7 @@ select:focus {
   margin-top: 20px;
 }
 
-/* Botões */
+/* Estilo dos botões */
 button#voltar,
 button#salvar,
 button#editar {

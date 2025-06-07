@@ -2,13 +2,16 @@
 
 body {
     margin: 0;
+    font-family: "Questrial", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
-    background-image: url("/imagens/fotofundo2.jpg");
+    overflow: hidden;
+    background-image: url('../imagens/fotofundo2.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    position: relative;
-    font-family: 'Questrial', sans-serif; 
 }
 
 /* Foto de perfil */

@@ -9,41 +9,52 @@
   <link rel="stylesheet" href="/css/logo.css">
 </head>
 <body>
-  <!-- container principal -->
-  <div class="form-container">
-    <form id="perfilForm">
-      <label for="nome">Nome</label>
-      <input type="text" id="nome" disabled>
 
-      <label for="data">Data de nascimento</label>
-      <input type="date" id="data" disabled>
+  <div class="foto">
+    <!-- Lado esquerdo: Imagem + nome -->
+    <div class="fotoperfil">
+      <img src="/imagens/laura.jpg" alt="Foto do usuário" />
+      <p id="nomeDisplay">Nome</p>
+    </div>
 
-      <label for="email">E-mail</label>
-      <input type="email" id="email" disabled>
+    <!-- Lado direito: Formulário -->
+    <div class="form-container">
+      <form id="perfilForm">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" disabled>
 
-      <label for="celular">Telefone</label>
-      <input type="tel" id="celular" disabled>
+        <label for="data">Data de nascimento</label>
+        <input type="date" id="data" disabled>
 
-      <label for="turmas">Turmas</label>
-      <input type="text" id="turmas" disabled>
+        <label for="email">E-mail</label>
+        <input type="email" id="email" disabled>
 
-      <label for="cargo">Cargo</label>
-      <select id="cargo" disabled>
-        <option value="feminino">Professor</option>
-        <option value="masculino">Estagiário</option>
-        <option value="outro">Diretor</option>
-      </select>
-    </form>
+        <label for="celular">Telefone</label>
+        <input type="tel" id="celular" disabled>
 
-    <div class="botoes">
-      <a href="telafunc.html"><button id="voltar">Voltar</button></a>
-      <button id="editar">Editar</button>
-      <button id="salvar">Salvar</button>
+        <label for="turmas">Turmas</label>
+        <input type="text" id="turmas" disabled>
+
+        <label for="cargo">Cargo</label>
+        <select id="cargo" disabled>
+          <option value="feminino">Professor</option>
+          <option value="masculino">Estagiário</option>
+          <option value="outro">Diretor</option>
+        </select>
+      </form>
+
+      <div class="botoes">
+        <a href="telafunc.html"><button id="voltar">Voltar</button></a>
+        <button id="editar">Editar</button>
+        <button id="salvar">Salvar</button>
+      </div>
     </div>
   </div>
+
   <div id="footer"></div>
   <div id="logo"></div>
-  
+
+  <!-- Scripts externos, se quiser manter -->
   <script src="/js/perfilfunc.js"></script>
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
