@@ -1,12 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap');
 
 body {
+  margin: 0;
+  font-family: "Questrial", sans-serif;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  background: url('/imagens/fotofundo2.jpg') no-repeat center center/cover;
-  padding: 30px;
-  font-family: 'Questrial', sans-serif;
+  height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  background-image: url('../imagens/fotofundo2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 
