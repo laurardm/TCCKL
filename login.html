@@ -56,18 +56,31 @@
 
      
         document.querySelector('.formLogin').addEventListener('submit', function(event) {
-        event.preventDefault(); // Evita o envio do formulário
+    event.preventDefault(); // Evita o envio do formulário
 
-        const email = document.getElementById('email').value.trim();
+    const email = document.getElementById('email').value.trim();
 
-        if (email.endsWith('@edu.ifc.br')) {  // Verifica o domínio do email
-            window.location.href = 'telafunc.html'; // Redireciona para funcionário
-        } else {
-            window.location.href = 'telaresp.html'; // Redireciona para responsável
-        }
-        });
+    const senha = document.getElementById('senha').value;
 
+// Busca usuários salvos
+const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
+// Procura um usuário com o mesmo email e senha
+const usuarioValido = usuarios.find(user => user.email === email && user.senha === senha);
+
+if (usuarioValido) {
+    // Login bem-sucedido
+    localStorage.setItem('usuarioEmail', email); // opcional
+    if (email.endsWith('@edu.ifc.br')) {
+        window.location.href = 'telafunc.html';
+    } else {
+        window.location.href = 'telaresp.html';
+    }
+} else {
+    alert('E-mail ou senha incorretos.');
+}
+
+});
     </script>
     <script src="/js/logo.js"></script>
 </body>

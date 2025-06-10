@@ -111,6 +111,7 @@ button#concluir {
   border-radius: 50px;
   text-align: center;
   display: inline-block;
+  font-family: 'Questrial', sans-serif;
 }
 
 /*efeito de hover no botão*/

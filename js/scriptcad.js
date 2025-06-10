@@ -1,19 +1,42 @@
-// função do olho na senha
-    function togglePassword(id) {
-        var passwordField = document.getElementById(id);
-        var type = passwordField.type === "password" ? "text" : "password";
-        passwordField.type = type;
+// Função do olho na senha (mantida)
+function togglePassword(id) {
+  const passwordField = document.getElementById(id);
+  const type = passwordField.type === "password" ? "text" : "password";
+  passwordField.type = type;
+}
+
+// Validação e armazenamento no localStorage
+document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+  if (senha !== confirmarSenha) {
+    alert("As senhas não coincidem.");
+    return;
   }
-  
-  // validação do formulário
-    document.getElementById('cadastroForm').addEventListener('submit', function(event) {
-        var senha = document.getElementById('senha').value;
-        var confirmarSenha = document.getElementById('confirmarSenha').value;
-  
-    // verifica se as senhas são iguais
-    if (senha !== confirmarSenha) {
-      event.preventDefault(); // Impede o envio do formulário
-      alert("As senhas não coincidem. Por favor, verifique.");
-    }
-  });
-  
+
+  // Busca os usuários já cadastrados (ou array vazio se não houver nenhum)
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+  // Verifica se o e-mail já está cadastrado
+  const emailExistente = usuarios.some(user => user.email === email);
+
+  if (emailExistente) {
+    alert("Este e-mail já está cadastrado.");
+    return;
+  }
+
+  // Adiciona novo usuário
+  usuarios.push({ email, senha });
+
+  // Salva no localStorage
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+  alert("Cadastro realizado com sucesso!");
+
+  // Redireciona para login
+  window.location.href = "login.html";
+});
