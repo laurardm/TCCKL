@@ -98,7 +98,7 @@ select {
 
 /*estilo para o botão de envio*/
 button#concluir {
-  background-color: #ffa7c6; /* Cor de fundo do botão */
+  background-color: #ffa7c6; 
   color: #fff;
   font-size: 14px;
   font-weight: 600;
@@ -107,13 +107,34 @@ button#concluir {
   transition: all linear 160ms;
   cursor: pointer;
   margin: 20px auto 1px;
-  padding: 10px;
+  padding: 11px;
   border-radius: 50px;
   text-align: center;
-  display: block;
+  display: inline-block;
 }
 
 /*efeito de hover no botão*/
-button#concluir:hover {
+button#concluir:hover,
+a:hover {
   transform: scale(1.05); /*leve aumento de tamanho quando o botão é hover*/
+}
+
+a{
+  background-color: #ffa7c6; 
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  width: 130px;
+  transition: all linear 160ms;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 50px;
+  margin-left: 45px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+}
+
+input[type="date"] {
+  font-family: "Questrial", sans-serif;
 }
