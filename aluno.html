@@ -4,24 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Editar Aluno</title>
-  <link rel="stylesheet" href="/css/turmas.css" />
+  <link rel="stylesheet" href="/css/aluno.css" /> <!--fiz um css de teste mas ficou feio-->
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/logo.css" />
 </head>
 <body>
-
+<div class="editar-container">
   <h1>Editar Aluno</h1>
 
-  <div class="editar-container">
-    <img id="fotoAluno" src="/imagens/perfil.png" alt="Foto do Aluno" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;" />
-    <br>
-    <input type="file" id="inputFoto" accept="image/*" />
-    <br><br>
-    <label for="nomeAluno">Nome:</label>
-    <input type="text" id="nomeAluno" />
-    <br><br>
-    <button id="salvarAluno">Salvar</button>
-    <a href="turmas/turmab1.html"><button id="voltar">Voltar</button></a>
+  <div class="foto-container">
+  <img id="fotoAluno" src="/imagens/perfil.png" alt="Foto do Aluno" />
+  <label for="inputFoto" class="label-foto">Selecionar Foto</label>
+  <input type="file" id="inputFoto" accept="image/*" hidden>
   </div>
 
+    <div class="campo-form">
+  <label for="nomeAluno">Nome:</label>
+  <input type="text" id="nomeAluno" />
+</div>
+
+    <div class="botoes-container">
+    <button id="salvarAluno">Salvar</button>
+    <a href="/turmas/turmab1.html"><button id="voltar">Voltar</button></a> <!--tem que rever essa linha, está sempre direcionando à turma b1-->
+  </div>
+</div>
+</div>
+
+  <div id="footer"></div>
+  <div id="logo"></div>
+
   <script src="/js/aluno.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/logo.js"></script>
 </body>
 </html>
