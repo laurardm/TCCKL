@@ -25,7 +25,7 @@ body {
       color: white;
     }
 
- .flecha {
+.flecha {
       position: absolute;
       top: 50px;
       left: 10px;
@@ -40,6 +40,7 @@ body {
   font-size: 1.8em;
   margin-bottom: 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-top: -80px;
 }
 
 .container-alunos {
@@ -97,4 +98,3 @@ body {
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
