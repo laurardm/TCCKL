@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/elogin.css">
+    <link rel="stylesheet" href="/css/logo.css">
+</head>
+<body>
+    <div class="page">
+        <form method="POST" class="formLogin" action="/login">
+            <img src="/imagens/fotosiei.png" alt="logo">
+
+            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required/>
+            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required/>
+
+            <a href="/" class="link-esqueci">Esqueceu a senha?</a>
+
+            <input type="submit" value="Entrar" class="entrar" />
+
+            <p class="cadastro-texto">
+                Não possui login? <a href="/cadastro" class="link-cadastro">Cadastre-se!</a>
+            </p>
+        </form>
+    </div>
+
+    <div class="rodape">
+        <div class="carrossel">
+            <span id="frase">
+                A educação infantil é o primeiro passo para um futuro brilhante.
+            </span>
+        </div>
+    </div>
+
+    <div id="logo"></div>
+
+    <script>
+        const frases = [
+            "A natureza estimula a curiosidade e o aprendizado...",
+            "O brincar é essencial para o desenvolvimento infantil...",
+            "Educar e cuidar são inseparáveis na educação infantil...",
+            "A curiosidade infantil impulsiona o aprendizado...",
+            "Segundo o artigo 4º inciso II..."
+        ];
+
+        let fraseAtual = 0;
+        const fraseElemento = document.getElementById('frase');
+
+        setInterval(() => {
+            fraseAtual = (fraseAtual + 1) % frases.length;
+            fraseElemento.innerText = frases[fraseAtual];
+        }, 10000);
+    </script>
+
+    <script src="../js/logo.js"></script>
+</body>
+</html>

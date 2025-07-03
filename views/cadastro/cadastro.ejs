@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro de Usuário</title>
+  <link rel="stylesheet" href="/css/ecad.css">
+  <link rel="stylesheet" href="/css/logo.css">
+</head>
+<body>
+  <div class="form-container">
+    <h2>Cadastro de usuário</h2>
+    <form id="cadastroForm" method="POST" action="/cadastro">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" placeholder="seuemail@gmail.com" required>
+
+      <label for="data">Data de nascimento</label>
+      <input type="date" id="data" name="data" placeholder="DD/MM/AAAA" required>
+
+      <label for="genero">Gênero</label>
+      <select id="genero" name="genero" required>
+        <option value="feminino">feminino</option>
+        <option value="masculino">masculino</option>
+        <option value="outro">outro</option>
+      </select>
+
+      <label for="senha">Senha</label>
+      <div class="senha-container">
+        <input type="password" id="senha" name="senha" required>
+        <span class="olho" onclick="togglePassword('senha')">&#128065;</span>
+      </div>
+
+      <label for="confirmarSenha">Confirmar senha</label>
+      <div class="senha-container">
+        <input type="password" id="confirmarSenha" name="confirmarSenha" required>
+        <span class="olho" onclick="togglePassword('confirmarSenha')">&#128065;</span>
+      </div>
+
+      <a href="/">Voltar</a>
+      <button id="concluir" type="submit">Concluir</button>
+    </form>
+  </div>
+  <div id="logo"></div>
+  <script src="/js/scriptcad.js"></script>
+  <script src="/js/logo.js"></script>
+</body>
+</html>
