@@ -1,4 +1,3 @@
-drop database sistema;
 create database sistema;
 use sistema;
 

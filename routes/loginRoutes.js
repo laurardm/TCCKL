@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-res.render('/login', {erro: null});
+router.get('/login', (req, res) => {
+  res.render('login', { erro: null });
+});
 
 //logando func
 router.post('/login', (req, res) => {

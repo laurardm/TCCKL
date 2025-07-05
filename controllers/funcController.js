@@ -38,7 +38,7 @@ const funcController = {
         });
     },
 
-    getAllFunc: (req, res) => {
+    getAllFuncs: (req, res) => {
         Func.getAll((err, func) => {
             if (err) {
                 return res.status(500).json({ error: err });

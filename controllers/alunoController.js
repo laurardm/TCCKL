@@ -1,5 +1,5 @@
 const Aluno = require('../models/alunoModel');
-const Turmas = require('../models/turmasModel');
+const Turmas = require('../models/turmaModel');
 
 const alunoController = {
 

@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+app.use(express.static(__dirname + '/public'));
 app.use(expressLayouts);
 
 app.use(bodyParser.json());
@@ -25,7 +26,7 @@ app.use('/', loginRoutes);
 app.use('/aluno', alunoRoutes);
 app.use('/cadastro', cadastroRoutes);
 app.use('/func', funcRoutes);
-app.use('/perfil', perfilRoutes);
+//app.use('/perfil', perfilRoutes);
 app.use('/resp', respRoutes);
 app.use('/turma', turmaRoutes);
 
