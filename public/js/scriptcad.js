@@ -1,29 +1,27 @@
-//————————————————————————————————— função do olho
 function togglePassword(id) {
   const passwordField = document.getElementById(id);
-  const type = passwordField.type === "password" ? "text" : "password";
-  passwordField.type = type;
+  passwordField.type = passwordField.type === "password" ? "text" : "password";
 }
 
-//————————————————————————————————— envio para o backend (substitui o localStorage)
 document.getElementById('cadastroForm').addEventListener('submit', function(event) {
   event.preventDefault();
 
+  const nome = document.getElementById('nome').value.trim();
   const email = document.getElementById('email').value.trim();
   const senha = document.getElementById('senha').value;
   const confirmarSenha = document.getElementById('confirmarSenha').value;
-  const data = document.getElementById('data').value;
-  const genero = document.getElementById('genero').value;
+  const data_nasc = document.getElementById('data_nasc').value;
+  const genero = parseInt(document.getElementById('genero').value);
 
   if (senha !== confirmarSenha) {
     alert("As senhas não coincidem.");
     return;
   }
 
-  fetch('/api/cadastrar', {
+  fetch('/cadastro/resp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, senha, data, genero })
+    body: JSON.stringify({ nome, email, senha, data_nasc, genero })
   })
   .then(response => {
     if (!response.ok) {
@@ -31,9 +29,11 @@ document.getElementById('cadastroForm').addEventListener('submit', function(even
     }
     return response.text();
   })
-  .then(message => {
-    alert(message);
-    window.location.href = "login.html";
+  .then(() => {
+    alert("Cadastro realizado com sucesso!");
+    window.location.href = "/login";  // redireciona para a página login
   })
-  .catch(err => alert(err.message));
+  .catch(err => {
+    alert("Erro ao cadastrar: " + err.message);
+  });
 });

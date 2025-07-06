@@ -2,11 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const expressLayouts = require('express-ejs-layouts');
+
 const loginRoutes = require('./routes/loginRoutes');
 const alunoRoutes = require('./routes/alunoRoutes');
 const cadastroRoutes = require('./routes/cadastroRoutes');
 const funcRoutes = require('./routes/funcRoutes');
-const perfilRoutes = require('./routes/perfilRoutes');
+//const perfilRoutes = require('./routes/perfilRoutes');
 const respRoutes = require('./routes/respRoutes');
 const turmaRoutes = require('./routes/turmaRoutes');
 

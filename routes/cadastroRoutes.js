@@ -7,42 +7,39 @@ router.get('/', (req, res) => {
   res.render('cadastro/cadastro', { erro: null, sucesso: null });
 });
 
-// Cadastro de funcionário
-router.post('/func', (req, res) => {
-  const { cod, nome, data_nasc, email, telefone, foto, matricula, senha, cargo, genero, turma } = req.body;
-
-  const query = `
-    INSERT INTO funcionario 
-    (cod, nome, data_nasc, email, telefone, foto, matricula, senha, cargo, genero, turma) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  db.query(query, [cod, nome, data_nasc, email, telefone, foto, matricula, senha, cargo, genero, turma], (err) => {
-    if (err) {
-      console.log(err);
-      return res.render('cadastro', { erro: 'Erro ao cadastrar funcionário.', sucesso: null });
-    }
-
-    res.render('cadastro', { erro: null, sucesso: 'Funcionário cadastrado com sucesso!' });
-  });
-});
-
-// Cadastro de responsável
+// Rota POST para cadastrar responsável
 router.post('/resp', (req, res) => {
-  const { cod, nome, data_nasc, email, foto, senha, genero, parentesco } = req.body;
+  const { nome, email, senha, data_nasc, genero } = req.body;
 
-  const query = `
-    INSERT INTO responsavel 
-    (cod, nome, data_nasc, email, foto, senha, genero, parentesco) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  if (!nome || !email || !senha || !data_nasc || !genero) {
+    return res.status(400).send('Todos os campos são obrigatórios.');
+  }
 
-  db.query(query, [cod, nome, data_nasc, email, foto, senha, genero, parentesco], (err) => {
+  // Verifica se o e-mail já está cadastrado
+  const verificarSql = `SELECT * FROM responsaveis WHERE email = ?`;
+  db.query(verificarSql, [email], (err, results) => {
     if (err) {
-      console.log(err);
-      return res.render('cadastro', { erro: 'Erro ao cadastrar responsável.', sucesso: null });
+      console.error('Erro ao verificar e-mail:', err);
+      return res.status(500).send('Erro no servidor ao verificar e-mail.');
     }
 
-    res.render('cadastro', { erro: null, sucesso: 'Responsável cadastrado com sucesso!' });
+    if (results.length > 0) {
+      return res.status(409).send('Este e-mail já está cadastrado.');
+    }
+
+    // Insere o novo responsável se o e-mail não existe
+    const inserirSql = `
+      INSERT INTO responsaveis (nome, email, senha, data_nasc, genero)
+      VALUES (?, ?, ?, ?, ?)`;
+
+    db.query(inserirSql, [nome, email, senha, data_nasc, genero], (err, result) => {
+      if (err) {
+        console.error('Erro no banco ao inserir:', err);
+        return res.status(500).send('Erro ao cadastrar: ' + err.message);
+      }
+      res.status(200).send('Cadastro realizado com sucesso');
+    });
   });
 });
 
-module.exports = router; // ✅ ISSO É ESSENCIAL!
+module.exports = router;
