@@ -36,24 +36,35 @@
 
     <div id="logo"></div>
 
+    <!-- Script do carrossel de frases -->
     <script>
-        const frases = [
-            "A natureza estimula a curiosidade e o aprendizado...",
-            "O brincar é essencial para o desenvolvimento infantil...",
-            "Educar e cuidar são inseparáveis na educação infantil...",
-            "A curiosidade infantil impulsiona o aprendizado...",
-            "Segundo o artigo 4º inciso II..."
-        ];
+        // Evita execução duplicada
+        if (!window.carrosselIniciado) {
+            window.carrosselIniciado = true;
 
-        let fraseAtual = 0;
-        const fraseElemento = document.getElementById('frase');
+            const frases = [
+                "A natureza estimula a curiosidade e o aprendizado...",
+                "O brincar é essencial para o desenvolvimento infantil...",
+                "Educar e cuidar são inseparáveis na educação infantil...",
+                "A curiosidade infantil impulsiona o aprendizado...",
+                "Segundo o artigo 4º inciso II do ECA..."
+            ];
 
-        setInterval(() => {
-            fraseAtual = (fraseAtual + 1) % frases.length;
-            fraseElemento.innerText = frases[fraseAtual];
-        }, 10000);
+            let fraseAtual = 0;
+            const fraseElemento = document.getElementById('frase');
+
+            if (fraseElemento) {
+                setInterval(() => {
+                    fraseAtual = (fraseAtual + 1) % frases.length;
+                    fraseElemento.innerText = frases[fraseAtual];
+                }, 2000); // 5 segundos
+            } else {
+                console.error("Elemento #frase não encontrado!");
+            }
+        }
     </script>
 
+    <!-- Script do logo (garanta que ele não tem carrossel duplicado) -->
     <script src="../js/logo.js"></script>
 </body>
 </html>

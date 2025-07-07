@@ -31,7 +31,7 @@ document.getElementById('cadastroForm').addEventListener('submit', function(even
   })
   .then(() => {
     alert("Cadastro realizado com sucesso!");
-    window.location.href = "/login";  // redireciona para a página login
+    window.location.href = "/";  // redireciona para a página login
   })
   .catch(err => {
     alert("Erro ao cadastrar: " + err.message);

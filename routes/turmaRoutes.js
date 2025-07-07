@@ -4,9 +4,9 @@ const router = express.Router();
 
 router.get('/', turmaController.getAllTurma);
 router.get('/new', turmaController.renderCreateForm);
-router.post('/', turmaController.createTurma);
+router.get('/:cod/edit', turmaController.renderEditForm); // mover esta linha para cima
 router.get('/:cod', turmaController.getTurmaByCod);
-router.get('/:cod/edit', turmaController.renderEditForm);
+router.post('/', turmaController.createTurma);
 router.put('/:cod', turmaController.updateTurma);
 router.delete('/:cod', turmaController.deleteTurma);
 
