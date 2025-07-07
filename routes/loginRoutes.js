@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-router.get('/login', (req, res) => {
+router.get('/', (req, res) => {
   res.render('login/login', { erro: null });
 });
 
-router.post('/login', (req, res) => {
+router.post('/', (req, res) => {
   const { email, senha } = req.body;
 
   if (!email || !senha) {
