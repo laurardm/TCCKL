@@ -9,7 +9,7 @@ const loginRoutes = require('./routes/loginRoutes');
 const alunoRoutes = require('./routes/alunoRoutes');
 const cadastroRoutes = require('./routes/cadastroRoutes');
 const funcRoutes = require('./routes/funcRoutes');
-// const perfilRoutes = require('./routes/perfilRoutes');
+const perfilRoutes = require('./routes/perfilRoutes');
 const respRoutes = require('./routes/respRoutes');
 const turmaRoutes = require('./routes/turmaRoutes');
 
@@ -43,7 +43,7 @@ app.use('/', loginRoutes);
 app.use('/aluno', alunoRoutes);
 app.use('/cadastro', cadastroRoutes);
 app.use('/func', funcRoutes);
-// app.use('/perfil', perfilRoutes);
+app.use('/perfil', perfilRoutes);
 app.use('/resp', respRoutes);
 app.use('/turma', turmaRoutes);
 

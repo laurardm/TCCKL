@@ -1,79 +1,83 @@
-//————————————————————————————————— impede datas futuas nos campos
-const hoje = new Date().toISOString().split('T')[0]; // pega a data de hoje no formato yyyy-mm-dd
-  document.getElementById('data').setAttribute('max', hoje); // define o valor máximo permitido no campo data
+// Impede datas futuras no campo data
+const hoje = new Date().toISOString().split('T')[0];
+const dataInput = document.getElementById('data');
+dataInput.setAttribute('max', hoje);
 
-//————————————————————————————————— carrega os dados do localstorage e preenche os campos
-const perfil = JSON.parse(localStorage.getItem('perfil')) || {}; // pega os dados salvos no localStorage ou usa objeto vazio
-  document.getElementById('nome').value = perfil.nome || ''; // preenche o campo nome se tiver
-  document.getElementById('email').value = perfil.email || ''; // preenche o campo email se tiver
-  document.getElementById('celular').value = perfil.celular || ''; // preenche o campo celular se tiver
-  document.getElementById('data').value = perfil.dataNascimento || ''; // preenche o campo data de nascimento se tiver
-  document.getElementById('turmas').value = perfil.turmas || ''; // preenche o campo turmas se tiver
-  document.getElementById('cargo').value = perfil.cargo || ''; // preenche o campo cargo se tiver
-const editarBtn = document.getElementById('editar'); // seleciona o botão editar
-const salvarBtn = document.getElementById('salvar'); // salvar
-const voltarBtn = document.getElementById('voltar'); // voltar
+// Seleciona botões e inputs
+const editarBtn = document.getElementById('editar');
+const salvarBtn = document.getElementById('salvar');
+const voltarBtn = document.getElementById('voltar');
+const inputs = document.querySelectorAll('#perfilForm input, #perfilForm select');
 
-//————————————————————————————————— esconde o botão de salvar no inicio
-salvarBtn.style.display = 'none'; 
+// Inicializa campos com dados do localStorage
+const perfil = JSON.parse(localStorage.getItem('perfil')) || {};
+document.getElementById('nome').value = perfil.nome || '';
+document.getElementById('email').value = perfil.email || '';
+document.getElementById('celular').value = perfil.celular || '';
+dataInput.value = perfil.dataNascimento || '';
+document.getElementById('turmas').value = perfil.turmas || '';
+document.getElementById('cargo').value = perfil.cargo || '';
+document.getElementById('nomeDisplay').textContent = perfil.nome || 'Nome';
 
-//————————————————————————————————— ativa a edição
-editarBtn.addEventListener('click', () => { // quando clicar no botão editar
-  const inputs = document.querySelectorAll('#perfilForm input, #perfilForm select'); // pega todos os inputs e selects do formulário
-  inputs.forEach(input => input.disabled = false); // ativa todos os campos para edição
-  editarBtn.style.display = 'none'; // esconde o botão editar
-  salvarBtn.style.display = 'inline-block'; // mostra o botão salvar
+// Estado inicial: inputs desabilitados, botão salvar escondido
+inputs.forEach(input => input.disabled = true);
+salvarBtn.style.display = 'none';
+
+// Função para habilitar/desabilitar inputs
+function setInputsDisabled(disabled) {
+  inputs.forEach(input => input.disabled = disabled);
+}
+
+// Evento: clicar em Editar
+editarBtn.addEventListener('click', () => {
+  setInputsDisabled(false);        // habilita inputs
+  editarBtn.style.display = 'none';
+  salvarBtn.style.display = 'inline-block';
 });
 
+// Evento: clicar em Salvar
+salvarBtn.addEventListener('click', () => {
+  const dataNascimento = dataInput.value;
 
-salvarBtn.addEventListener('click', () => { //salva os dados quando clicar no botão salvar
-  const dataInput = document.getElementById('data'); // seleciona o input da data de nascimento
-  const dataNascimento = dataInput.value; // pega o valor da data
-  const hoje = new Date().toISOString().split('T')[0]; // pega a data atual novamente
-
-  //————————————————————————————————— Validação de data futura
-  if (dataNascimento > hoje) { // se a data digitada for maior que hoje
-    alert('A data de nascimento não pode ser no futuro.'); // mostra alerta de erro
-    dataInput.classList.add('erro'); // adiciona uma classe de erro no input
-    return; // cancela o salvamento
+  // Validação data futura
+  if (dataNascimento > hoje) {
+    alert('A data de nascimento não pode ser no futuro.');
+    dataInput.classList.add('erro');
+    return;
   } else {
-    dataInput.classList.remove('erro'); // remove a classe de erro se a data estiver correta
+    dataInput.classList.remove('erro');
   }
 
-  //————————————————————————————————— cria um objeto com os dados atualizados
+  // Atualiza objeto perfil e salva no localStorage
   const perfilAtualizado = {
-    nome: document.getElementById('nome').value,
-    email: document.getElementById('email').value,
-    celular: document.getElementById('celular').value,
+    nome: document.getElementById('nome').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    celular: document.getElementById('celular').value.trim(),
     dataNascimento: dataNascimento,
-    turmas: document.getElementById('turmas').value,
-    cargo: document.getElementById('cargo').value
+    turmas: document.getElementById('turmas').value.trim(),
+    cargo: document.getElementById('cargo').value.trim()
   };
 
-//————————————————————————————————— local storage
-  localStorage.setItem('perfil', JSON.stringify(perfilAtualizado)); // salva os dados no localStorage
+  localStorage.setItem('perfil', JSON.stringify(perfilAtualizado));
 
-  const inputs = document.querySelectorAll('#perfilForm input, #perfilForm select'); // seleciona novamente os campos
-  inputs.forEach(input => input.disabled = true); // desativa a edição
-  salvarBtn.style.display = 'none'; // esconde o botão salvar
-  editarBtn.style.display = 'inline-block'; // mostra o botão editar novamente
-  alert('Alterações salvas com sucesso!'); // mostra alerta de sucesso
+  // Atualiza display do nome
+  document.getElementById('nomeDisplay').textContent = perfilAtualizado.nome || 'Nome';
+
+  // Desabilita inputs e ajusta botões
+  setInputsDisabled(true);
+  salvarBtn.style.display = 'none';
+  editarBtn.style.display = 'inline-block';
+
+  alert('Alterações salvas com sucesso!');
 });
 
-//————————————————————————————————— botão de voltar
-voltarBtn.addEventListener('click', () => { // quando clicar em voltar
-  window.history.back(); // volta para a página anterior
+// Evento: clicar em Voltar
+voltarBtn.addEventListener('click', () => {
+  window.history.back();
 });
 
-//————————————————————————————————— exibição do nome
-document.getElementById('nome').addEventListener('input', function () { // escuta o que é digitado no nome
-  const nomeDigitado = this.value.trim(); // remove espaços no início e fim
-  document.getElementById('nomeDisplay').textContent = nomeDigitado || "Nome"; // atualiza a exibição do nome
-});
-
-//————————————————————————————————— habilita os campos para editar
-document.getElementById('editar').addEventListener('click', function () { // ao clicar em editar
-  document.querySelectorAll('#perfilForm input, #perfilForm select').forEach(el => { // pega todos os campos
-    el.disabled = false; // ativa todos os campos para edição
-  });
+// Evento: atualiza nome em tempo real no display
+document.getElementById('nome').addEventListener('input', function () {
+  const nomeDigitado = this.value.trim();
+  document.getElementById('nomeDisplay').textContent = nomeDigitado || 'Nome';
 });

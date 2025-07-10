@@ -20,15 +20,18 @@ router.post('/', (req, res) => {
       return res.render('login/login', { erro: 'Erro no servidor.' });
     }
 
+    //verifica se há mais de uma senha pro mesmo usuário e libera a utilização das mesmas
     if (resultsResp.length > 0) {
-      const user = resultsResp[0];
-      if (user.senha !== senha) {
-        return res.render('login/login', { erro: 'Senha incorreta.' });
-      }
+    const usuarioValido = resultsResp.find(user => user.senha === senha);
 
-      req.session.usuario = user;
-      return res.redirect('/resp');
+    if (!usuarioValido) {
+      return res.render('login/login', { erro: 'Senha incorreta.' });
     }
+
+    req.session.usuario = usuarioValido;
+    return res.redirect('/resp');
+  }
+
 
     // Tenta como funcionário (matrícula)
     db.query('SELECT * FROM funcionario WHERE matricula = ?', [email], (err, resultsFunc) => {

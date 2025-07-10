@@ -1,13 +1,9 @@
 const express = require('express');
-const turmaController = require('../controllers/turmaController');
 const router = express.Router();
+const db = require('../config/db');
 
-router.get('/', turmaController.getAllTurma);
-router.get('/new', turmaController.renderCreateForm);
-router.get('/:cod/edit', turmaController.renderEditForm); // mover esta linha para cima
-router.get('/:cod', turmaController.getTurmaByCod);
-router.post('/', turmaController.createTurma);
-router.put('/:cod', turmaController.updateTurma);
-router.delete('/:cod', turmaController.deleteTurma);
+router.get('/', (req, res) => {
+  res.render('turma/index');
+});
 
 module.exports = router;

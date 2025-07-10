@@ -26,17 +26,12 @@
         <input type="tel" id="celular" value="<%= celular %>" disabled>
         <label for="turmas">Turmas</label>
         <input type="text" id="turmas" value="<%= turmas %>" disabled>
-        <label for="cargo">Cargo</label>
-        <select id="cargo" disabled>
-          <option <%= cargo === 'Professor' ? 'selected' : '' %>>Professor</option>
-          <option <%= cargo === 'Estagiário' ? 'selected' : '' %>>Estagiário</option>
-          <option <%= cargo === 'Diretor' ? 'selected' : '' %>>Diretor</option>
         </select>
       </form>
       <div class="botoes">
-        <a href="/telafunc"><button id="voltar">Voltar</button></a>
+        <a href="/func"><button id="voltar">Voltar</button></a>
         <button id="editar">Editar</button>
-        <button id="salvar">Salvar</button>
+        <button id="salvar" disabled>Salvar</button>
       </div>
     </div>
   </div>
