@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Perfil do Funcionário</title>
-  <link rel="stylesheet" href="/css/perfilprof.css">
-  <link rel="stylesheet" href="/css/footer.css">
-  <link rel="stylesheet" href="/css/logo.css">
+  <link rel="stylesheet" href="/css/perfilprof.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/logo.css" />
 </head>
 <body>
   <div class="foto">
@@ -15,28 +15,36 @@
       <p id="nomeDisplay"><%= nome %></p>
     </div>
     <div class="form-container">
-      <form id="perfilForm">
+      <% if (erro) { %>
+        <div class="erro-msg" style="color:red; margin-bottom: 10px;"><%= erro %></div>
+      <% } %>
+      <form id="perfilForm" method="POST" action="/perfil">
         <label for="nome">Nome</label>
-        <input type="text" id="nome" value="<%= nome %>" disabled>
+        <input type="text" id="nome" name="nome" value="<%= nome %>" disabled required />
+
         <label for="data">Data de nascimento</label>
-        <input type="date" id="data" value="<%= dataNascimento %>" disabled>
+        <input type="date" id="data" name="data_nasc" value="<%= data_nasc %>" disabled required />
+
         <label for="email">E-mail</label>
-        <input type="email" id="email" value="<%= email %>" disabled>
+        <input type="email" id="email" name="email" value="<%= email %>" disabled required />
+
         <label for="celular">Telefone</label>
-        <input type="tel" id="celular" value="<%= celular %>" disabled>
+        <input type="tel" id="celular" name="telefone" value="<%= celular %>" disabled required />
+
         <label for="turmas">Turmas</label>
-        <input type="text" id="turmas" value="<%= turmas %>" disabled>
-        </select>
+        <input type="text" id="turmas" value="<%= turmas %>" disabled />
+
+        <div class="botoes">
+          <button type="button" id="voltar">Voltar</button>
+          <button type="button" id="editar">Editar</button>
+          <button type="submit" id="salvar" disabled>Salvar</button>
+        </div>
       </form>
-      <div class="botoes">
-        <a href="/func"><button id="voltar">Voltar</button></a>
-        <button id="editar">Editar</button>
-        <button id="salvar" disabled>Salvar</button>
-      </div>
     </div>
   </div>
   <div id="footer"></div>
   <div id="logo"></div>
+
   <script src="/js/perfilfunc.js"></script>
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>

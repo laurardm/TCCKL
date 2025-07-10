@@ -4,7 +4,7 @@ const db = require('../config/db');
 
 // Página inicial do responsável
 router.get('/', (req, res) => {
-  res.render('resp/index'); 
+  res.render('resp/index', {erro: null}); 
 });
 
 module.exports = router;
