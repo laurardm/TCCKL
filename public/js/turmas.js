@@ -1,146 +1,137 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Pega o nome da turma a partir do título na página (ex: "B1")
   const nomeTurma = document.querySelector(".turma-titulo").textContent.trim();
-
-  // Função que retorna a chave única de armazenamento com base na turma e ID do aluno
-  const chaveAluno = (id) => `aluno-${nomeTurma}-${id}`;
-
-  // Seleciona os botões da interface
-  const btnFotos = document.getElementById("btnFotos");
+  const alunosContainer = document.querySelector(".grade-alunos");
   const btnAdicionar = document.getElementById("btnAdicionar");
   const btnEditar = document.getElementById("btnEditar");
   const btnSalvar = document.getElementById("btnSalvar");
 
-  // Seleciona o container onde os alunos serão exibidos
-  const alunosContainer = document.querySelector(".grade-alunos");
-
-  // Variável que define se o modo de edição está ativado
   let modoEdicao = false;
 
-//————————————————————————————————— função para carregar os alunos no LS
-  function carregarAlunos() {
-    alunosContainer.innerHTML = ""; // Limpa o container antes de adicionar os alunos
-
-    for (let i = 0; i < 12; i++) {
-      // Tenta carregar um aluno do localStorage usando a chave gerada
-      let aluno = JSON.parse(localStorage.getItem(chaveAluno(i)));
-
-      // Se não existir nenhum aluno salvo, cria um aluno genérico
-      if (!aluno) {
-        aluno = { nome: `Fulano ${i + 1}`, foto: "/imagens/perfil.png" };
-      }
-
-      // Cria o elemento do aluno com nome e foto, e adiciona no container
-      const divAluno = criarAlunoElemento(i, aluno.nome, aluno.foto);
-      alunosContainer.appendChild(divAluno);
+  // Calcular idade a partir da data de nascimento
+  function calcularIdade(dataNasc) {
+    const nascimento = new Date(dataNasc);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const mes = hoje.getMonth() - nascimento.getMonth();
+    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
     }
+    return idade;
   }
 
-//————————————————————————————————— cria o html de um aluno na tela :)
-  function criarAlunoElemento(id, nome, foto) {
-    const div = document.createElement("div"); // Cria uma div
-    div.classList.add("aluno"); // Adiciona a classe CSS "aluno"
-    div.dataset.id = id; // Salva o ID como um atributo da div
+  async function carregarAlunos() {
+    alunosContainer.innerHTML = "";
+    const resp = await fetch(`/alunos/${nomeTurma}`);
+    const alunos = await resp.json();
 
-    // Define o HTML do aluno: uma imagem e um nome
-    div.innerHTML = `<img src="${foto}" alt="Foto do aluno"><span>${nome}</span>`;
+    alunos.forEach(aluno => {
+      const div = criarAlunoElemento(aluno.cod, aluno.nome, aluno.data_nasc, aluno.foto || "/imagens/perfil.png");
+      alunosContainer.appendChild(div);
+    });
+  }
 
-    // Quando clica no aluno (se não estiver editando), abre a página individual dele
-    div.addEventListener("click", () => {
-      if (!modoEdicao) {
-        window.location.href = `/aluno.html?id=${id}&turma=${nomeTurma}&retorno=${encodeURIComponent(window.location.pathname)}`;
+  function criarAlunoElemento(id, nome, data_nasc, foto) {
+    const idade = calcularIdade(data_nasc);
+    const div = document.createElement("div");
+    div.classList.add("aluno");
+    div.dataset.id = id;
+
+    div.innerHTML = `
+      <img src="${foto}" alt="Foto do aluno">
+      <span class="nome">${nome}</span>
+      <small class="info">${idade} anos - ${data_nasc}</small>
+    `;
+
+    if (!modoEdicao) {
+      div.addEventListener("click", () => {
+        window.location.href = `/aluno/${id}`;
+      });
+    }
+
+    return div;
+  }
+
+  btnEditar?.addEventListener("click", () => {
+    modoEdicao = true;
+    alunosContainer.querySelectorAll(".aluno").forEach(div => {
+      const nomeSpan = div.querySelector(".nome");
+      nomeSpan.setAttribute("contenteditable", true);
+      nomeSpan.style.borderBottom = "1px dashed black";
+
+      // Adiciona campo de edição de foto
+      if (!div.querySelector("input[type='text']")) {
+        const fotoInput = document.createElement("input");
+        fotoInput.type = "text";
+        fotoInput.placeholder = "URL da nova foto";
+        fotoInput.classList.add("input-foto");
+        div.appendChild(fotoInput);
+      }
+
+      adicionarBotaoExcluir(div);
+    });
+  });
+
+  btnSalvar?.addEventListener("click", async () => {
+    modoEdicao = false;
+
+    const edits = alunosContainer.querySelectorAll(".aluno");
+    for (const div of edits) {
+      const id = div.dataset.id;
+      const nome = div.querySelector(".nome").innerText.trim();
+      const inputFoto = div.querySelector("input[type='text']");
+      const novaFoto = inputFoto?.value.trim() || div.querySelector("img").src;
+
+      await fetch(`/alunos/${id}`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, foto: novaFoto })
+      });
+    }
+
+    carregarAlunos();
+  });
+
+  btnAdicionar?.addEventListener("click", async () => {
+    const turmaRes = await fetch(`/alunos/${nomeTurma}`);
+    const alunos = await turmaRes.json();
+    const turmaId = alunos[0]?.turma;
+
+    const respAdd = await fetch('/alunos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: "Novo Aluno",
+        data_nasc: "2018-01-01",
+        turma_id: turmaId,
+        genero_id: 1,
+        agenda_id: 1,
+        foto: "/imagens/perfil.png"
+      })
+    });
+
+    const { id } = await respAdd.json();
+    const novo = criarAlunoElemento(id, "Novo Aluno", "2018-01-01", "/imagens/perfil.png");
+    adicionarBotaoExcluir(novo);
+    alunosContainer.appendChild(novo);
+  });
+
+  function adicionarBotaoExcluir(div) {
+    if (div.querySelector(".botao-excluir")) return;
+    const btn = document.createElement("button");
+    btn.textContent = "Excluir";
+    btn.classList.add("botao-excluir");
+
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (confirm("Deseja excluir este aluno?")) {
+        const id = div.dataset.id;
+        await fetch(`/alunos/${id}`, { method: "DELETE" });
+        div.remove();
       }
     });
 
-    return div; // Retorna a div criada
+    div.appendChild(btn);
   }
 
-//————————————————————————————————— botão de fotos turma
-  btnFotos.addEventListener("click", () => {
-    window.location.href = "/fotos-turma.html";
-  });
-
-  // -------------------------- botão adicionar aluno
-  btnAdicionar.addEventListener("click", () => {
-    if (!modoEdicao) return alert("Ative o modo edição para adicionar alunos.");
-
-    const novoId = alunosContainer.children.length; // Define o novo ID baseado na quantidade atual
-
-    // Cria o visual do novo aluno e adiciona botão de excluir
-    const novoAluno = criarAlunoElemento(novoId, "Novo Aluno", "/imagens/perfil.png");
-    adicionarBotaoExcluir(novoAluno); // Adiciona botão de excluir
-    alunosContainer.appendChild(novoAluno); // Adiciona à tela
-
-    // Salva o novo aluno no localStorage
-    localStorage.setItem(chaveAluno(novoId), JSON.stringify({ nome: "Novo Aluno", foto: "/imagens/perfil.png" }));
-  });
-
-  //————————————————————————————————— botão editar alunos 
-  btnEditar.addEventListener("click", () => {
-    modoEdicao = true; // Ativa modo edição
-
-    const spans = alunosContainer.querySelectorAll("span"); // Seleciona os nomes
-    spans.forEach(span => {
-      span.setAttribute("contenteditable", "true"); // Permite digitar diretamente no nome
-      span.style.borderBottom = "1px dashed #000"; // Adiciona uma linha para indicar que é editável
-    });
-
-    // Adiciona botão de excluir em cada aluno
-    alunosContainer.querySelectorAll(".aluno").forEach(divAluno => {
-      adicionarBotaoExcluir(divAluno);
-    });
-  });
-
-//————————————————————————————————— botão de salvar
-  btnSalvar.addEventListener("click", () => {
-    modoEdicao = false; // Sai do modo edição
-
-    const spans = alunosContainer.querySelectorAll("span");
-    spans.forEach(span => {
-      span.removeAttribute("contenteditable"); // Remove edição
-      span.style.borderBottom = "none"; // Remove o estilo de edição
-    });
-
-    // Remove todos os botões de excluir da tela
-    alunosContainer.querySelectorAll(".botao-excluir").forEach(btn => btn.remove());
-
-    // Salva cada aluno com os dados atuais
-    alunosContainer.querySelectorAll(".aluno").forEach(divAluno => {
-      const id = divAluno.dataset.id; // ID do aluno
-      const nome = divAluno.querySelector("span").innerText; // Nome editado
-      const foto = divAluno.querySelector("img").src; // Caminho da imagem
-      localStorage.setItem(chaveAluno(id), JSON.stringify({ nome, foto })); // Salva no localStorage
-    });
-  });
-
- //————————————————————————————————— função para adicionar um botão de excluir do lado
-  function adicionarBotaoExcluir(divAluno) {
-    // Verifica se o botão já existe (pra não duplicar)
-    if (divAluno.querySelector(".botao-excluir")) return;
-
-    const btnExcluir = document.createElement("button");
-    btnExcluir.textContent = "Excluir"; // Texto do botão
-    btnExcluir.classList.add("botao-excluir"); // Classe CSS para o botão
-
-    // Quando clicar no botão excluir
-    btnExcluir.addEventListener("click", (e) => {
-      e.stopPropagation(); // Impede o clique de ativar o evento da div
-
-      const id = divAluno.dataset.id;
-      const nome = divAluno.querySelector("span").innerText;
-
-      // Pergunta se tem certeza que quer excluir
-      if (confirm(`Deseja excluir o aluno "${nome}"?`)) {
-        localStorage.removeItem(chaveAluno(id)); // Remove do localStorage
-        divAluno.remove(); // Remove da tela
-        alert("Aluno excluído!"); // Confirma a exclusão
-      }
-    });
-
-    // Adiciona o botão ao card do aluno
-    divAluno.appendChild(btnExcluir);
-  }
-
-//————————————————————————————————— carrega os alunos automatico
   carregarAlunos();
 });

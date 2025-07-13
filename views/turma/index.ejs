@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tela Turmas</title>
+  <title>Turma <%= nomeTurma %></title>
   <link rel="stylesheet" href="/css/telaturmas.css">
   <link rel="stylesheet" href="/css/footer.css">
   <link rel="stylesheet" href="/css/logo.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap" rel="stylesheet">
 </head>
 <body>
+  
   <div class="caixabotao" id="turmasContainer">
-      <div class="botoes">
+    <div class="botoes">
       <a href="/turmas/turmab1"><button class="botao">B1</button></a>
       <a href="/turmas/turmab2a"><button class="botao">B2A</button></a>
       <a href="/turmas/turmab2b"><button class="botao">B2B</button></a>
@@ -24,11 +25,43 @@
       <a href="/turmas/turmap2a"><button class="botao">Pré 2A</button></a>
       <a href="/turmas/turmap2b"><button class="botao">Pré 2B</button></a>
     </div>
-    <a href="/resp"><button class="botaodevoltar">Voltar</button></a>
+
+  <h1 class="turma-titulo">Turma <%= nomeTurma.toUpperCase() %></h1>
+
+  <div class="grade-alunos">
+    <% alunos.forEach(aluno => { %>
+      <div class="aluno">
+        <img src="/imagens/perfil.png" alt="Foto de <%= aluno.nome %>">
+        <span><%= aluno.nome %></span>
+      </div>
+    <% }) %>
   </div>
+
+  <% if (usuario?.tipo === 'funcionario') { %>
+    <div class="botoes">
+      <button id="btnEditar">Editar turma</button>
+      <button id="btnSalvar">Salvar</button>
+      <button id="btnAdicionar">Adicionar aluno</button>
+    </div>
+  <% } %>
+
+  <button class="botaodevoltar" id="btnVoltar">Voltar</button>
+
   <div id="footer"></div>
   <div id="logo"></div>
+
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnVoltar = document.getElementById("btnVoltar");
+      if (btnVoltar) {
+        btnVoltar.addEventListener("click", () => {
+          history.back();
+        });
+      }
+    });
+  </script>
 </body>
 </html>

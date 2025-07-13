@@ -45,7 +45,7 @@ body {
 }
 
 /* Estilo para os campos de email e senha */
-.formLogin input[type="email"],
+.formLogin input[type="text"],
 .formLogin input[type="password"] {
     padding: 10px;
     font-size: 14px;

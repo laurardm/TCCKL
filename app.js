@@ -10,6 +10,7 @@ const perfilRoutes = require('./routes/perfilRoutes');
 const respRoutes = require('./routes/respRoutes');
 const funcRoutes = require('./routes/funcRoutes');
 const turmaRoutes = require('./routes/turmaRoutes');
+const alunoRoutes = require('./routes/alunoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ app.use('/func', funcRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/resp', respRoutes);
 app.use('/turma', turmaRoutes);
+app.use('/aluno', alunoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
