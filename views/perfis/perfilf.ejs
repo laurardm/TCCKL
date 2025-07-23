@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Perfil do Funcionário</title>
-  <link rel="stylesheet" href="/css/perfilprof.css" />
+  <link rel="stylesheet" href="/css/perfil.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/logo.css" />
 </head>
@@ -18,7 +18,7 @@
       <% if (erro) { %>
         <div class="erro-msg" style="color:red; margin-bottom: 10px;"><%= erro %></div>
       <% } %>
-      <form id="perfilForm" method="POST" action="/perfil">
+      <form id="perfilForm" method="POST" action="/perfilf">
         <label for="nome">Nome</label>
         <input type="text" id="nome" name="nome" value="<%= nome %>" disabled required />
 
@@ -45,7 +45,7 @@
   <div id="footer"></div>
   <div id="logo"></div>
 
-  <script src="/js/perfilfunc.js"></script>
+  <script src="/js/perfil.js"></script>
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
 </body>

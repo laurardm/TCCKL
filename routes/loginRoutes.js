@@ -2,58 +2,51 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
+// Página de login
 router.get('/', (req, res) => {
   res.render('login/login', { erro: null });
 });
 
+// Processar login
 router.post('/', (req, res) => {
   const { email, senha } = req.body;
 
   if (!email || !senha) {
-    return res.render('login/login', { erro: 'Preencha email/matrícula e senha.' });
+    return res.render('login/login',{ erro: 'Preencha todos os campos.' });
   }
 
-  const isEmail = email.includes('@');
+  const sql = `
+    SELECT * FROM usuario
+    WHERE login = ? AND senha = ?`;
 
-  if (isEmail) {
-    // Login como responsável
-    db.query('SELECT * FROM responsaveis WHERE email = ?', [email], (err, resultsResp) => {
-      if (err) {
-        console.error('Erro no banco responsaveis:', err);
-        return res.render('login/login', { erro: 'Erro no servidor.' });
-      }
+  db.query(sql, [email, senha], (err, results) => {
+    if (err) {
+      console.error('Erro ao consultar login:', err);
+      return res.render('login/login', { erro: 'Erro no servidor. Tente novamente.' });
+    }
 
-      const usuarioValido = resultsResp.find(user => user.senha === senha);
+    if (results.length === 0) {
+      return res.render('login/login', { erro: 'Login ou senha incorretos.' });
+    }
 
-      if (!usuarioValido) {
-        return res.render('login/login', { erro: 'Senha incorreta ou usuário não encontrado.' });
-      }
+    const usuario = results[0];
 
-      req.session.usuario = usuarioValido;
-      return res.redirect('/resp');
-    });
+    // Salvar usuário na sessão
+    req.session.usuario = {
+      cod: usuario.cod_funcionario || usuario.cod_responsavel || usuario.cod, 
+      nome: usuario.login,
+      tipo: usuario.tipo
+    };
 
-  } else {
-    // Login como funcionário (matrícula)
-    db.query('SELECT * FROM funcionario WHERE matricula = ?', [email], (err, resultsFunc) => {
-      if (err) {
-        console.error('Erro no banco funcionario:', err);
-        return res.render('login/login', { erro: 'Erro no servidor.' });
-      }
-
-      if (resultsFunc.length === 0) {
-        return res.render('login/login', { erro: 'Matrícula não cadastrada.' });
-      }
-
-      const user = resultsFunc[0];
-      if (user.senha !== senha) {
-        return res.render('login/login', { erro: 'Senha incorreta.' });
-      }
-
-      req.session.usuario = user;
-      return res.redirect('/func');
-    });
-  }
+    if (usuario.tipo === 'responsavel') {
+      res.redirect('/resp'); 
+    } else if (usuario.tipo === 'funcionario') {
+      res.redirect('/func');
+    } else {
+      res.render('login/login', { erro: 'Tipo de usuário inválido.' });
+    }
+  });
 });
+
 
 module.exports = router;
