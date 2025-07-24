@@ -6,7 +6,13 @@ dataInput.setAttribute('max', hoje);
 const editarBtn = document.getElementById('editar');
 const salvarBtn = document.getElementById('salvar');
 const voltarBtn = document.getElementById('voltar');
-const inputs = document.querySelectorAll('#perfilForm input:not(#turmas)');
+const inputs = document.querySelectorAll('#perfilForm input:not(#turmas), #perfilForm input[type="file"]');
+
+const fotoInput = document.getElementById('foto');
+function setInputsDisabled(disabled) {
+  inputs.forEach(input => input.disabled = disabled);
+  fotoInput.disabled = disabled;
+}
 
 function setInputsDisabled(disabled) {
   inputs.forEach(input => input.disabled = disabled);
@@ -42,3 +48,8 @@ document.getElementById('nome').addEventListener('input', function () {
   const nomeDigitado = this.value.trim();
   document.getElementById('nomeDisplay').textContent = nomeDigitado || 'Nome';
 });
+
+
+
+
+

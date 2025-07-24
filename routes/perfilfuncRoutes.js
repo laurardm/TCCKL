@@ -1,6 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/');
+  },
+  filename: function (req, file, cb) {
+    // Cria nome único com timestamp e extensão original
+    cb(null, req.session.usuario.cod + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
 
 // GET /perfil - renderiza a página com dados completos do funcionário
 router.get('/', (req, res) => {
@@ -45,7 +60,6 @@ router.get('/', (req, res) => {
       return `${ano}-${mes}-${dia}`;
     };
 
-
     res.render('perfis/perfilf', {
       nome: dados.nome,
       data_nasc: formatarData(dados.data_nasc),
@@ -54,14 +68,16 @@ router.get('/', (req, res) => {
       cargo: dados.cargo || 'Sem cargo',
       genero: dados.genero || 'Não informado',
       turmas: dados.nome_turma || 'Nenhuma turma vinculada',
+      foto: dados.foto || null,
       erro: null,
       sucesso: null
     });
+
   });
 });
 
 // POST /perfil - atualiza dados do funcionário
-router.post('/', (req, res) => {
+router.post('/', upload.single('foto'), (req, res) => {
   if (!req.session.usuario) {
     return res.redirect('/');
   }
@@ -69,12 +85,20 @@ router.post('/', (req, res) => {
   const funcionario = req.session.usuario;
   const { nome, data_nasc, email, telefone } = req.body;
 
-  const sqlUpdate = `
-    UPDATE funcionario
-    SET nome = ?, data_nasc = ?, email = ?, telefone = ?
-    WHERE cod = ?`;
+  // Se enviou foto, pega o caminho relativo para salvar no banco
+  let fotoPath = null;
+  if (req.file) {
+    fotoPath = '/uploads/' + req.file.filename; // caminho público para acessar no front
+  }
 
-  db.query(sqlUpdate, [nome, data_nasc, email, telefone, funcionario.cod], (err, result) => {
+  // Se a foto foi enviada, atualiza junto
+  const sqlUpdate = fotoPath ?
+    `UPDATE funcionario SET nome = ?, data_nasc = ?, email = ?, telefone = ?, foto = ? WHERE cod = ?` :
+    `UPDATE funcionario SET nome = ?, data_nasc = ?, email = ?, telefone = ? WHERE cod = ?`;
+
+  const params = fotoPath ? [nome, data_nasc, email, telefone, fotoPath, funcionario.cod] : [nome, data_nasc, email, telefone, funcionario.cod];
+
+  db.query(sqlUpdate, params, (err, result) => {
     if (err) {
       console.error('Erro ao atualizar dados:', err);
       return res.render('perfis/perfilf', {
@@ -94,9 +118,11 @@ router.post('/', (req, res) => {
     req.session.usuario.data_nasc = data_nasc;
     req.session.usuario.email = email;
     req.session.usuario.telefone = telefone;
+    if (fotoPath) req.session.usuario.foto = fotoPath;
 
     res.redirect('/perfilf');
   });
 });
+
 
 module.exports = router;
