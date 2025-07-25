@@ -15,23 +15,22 @@ body {
   background-repeat: no-repeat;
 }
 
-
 .logo {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 2em;
-      font-weight: bold;
-      color: white;
-    }
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 2em;
+  font-weight: bold;
+  color: white;
+}
 
 .flecha {
-      position: absolute;
-      top: 50px;
-      left: 10px;
-      font-size: 2em;
-      color: white;
-    }
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  font-size: 2em;
+  color: white;
+}
 
 .turma-titulo {
   background: white;
@@ -50,43 +49,123 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   max-width: 900px;
   width: 100%;
+  box-sizing: border-box;
 }
 
+/* Grade de alunos em grid */
 .grade-alunos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
 
+/* Card do aluno */
 .aluno {
-  background: white;
+  background: #fff;
   border-radius: 25px;
   border: 2px solid #d9d9d9;
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  padding: 10px 15px;
   gap: 10px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
 }
 
+/* Foto do aluno */
 .aluno img {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
-.aluno span {
+/* Input do nome do aluno */
+.nome-aluno {
+  flex-grow: 1;
+  border: none;
   font-weight: bold;
+  font-size: 1em;
+  background: transparent;
+  outline: none;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: default;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+/* Quando o input estiver editável */
+.nome-aluno:not([readonly]) {
+  cursor: text;
+  background-color: #f0f0f0;
+  user-select: text;
+  border: 1.5px solid #888;
+}
+
+/* Botões dentro do card aluno */
+.aluno button {
+  background: #fbe9f1;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 5px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-size: 0.85em;
+  transition: background-color 0.3s ease;
+}
+
+.aluno button:hover {
+  background-color: #f9cde6;
+}
+
+/* Formulário para adicionar novo aluno */
+#form-adicionar-aluno {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#form-adicionar-aluno input[type="text"] {
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  width: 250px;
+  max-width: 100%;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#form-adicionar-aluno input[type="text"]:focus {
+  border-color: #f9cde6;
+}
+
+#form-adicionar-aluno button {
+  padding: 10px 25px;
+  border-radius: 25px;
+  border: none;
+  background-color: #f9cde6;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1em;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease;
+}
+
+#form-adicionar-aluno button:hover {
+  background-color: #f78fbe;
 }
 
 .botoes {
   margin-top: 30px;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 30px;
-  font-size: 1em;
-  cursor: pointer;
-  font-weight: bold;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
 }
 
 .botoes button {
@@ -97,4 +176,10 @@ body {
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.botoes button:hover {
+  background-color: #f9cde6;
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Turmas</title>
+  <link rel="stylesheet" href="css/telaturmas.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  
+  <div class="caixabotao" id="turmasContainer">
+    <div class="botoes">
+      <% turmas.forEach(turma => { %>
+        <a href="/turmas/<%= turma.nome %>">
+          <button class="botao"><%= turma.nome %></button>
+        </a>
+      <% }) %>
+    </div>
+    <button onclick="history.back()" class="botaodevoltar">Voltar</button>
+  </div>
+
+  <div id="footer"></div>
+  <div id="logo"></div>
+
+  <script src="/js/footer.js"></script>
+  <script src="/js/logo.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnVoltar = document.getElementById("btnVoltar");
+      if (btnVoltar) {
+        btnVoltar.addEventListener("click", () => {
+          history.back();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

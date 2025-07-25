@@ -49,7 +49,7 @@ create table eventos (
 
 create table turma (
   cod int not null auto_increment,
-  nome char(2),
+  nome char(3),
   fotost int,
   primary key (cod),
   foreign key (fotost) references fotost (cod)
@@ -100,13 +100,10 @@ create table funcionario (
 create table aluno (
   cod int not null auto_increment,
   nome varchar(40) not null,
-  data_nasc date not null,
   turma int,
-  genero int,
   agenda int,
   primary key (cod),
   foreign key (turma) references turma (cod),
-  foreign key (genero) references genero (cod),
   foreign key (agenda) references agenda (cod)
 );
 
