@@ -1,27 +1,26 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../config/db');
+const db = require("../config/db");
 
-router.get('/', (req, res) => {
-  const sql = 'SELECT nome FROM turma ORDER BY nome';
+router.get("/", (req, res) => {
+  const sql = "SELECT nome FROM turma ORDER BY nome";
   db.query(sql, (err, turmas) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Erro ao buscar turmas');
+      return res.status(500).send("Erro ao buscar turmas");
     }
-    // Passa a variável com nome 'turmas' para combinar com o ejs
-    res.render('turmas/index', { turmas });
+    res.render("turmas/index", { turmas });
   });
 });
 
-// GET - Exibir os alunos da turma
-router.get('/:nomeTurma', (req, res) => {
+router.get("/:nomeTurma", (req, res) => {
   const nomeTurma = req.params.nomeTurma;
-  const sqlTurma = 'SELECT cod, nome FROM turma WHERE TRIM(UPPER(nome)) = UPPER(?) LIMIT 1';
+  const sqlTurma =
+    "SELECT cod, nome FROM turma WHERE TRIM(UPPER(nome)) = UPPER(?) LIMIT 1";
 
   db.query(sqlTurma, [nomeTurma], (err, turmaResults) => {
     if (err || turmaResults.length === 0) {
-      return res.render('turmas/turmanome', { nomeTurma, alunos: [] });
+      return res.render("turmas/turmanome", { nomeTurma, alunos: [] });
     }
 
     const codTurma = turmaResults[0].cod;
@@ -36,12 +35,12 @@ router.get('/:nomeTurma', (req, res) => {
 
     db.query(sqlAlunos, [codTurma], (err2, alunos) => {
       if (err2) {
-        return res.render('turmas/turmanome', { nomeTurma, alunos: [] });
+        return res.render("turmas/turmanome", { nomeTurma, alunos: [] });
       }
 
-      res.render('turmas/turmanome', {
+      res.render("turmas/turmanome", {
         nomeTurma: turmaResults[0].nome.trim(),
-        alunos
+        alunos,
       });
     });
   });
@@ -58,32 +57,32 @@ router.post('/:nomeTurma', (req, res) => {
 
     const codTurma = result[0].cod;
     const sqlInsert = 'INSERT INTO aluno (nome, turma) VALUES (?, ?)';
-    db.query(sqlInsert, [nome, codTurma || null], (err2) => {
+    db.query(sqlInsert, [nome, codTurma || null], (err2, resultInsert) => {
       if (err2) return res.status(500).send('Erro ao adicionar aluno');
-      res.status(200).send('Aluno adicionado com sucesso');
+      
+      // retorna o id do aluno inserido
+      res.status(200).json({ cod: resultInsert.insertId, nome });
     });
   });
 });
 
-// PUT - Editar aluno
-router.put('/:nomeTurma', (req, res) => {
+router.put("/:nomeTurma", (req, res) => {
   const { cod, nome } = req.body;
-  const sqlUpdate = 'UPDATE aluno SET nome = ?WHERE cod = ?';
+  const sqlUpdate = "UPDATE aluno SET nome = ? WHERE cod = ?";
 
-  db.query(sqlUpdate, [nome, agenda || null, cod], (err) => {
-    if (err) return res.status(500).send('Erro ao editar aluno');
-    res.status(200).send('Aluno atualizado');
+  db.query(sqlUpdate, [nome, cod], (err) => {
+    if (err) return res.status(500).send("Erro ao editar aluno");
+    res.status(200).send("Aluno atualizado");
   });
 });
 
-// DELETE - Excluir aluno
-router.delete('/:nomeTurma', (req, res) => {
+router.delete("/:nomeTurma", (req, res) => {
   const { cod } = req.body;
-  const sqlDelete = 'DELETE FROM aluno WHERE cod = ?';
+  const sqlDelete = "DELETE FROM aluno WHERE cod = ?";
 
   db.query(sqlDelete, [cod], (err) => {
-    if (err) return res.status(500).send('Erro ao excluir aluno');
-    res.status(200).send('Aluno excluído');
+    if (err) return res.status(500).send("Erro ao excluir aluno");
+    res.status(200).send("Aluno excluído");
   });
 });
 

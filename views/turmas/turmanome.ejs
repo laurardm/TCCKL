@@ -3,42 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Turma <%= nomeTurma %></title>
+  <title><%= nomeTurma %></title>
   <link rel="stylesheet" href="/css/turmas.css" />
   <link rel="stylesheet" href="/css/logo.css" />
   <link rel="stylesheet" href="/css/footer.css" />
 </head>
 <body>
 
-  <h1 class="turma-titulo">Turma <%= nomeTurma %></h1>
+  <h1 class="turma-titulo"><%= nomeTurma %></h1>
 
   <div class="container-alunos">
-    <div class="grade-alunos">
+    <div class="grade-alunos" id="lista-alunos">
       <% if (alunos.length > 0) { %>
-        <% alunos.forEach(aluno => { %>
-          <div class="aluno" data-id="<%= aluno.cod %>">
+        <% alunos.forEach((aluno, index) => { %>
+          <div class="aluno" data-cod="<%= aluno.cod %>">
             <img src="<%= aluno.foto || '/imagens/perfil.png' %>" alt="Foto do aluno">
-            <input class="nome-aluno" type="text" value="<%= aluno.nome %>" readonly />
-            <button class="btn-editar">Editar</button>
-            <button class="btn-salvar" style="display:none;">Salvar</button>
-            <button class="btn-excluir">Excluir</button>
+            <span><%= aluno.nome %></span>
           </div>
         <% }) %>
       <% } else { %>
         <p>Nenhum aluno encontrado para esta turma.</p>
       <% } %>
     </div>
-
-    <!-- Formulário para adicionar novo aluno -->
-    <form id="form-adicionar-aluno">
-      <input type="text" id="novo-nome" placeholder="Nome do aluno" required />
-      <button type="submit">Adicionar aluno</button>
-    </form>
   </div>
 
   <div class="botoes">
-    <button onclick="history.back()" id="btnVoltar" class="botao">Voltar</button>
+    <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
     <button id="btnFotos" class="botao">Fotos da turma</button>
+    <button id="btnAdicionar" class="botao">Adicionar aluno</button>
+    <button id="btnEditar" class="botao">Editar alunos</button>
+    <button id="btnSalvar" class="botao" style="display:none;">Salvar</button>
   </div>
 
   <div id="footer"></div>

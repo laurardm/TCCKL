@@ -9,16 +9,28 @@
 <body>
   <h1>Editar Aluno</h1>
   <div class="editar-container">
-    <img id="fotoAluno" src="/imagens/perfil.png" alt="Foto do Aluno" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;" />
+    <!-- Foto do aluno -->
+    <img id="fotoAluno" src="<%= aluno.foto ? '/uploads/' + aluno.foto : '/imagens/perfil.png' %>" 
+         alt="Foto do Aluno"
+         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;" />
     <br>
+
+    <!-- Input de foto -->
     <input type="file" id="inputFoto" accept="image/*" />
     <br><br>
+
+    <!-- Nome do aluno -->
     <label for="nomeAluno">Nome:</label>
-    <input type="text" id="nomeAluno" value="<%= aluno?.nome || '' %>"/>
+    <input type="text" id="nomeAluno" value="<%= aluno.nome %>" />
     <br><br>
-    <button id="salvarAluno">Salvar</button>
-    <a href="/turma"><button id="voltar">Voltar</button></a>
+
+    <!-- Botões -->
+    <button id="salvarAluno" data-cod="<%= aluno.cod %>">Salvar</button>
+    <a href="/turmas/<%= aluno.nome_turma %>">
+      <button id="voltar">Voltar</button>
+    </a>
   </div>
+
   <script src="/js/aluno.js"></script>
 </body>
 </html>
