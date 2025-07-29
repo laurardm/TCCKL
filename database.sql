@@ -102,6 +102,7 @@ create table aluno (
   nome varchar(40) not null,
   turma int,
   agenda int,
+  foto varchar(150),
   primary key (cod),
   foreign key (turma) references turma (cod),
   foreign key (agenda) references agenda (cod)
