@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const salvarBtn = document.getElementById("salvarAluno");
+  if (!salvarBtn) return; // Não ativa se for responsável
+
   const nomeInput = document.getElementById("nomeAluno");
   const inputFoto = document.getElementById("inputFoto");
   const fotoImg = document.getElementById("fotoAluno");
@@ -22,7 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const cod = salvarBtn.dataset.cod;
     const turma = salvarBtn.dataset.turma;
     const url = `/turmas/${encodeURIComponent(turma)}/aluno/${cod}`;
-    const nome = nomeInput.value;
+
+    const nome = nomeInput.value.trim();
+
+    if (!nome) {
+      alert("O nome do aluno não pode ficar vazio.");
+      return;
+    }
 
     try {
       const resposta = await fetch(url, {

@@ -17,19 +17,24 @@
     />
     <br />
 
-    <input type="file" id="inputFoto" accept="image/*" />
-    <br /><br />
+    <% if (tipoUsuario === 'funcionario') { %>
+      <input type="file" id="inputFoto" accept="image/*" />
+      <br /><br />
+      <label for="nomeAluno">Nome:</label>
+      <input type="text" id="nomeAluno" value="<%= aluno.nome %>" />
+      <br /><br />
+      <button id="salvarAluno" data-cod="<%= aluno.cod %>" data-turma="<%= aluno.nome_turma %>">Salvar</button>
+    <% } else { %>
+      <p><strong>Nome:</strong> <%= aluno.nome %></p>
+    <% } %>
 
-    <label for="nomeAluno">Nome:</label>
-    <input type="text" id="nomeAluno" value="<%= aluno.nome %>" />
-    <br /><br />
-
-    <button id="salvarAluno" data-cod="<%= aluno.cod %>" data-turma="<%= aluno.nome_turma %>">Salvar</button>
     <a href="/turmas/<%= aluno.nome_turma %>">
       <button type="button">Voltar</button>
     </a>
   </div>
 
-  <script src="/js/aluno.js"></script>
+  <% if (tipoUsuario === 'funcionario') { %>
+    <script src="/js/aluno.js"></script>
+  <% } %>
 </body>
 </html>
