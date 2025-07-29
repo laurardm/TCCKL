@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="/css/footer.css" />
 </head>
 <body>
+  <script>
+    window.tipoUsuario = "<%= tipoUsuario || '' %>";
+  </script>
 
   <h1 class="turma-titulo"><%= nomeTurma %></h1>
 
@@ -30,17 +33,19 @@
   <div class="botoes">
     <a href="/turmas"> <button class="btn-voltar">Voltar</button></a>
     <button id="btnFotos" class="botao">Fotos da turma</button>
-    <button id="btnAdicionar" class="botao">Adicionar aluno</button>
-    <button id="btnEditar" class="botao">Editar alunos</button>
-    <button id="btnSalvar" class="botao" style="display:none;">Salvar</button>
+
+    <% if (tipoUsuario === 'func') { %>
+      <button id="btnAdicionar" class="botao">Adicionar aluno</button>
+      <button id="btnEditar" class="botao">Editar alunos</button>
+      <button id="btnSalvar" class="botao" style="display:none;">Salvar</button>
+    <% } %>
   </div>
 
   <div id="footer"></div>
   <div id="logo"></div>
-
+  
   <script src="/js/turmas.js"></script>
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
-
 </body>
 </html>
