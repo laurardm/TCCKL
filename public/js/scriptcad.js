@@ -3,6 +3,23 @@ function togglePassword(id) {
   passwordField.type = passwordField.type === "password" ? "text" : "password";
 }
 
+// Substitui alert padrão por um alerta personalizado
+window.alert = function(message, callback = null) {
+  const alertBox = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  const alertButton = document.getElementById('alert-ok-button');
+
+  alertMessage.textContent = message;
+  alertBox.classList.remove('hidden');
+
+  alertButton.onclick = () => {
+    alertBox.classList.add('hidden');
+    if (typeof callback === 'function') {
+      callback();
+    }
+  };
+};
+
 document.getElementById('cadastroForm').addEventListener('submit', function(event) {
   event.preventDefault();
 
@@ -30,8 +47,9 @@ document.getElementById('cadastroForm').addEventListener('submit', function(even
     return response.text();
   })
   .then(() => {
-    alert("Cadastro realizado com sucesso!");
-    window.location.href = "/";  // redireciona para a página login
+    alert("Cadastro realizado com sucesso!", () => {
+      window.location.href = "/";
+    });
   })
   .catch(err => {
     alert("Erro ao cadastrar: " + err.message);

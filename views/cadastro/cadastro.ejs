@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="/css/ecad.css" />
   <link rel="stylesheet" href="/css/logo.css" />
 </head>
+
 <body>
   <div class="form-container">
     <h2>Cadastro de usuário</h2>
@@ -40,6 +42,14 @@
         <span class="olho" onclick="togglePassword('confirmarSenha')">&#128065;</span>
       </div>
 
+      <!-- Alerta personalizado (sem criar novo botão) -->
+      <div id="custom-alert" class="alert hidden">
+        <div class="alert-content">
+          <span id="alert-message">Mensagem</span>
+          <button id="alert-ok-button">OK</button>
+        </div>
+      </div>
+
       <a href="/">Voltar</a>
       <button id="concluir" type="submit">Concluir</button>
     </form>
@@ -48,4 +58,5 @@
   <script src="/js/scriptcad.js"></script>
   <script src="/js/logo.js"></script>
 </body>
+
 </html>

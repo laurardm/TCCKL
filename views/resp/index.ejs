@@ -8,16 +8,20 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/logo.css">
 </head>
-<body>
-    <div id="imagem">
-        <img src="" alt="fotofunc" id="fotoperfil">
-    </div>
+<body></body>
 
     <div id="botoes">
         <a href="/turmas" onclick="sessionStorage.setItem('voltarPara', window.location.pathname)" class="botao">Turmas</a>
         <a href="/perfilr" class="botao">Perfil</a>
         <a href="/" id="logout">Sair</a>
     </div>
+
+<body>
+    <div id="imagem">
+        <img src="<%= foto %>" alt="fotofunc" id="fotoperfil">
+    </div>
+
+
     <div id="footer"></div>
     <div id="logo"></div>
     <script src="/js/footer.js"></script>
