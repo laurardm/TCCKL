@@ -63,9 +63,9 @@ router.get("/:nomeTurma", (req, res) => {
   });
 });
 
-// POST - Adicionar aluno (somente funcionário)
+//adicionando aluno
 router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
-  const { nome, agenda } = req.body;
+  const { nome } = req.body;
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
   const sqlTurma = 'SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1';
@@ -73,11 +73,43 @@ router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
     if (err || result.length === 0) return res.status(400).send('Turma não encontrada');
 
     const codTurma = result[0].cod;
-    const sqlInsert = 'INSERT INTO aluno (nome, turma) VALUES (?, ?)';
-    db.query(sqlInsert, [nome, codTurma || null], (err2, resultInsert) => {
-      if (err2) return res.status(500).send('Erro ao adicionar aluno');
-      
-      res.status(200).json({ cod: resultInsert.insertId, nome });
+
+    // 1. Buscar uma agenda disponível
+    const sqlAgendaLivre = `
+      SELECT cod FROM agenda
+      WHERE cod NOT IN (SELECT agenda FROM aluno WHERE agenda IS NOT NULL)
+      ORDER BY cod ASC
+      LIMIT 1
+    `;
+
+    db.query(sqlAgendaLivre, (err2, resultAgenda) => {
+      if (err2) return res.status(500).send('Erro ao buscar agenda');
+
+      if (resultAgenda.length > 0) {
+        // Agenda disponível encontrada
+        const codAgenda = resultAgenda[0].cod;
+
+        const sqlInsert = 'INSERT INTO aluno (nome, turma, agenda) VALUES (?, ?, ?)';
+        db.query(sqlInsert, [nome, codTurma, codAgenda], (err3, resultInsert) => {
+          if (err3) return res.status(500).send('Erro ao adicionar aluno');
+          res.status(200).json({ cod: resultInsert.insertId, nome });
+        });
+
+      } else {
+        // Nenhuma agenda livre — criar nova
+        const sqlNovaAgenda = 'INSERT INTO agenda (data) VALUES (CURDATE())';
+        db.query(sqlNovaAgenda, (err4, resultNovaAgenda) => {
+          if (err4) return res.status(500).send('Erro ao criar nova agenda');
+
+          const codAgenda = resultNovaAgenda.insertId;
+
+          const sqlInsert = 'INSERT INTO aluno (nome, turma, agenda) VALUES (?, ?, ?)';
+          db.query(sqlInsert, [nome, codTurma, codAgenda], (err5, resultInsert) => {
+            if (err5) return res.status(500).send('Erro ao adicionar aluno com nova agenda');
+            res.status(200).json({ cod: resultInsert.insertId, nome });
+          });
+        });
+      }
     });
   });
 });

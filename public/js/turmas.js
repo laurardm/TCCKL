@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (divAluno && !modoEdicao) {
       const cod = divAluno.dataset.cod;
       if (cod) {
-        window.location.href = `/turmas/${encodeURIComponent(nomeTurma)}/aluno/${cod}`;
+        window.location.href = `/agenda`;
       }
     }
   });

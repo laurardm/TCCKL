@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
     return res.redirect('/');
   }
 
-  const sql = 'SELECT nome, email, data_nasc, parentesco, foto FROM responsavel WHERE cod = ?';
+  const sql = 'SELECT nome, email, data_nasc, parentesco, foto FROM responsaveis WHERE cod = ?';
 
   db.query(sql, [responsavel.cod], (err, results) => {
     if (err || results.length === 0) {
@@ -68,7 +68,7 @@ router.post('/foto', upload.single('foto'), (req, res) => {
 
   const caminhoFoto = '/uploads/' + req.file.filename;
 
-  const sql = 'UPDATE responsavel SET foto = ? WHERE cod = ?';
+  const sql = 'UPDATE responsaveis SET foto = ? WHERE cod = ?';
 
   db.query(sql, [caminhoFoto, responsavel.cod], (err) => {
     if (err) {
