@@ -213,14 +213,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   alunosContainer.addEventListener("click", (event) => {
-    const divAluno = event.target.closest(".aluno");
-    if (divAluno && !modoEdicao) {
-      const cod = divAluno.dataset.cod;
-      if (cod) {
-        window.location.href = `/agenda`;
-      }
+  const divAluno = event.target.closest(".aluno");
+  if (divAluno && !modoEdicao) {
+    const cod = divAluno.dataset.cod;
+    if (cod) {
+      window.location.href = `/agenda?aluno=${cod}`;
     }
-  });
+  }
+});
 
   if (btnAdicionar) btnAdicionar.addEventListener("click", () => {
     if (!modoEdicao) {

@@ -12,8 +12,8 @@
 
 <body>
   <div class="painel-perfil">
-    <img src="<%= userImage || '/img/foto-usuario.jpg' %>" alt="Foto do Usuário" class="foto-perfil">
-    <span class="nome-usuario"><%= userName || 'Nome do Usuário' %></span>
+    <img src="<%= userImage || '/imagens/perfil.png' %>" alt="Foto do Usuário" class="foto-perfil">
+    <span class="nome-usuario"><%= typeof nomeAluno !== 'undefined' ? nomeAluno : 'Nome do Usuário' %></span>
   </div>
 
   <div class="container" id="pagina-atual">
