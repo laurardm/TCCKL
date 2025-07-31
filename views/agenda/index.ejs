@@ -3,24 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agenda Digital</title>
+  <title>Agendinha Digital - Página Única</title>
   <link rel="stylesheet" href="/css/eagenda.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/logo.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
   <div class="painel-perfil">
-    <img src="<%= userImage %>" alt="Foto do Usuário" class="foto-perfil" />
-    <span class="nome-usuario"><%= userName %></span>
+    <img src="<%= userImage || '/img/foto-usuario.jpg' %>" alt="Foto do Usuário" class="foto-perfil">
+    <span class="nome-usuario"><%= userName || 'Nome do Usuário' %></span>
   </div>
 
   <div class="container" id="pagina-atual">
-    <h2 id="data-titulo">Nenhuma data selecionada</h2>
+    <h2 id="data-titulo"><%= selectedDate || 'Nenhuma data selecionada' %></h2>
     <div class="conteudo" id="conteudo-pagina">
       <p>Adicione um recado, evento ou foto para começar.</p>
     </div>
@@ -48,20 +45,10 @@
     </button>
   </div>
 
+  <!-- Modal -->
   <div class="modal-bg" id="modal-bg">
-    <div
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <button
-        class="modal-close"
-        aria-label="Fechar modal"
-        onclick="fecharModal()"
-      >
-        &times;
-      </button>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" aria-label="Fechar modal" onclick="fecharModal()">&times;</button>
       <h3 id="modal-title"></h3>
       <input type="date" id="modal-date" />
       <textarea id="modal-text" placeholder="Digite aqui..."></textarea>
@@ -72,6 +59,8 @@
   </div>
 
   <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
+  <div id="footer"></div>
+  <div id="logo"></div>
 
   <script src="/js/agenda.js"></script>
   <script src="/js/footer.js"></script>
