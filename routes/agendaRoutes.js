@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
       nomeAluno: 'não definido',
       userImage: null,
       userName: null,
-      selectedDate // ← adiciona aqui também
+      selectedDate 
     });
   }
 

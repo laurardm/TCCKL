@@ -40,6 +40,7 @@ body {
   margin-bottom: 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   margin-top: -80px;
+  text-align: center;
 }
 
 .container-alunos {
@@ -73,15 +74,55 @@ body {
 }
 
 /* Foto do aluno */
-.aluno img {
+.aluno .foto-wrapper {
+  position: relative;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
   flex-shrink: 0;
 }
 
-/* Input do nome do aluno */
+.aluno .foto-wrapper img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ícone SVG da câmera centralizado */
+.aluno .camera-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.aluno .camera-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Mostra a câmera apenas em modo edição */
+.aluno.editando .camera-icon {
+  opacity: 1;
+}
+
+.aluno input[type="file"] {
+  display: none;
+}
+
+/* Nome do aluno */
 .nome-aluno {
   flex-grow: 1;
   border: none;
@@ -96,7 +137,6 @@ body {
   transition: background-color 0.2s ease;
 }
 
-/* Quando o input estiver editável */
 .nome-aluno:not([readonly]) {
   cursor: text;
   background-color: #f0f0f0;
@@ -104,7 +144,7 @@ body {
   border: 1.5px solid #888;
 }
 
-/* Botões dentro do card aluno */
+/* Botões no card do aluno */
 .aluno button {
   background: #fbe9f1;
   border: 1px solid #ccc;
@@ -121,7 +161,7 @@ body {
   background-color: #f9cde6;
 }
 
-/* Formulário para adicionar novo aluno */
+/* Formulário adicionar aluno */
 #form-adicionar-aluno {
   margin-top: 30px;
   display: flex;
@@ -182,4 +222,72 @@ body {
 
 .botoes button:hover {
   background-color: #f9cde6;
+}
+
+/* Toasts */
+.toast {
+  padding: 10px 20px;
+  margin-bottom: 8px;
+  border-radius: 30px;
+  color: white;
+  font-weight: 600;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-family: Arial, sans-serif;
+}
+
+.toast.info {
+  background-color: #2196F3;
+}
+
+.toast.success {
+  background-color: #4CAF5070;
+}
+
+.toast.error {
+  background-color: #f44336;
+}
+
+/* Responsivo para celulares */
+@media (max-width: 600px) {
+  .turma-titulo {
+    font-size: 1.4em;
+    padding: 8px 20px;
+  }
+
+  .container-alunos {
+    padding: 15px;
+  }
+
+  .grade-alunos {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .aluno {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .nome-aluno {
+    width: 100%;
+  }
+
+  .botoes {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #form-adicionar-aluno {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #form-adicionar-aluno input,
+  #form-adicionar-aluno button {
+    width: 100%;
+    max-width: 300px;
+  }
 }
