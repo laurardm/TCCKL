@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.querySelectorAll(".aluno").forEach(el => {
   el.addEventListener("click", () => {
     const cod = el.getAttribute("data-cod");
-    window.location.href = `/turmas/agenda/aluno/${cod}`;
+    window.location.href = `/agenda?aluno=${cod}`;
   });
 });
 
