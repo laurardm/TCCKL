@@ -1,130 +1,128 @@
-drop database sistema;
-create database sistema;
-use sistema;
+USE sistema;
 
-create table parentesco (
-  cod int not null auto_increment,
-  descricao varchar(6) default 'Mãe',
-  primary key (cod)
+CREATE TABLE parentesco (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(6) DEFAULT 'Mãe',
+  PRIMARY KEY (cod)
 );
 
-create table genero (
-  cod int not null auto_increment,
-  descricao varchar(11),
-  primary key (cod)
+CREATE TABLE genero (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(11),
+  PRIMARY KEY (cod)
 );
 
-create table cargo (
-  cod int not null auto_increment,
-  descricao varchar(10) default 'Professor',
-  primary key (cod)
+CREATE TABLE cargo (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(10) DEFAULT 'Professor',
+  PRIMARY KEY (cod)
 );
 
-create table fotosa (
-  cod int not null auto_increment,
-  linkf varchar(150) not null,
-  descricao varchar(40),
-  primary key (cod)
+CREATE TABLE fotosa (
+  cod INT NOT NULL AUTO_INCREMENT,
+  linkf VARCHAR(150) NOT NULL,
+  descricao VARCHAR(40),
+  agenda INT NOT NULL,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_fotosa_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
 
-create table fotost (
-  cod int not null auto_increment,
-  descricao varchar(150),
-  primary key (cod)
+CREATE TABLE fotost (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(150),
+  PRIMARY KEY (cod)
 );
 
-create table recados (
-  cod int not null auto_increment,
-  descricao varchar(1000),
-  datar date,
-  primary key (cod)
+CREATE TABLE recados (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(1000),
+  datar DATE,
+  agenda INT NOT NULL,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_recados_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
 
-create table eventos (
-  cod int not null auto_increment,
-  descricao varchar(100),
-  datae date,
-  primary key (cod)
+CREATE TABLE eventos (
+  cod INT NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(100),
+  datae DATE,
+  agenda INT NOT NULL,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_eventos_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
 
-create table turma (
-  cod int not null auto_increment,
-  nome char(3),
-  fotost int,
-  primary key (cod),
-  foreign key (fotost) references fotost (cod)
+CREATE TABLE turma (
+  cod INT NOT NULL AUTO_INCREMENT,
+  nome CHAR(3),
+  fotost INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_turma_fotost FOREIGN KEY (fotost) REFERENCES fotost(cod) ON DELETE SET NULL
 );
 
-create table agenda (
-  cod int not null auto_increment,
-  recados int,
-  fotosa int,
-  eventos int,
-  primary key (cod),
-  foreign key (recados) references recados (cod),
-  foreign key (fotosa) references fotosa (cod),
-  foreign key (eventos) references eventos (cod)
+CREATE TABLE agenda (
+  cod INT NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (cod)
+  -- Removed recados, fotosa, eventos fields as explained
 );
 
-
-create table responsaveis (
-  cod int not null auto_increment,
-  nome varchar(40) not null,
-  data_nasc date not null,
-  email varchar(40) not null,
-  foto varchar(100),
-  genero int,
-  parentesco int,
-  primary key (cod),
-  foreign key (genero) references genero (cod),
-  foreign key (parentesco) references parentesco (cod)
+CREATE TABLE responsaveis (
+  cod INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(40) NOT NULL,
+  data_nasc DATE NOT NULL,
+  email VARCHAR(40) NOT NULL,
+  foto VARCHAR(100),
+  genero INT,
+  parentesco INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_responsaveis_genero FOREIGN KEY (genero) REFERENCES genero(cod),
+  CONSTRAINT fk_responsaveis_parentesco FOREIGN KEY (parentesco) REFERENCES parentesco(cod)
 );
 
-create table funcionario (
-  cod int not null auto_increment,
-  nome varchar(40) not null,
-  data_nasc date not null,
-  email varchar(40) not null,
-  telefone varchar(15),
-  foto varchar(150),
-  matricula char(4) not null,
-  cargo int,
-  genero int,
-  turma int,
-  primary key (cod),
-  foreign key (cargo) references cargo (cod),
-  foreign key (genero) references genero (cod),
-  foreign key (turma) references turma (cod)
+CREATE TABLE funcionario (
+  cod INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(40) NOT NULL,
+  data_nasc DATE NOT NULL,
+  email VARCHAR(40) NOT NULL,
+  telefone VARCHAR(15),
+  foto VARCHAR(150),
+  matricula CHAR(4) NOT NULL,
+  cargo INT,
+  genero INT,
+  turma INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_funcionario_cargo FOREIGN KEY (cargo) REFERENCES cargo(cod),
+  CONSTRAINT fk_funcionario_genero FOREIGN KEY (genero) REFERENCES genero(cod),
+  CONSTRAINT fk_funcionario_turma FOREIGN KEY (turma) REFERENCES turma(cod)
 );
 
-create table aluno (
-  cod int not null auto_increment,
-  nome varchar(40) not null,
-  turma int,
-  agenda int,
-  foto varchar(150),
-  primary key (cod),
-  foreign key (turma) references turma (cod),
-  foreign key (agenda) references agenda (cod)
+CREATE TABLE aluno (
+  cod INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(40) NOT NULL,
+  turma INT,
+  agenda INT,
+  foto VARCHAR(150),
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_aluno_turma FOREIGN KEY (turma) REFERENCES turma(cod),
+  CONSTRAINT fk_aluno_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod)
 );
 
-create table alu_resp (
-  cod int not null auto_increment,
-  cod_aluno int,
-  cod_resp int,
-  primary key (cod),
-  foreign key (cod_aluno) references aluno (cod),
-  foreign key (cod_resp) references responsaveis (cod)
+CREATE TABLE alu_resp (
+  cod INT NOT NULL AUTO_INCREMENT,
+  cod_aluno INT,
+  cod_resp INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_alu_resp_aluno FOREIGN KEY (cod_aluno) REFERENCES aluno(cod),
+  CONSTRAINT fk_alu_resp_resp FOREIGN KEY (cod_resp) REFERENCES responsaveis(cod)
 );
 
-create table usuario (
-  cod int not null auto_increment,
-  login varchar(100) not null,
-  senha varchar(100) not null,
-  tipo enum('responsavel', 'funcionario') not null,
-  cod_funcionario int,
-  cod_responsavel int,
-  primary key (cod),
-  foreign key (cod_funcionario) references funcionario (cod),
-  foreign key (cod_responsavel) references responsaveis (cod)
+CREATE TABLE usuario (
+  cod INT NOT NULL AUTO_INCREMENT,
+  login VARCHAR(100) NOT NULL,
+  senha VARCHAR(100) NOT NULL,
+  tipo ENUM('responsavel', 'funcionario') NOT NULL,
+  cod_funcionario INT,
+  cod_responsavel INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_usuario_funcionario FOREIGN KEY (cod_funcionario) REFERENCES funcionario(cod),
+  CONSTRAINT fk_usuario_responsavel FOREIGN KEY (cod_responsavel) REFERENCES responsaveis(cod)
 );

@@ -7,12 +7,12 @@
   <link rel="stylesheet" href="/css/eagenda.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/logo.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
 <body>
   <div class="painel-perfil">
-    <img src="<%= userImage || '/imagens/perfil.png' %>" alt="Foto do Usuário" class="foto-perfil">
+    <img src="<%= userImage || '/imagens/perfil.png' %>" alt="Foto do Usuário" class="foto-perfil" />
     <span class="nome-usuario"><%= typeof nomeAluno !== 'undefined' ? nomeAluno : 'Nome do Usuário' %></span>
   </div>
 
@@ -59,8 +59,21 @@
   </div>
 
   <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
+
   <div id="footer"></div>
   <div id="logo"></div>
+
+  <!-- Dados injetados via data-attributes -->
+  <div id="agenda-data"
+       data-agenda-id="<%= agenda_id || '' %>"
+       data-recados='<%- JSON.stringify(recadosEventos || []) %>'>
+  </div>
+
+  <script>
+    const el = document.getElementById('agenda-data');
+    window.agendaId = el.getAttribute('data-agenda-id') || null;
+    window.pagesData = JSON.parse(el.getAttribute('data-recados') || '[]');
+  </script>
 
   <script src="/js/agenda.js"></script>
   <script src="/js/footer.js"></script>

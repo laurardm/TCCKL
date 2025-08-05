@@ -1,50 +1,70 @@
-let pagesData = [
-  { date: '2025-07-28', contents: ['Recado: João se alimentou bem hoje.'] },
-  { date: '2025-07-29', contents: ['Evento: Atividade de pintura em grupo.'] }
-];
+// Pega os dados do elemento com data-attributes
+const agendaElem = document.getElementById('agenda-data');
+let rawAgendaId = null;
+let rawPages = '[]';
+
+if (agendaElem) {
+  rawAgendaId = agendaElem.getAttribute('data-agenda-id');
+  rawPages = agendaElem.getAttribute('data-recados') || '[]';
+}
+
+window.agendaId = rawAgendaId ? Number(rawAgendaId) : null;
+
+try {
+  window.pagesData = JSON.parse(rawPages);
+  if (!Array.isArray(window.pagesData)) window.pagesData = [];
+} catch (e) {
+  console.warn('Erro ao fazer parse de recadosEventos:', e);
+  window.pagesData = [];
+}
 
 let currentPageIndex = 0;
 let tipoAtual = '';
 
 function formatarData(dataStr) {
   const d = new Date(dataStr + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
-    .replace(/^\w/, c => c.toUpperCase());
+  return d.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).replace(/^\w/, (c) => c.toUpperCase());
 }
 
 function renderPage() {
   const titulo = document.getElementById('data-titulo');
   const conteudoDiv = document.getElementById('conteudo-pagina');
 
-  if (pagesData.length === 0) {
+  if (!window.pagesData || window.pagesData.length === 0) {
     titulo.textContent = 'Nenhuma data adicionada';
     conteudoDiv.innerHTML = '<p>Adicione um recado, evento ou foto para começar.</p>';
     return;
   }
 
-  // Ordenar páginas por data (ascendente)
-  pagesData.sort((a, b) => a.date.localeCompare(b.date));
+  window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
 
-  // Garantir índice dentro do limite
   if (currentPageIndex < 0) currentPageIndex = 0;
-  if (currentPageIndex >= pagesData.length) currentPageIndex = pagesData.length - 1;
+  if (currentPageIndex >= window.pagesData.length) currentPageIndex = window.pagesData.length - 1;
 
-  const pagina = pagesData[currentPageIndex];
+  const pagina = window.pagesData[currentPageIndex];
 
   titulo.textContent = formatarData(pagina.date);
 
-  if (pagina.contents.length === 0) {
+  if (!pagina.contents || pagina.contents.length === 0) {
     conteudoDiv.innerHTML = '<p>Sem conteúdos nesta data.</p>';
   } else {
-    // Agora com lixeira à esquerda e fundo azul claro
-    conteudoDiv.innerHTML = pagina.contents.map((conteudo, index) =>
-      `<div class="conteudo-item">
+    conteudoDiv.innerHTML = pagina.contents
+      .map(
+        (conteudo, index) => `
+      <div class="conteudo-item">
         <button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
           <i class="fa-solid fa-trash"></i>
         </button>
         <span class="conteudo-text">${conteudo}</span>
-      </div>`
-    ).join('');
+      </div>
+    `
+      )
+      .join('');
   }
 }
 
@@ -52,7 +72,8 @@ function abrirModal(tipo) {
   tipoAtual = tipo;
   document.getElementById('modal-title').textContent = `Adicionar ${tipo}`;
   document.getElementById('modal-text').value = '';
-  document.getElementById('modal-date').value = pagesData.length > 0 ? pagesData[currentPageIndex].date : '';
+  document.getElementById('modal-date').value =
+    window.pagesData.length > 0 ? window.pagesData[currentPageIndex].date : '';
   document.getElementById('modal-bg').classList.add('active');
   document.getElementById('modal-date').focus();
 }
@@ -62,6 +83,11 @@ function fecharModal() {
 }
 
 function confirmarAdicao() {
+  if (!window.agendaId) {
+    alert('Agenda do aluno não definida.');
+    return;
+  }
+
   const data = document.getElementById('modal-date').value;
   const texto = document.getElementById('modal-text').value.trim();
   if (!data || !texto) {
@@ -80,18 +106,17 @@ function confirmarAdicao() {
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ descricao: texto, data })
+    body: JSON.stringify({ descricao: texto, data, agenda_id: window.agendaId })
   })
-    .then(res => res.json())
-    .then(json => {
+    .then((res) => res.json())
+    .then((json) => {
       if (json.sucesso) {
-        // Atualiza dados locais
-        let pagina = pagesData.find(p => p.date === data);
+        let pagina = window.pagesData.find((p) => p.date === data);
         if (!pagina) {
           pagina = { date: data, contents: [] };
-          pagesData.push(pagina);
-          pagesData.sort((a,b) => a.date.localeCompare(b.date));
-          currentPageIndex = pagesData.findIndex(p => p.date === data);
+          window.pagesData.push(pagina);
+          window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
+          currentPageIndex = window.pagesData.findIndex((p) => p.date === data);
         }
         pagina.contents.push(`${tipoAtual}: ${texto}`);
 
@@ -101,14 +126,14 @@ function confirmarAdicao() {
         alert('Erro ao adicionar conteúdo: ' + (json.erro || ''));
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       alert('Erro ao conectar ao servidor');
     });
 }
 
 function excluirConteudo(index) {
-  const pagina = pagesData[currentPageIndex];
+  const pagina = window.pagesData[currentPageIndex];
   if (pagina) {
     pagina.contents.splice(index, 1);
     renderPage();
@@ -116,7 +141,7 @@ function excluirConteudo(index) {
 }
 
 function avancarPagina() {
-  if (currentPageIndex < pagesData.length - 1) {
+  if (currentPageIndex < window.pagesData.length - 1) {
     currentPageIndex++;
     renderPage();
   }
