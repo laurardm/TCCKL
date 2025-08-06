@@ -42,18 +42,19 @@
         <span class="olho" onclick="togglePassword('confirmarSenha')">&#128065;</span>
       </div>
 
-      <!-- Alerta personalizado (sem criar novo botão) -->
-      <div id="custom-alert" class="alert hidden">
-        <div class="alert-content">
-          <span id="alert-message">Mensagem</span>
-          <button id="alert-ok-button">OK</button>
-        </div>
-      </div>
-
       <a href="/">Voltar</a>
       <button id="concluir" type="submit">Concluir</button>
     </form>
   </div>
+
+  <!-- ✅ ALERTA FORA DO FORMULARIO -->
+  <div id="custom-alert" class="alert hidden">
+    <div class="alert-content">
+      <span id="alert-message">Mensagem</span>
+      <button id="alert-ok-button" type="button">OK</button> <!-- ✅ CORRIGIDO -->
+    </div>
+  </div>
+
   <div id="logo"></div>
   <script src="/js/scriptcad.js"></script>
   <script src="/js/logo.js"></script>
