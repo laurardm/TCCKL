@@ -18,7 +18,7 @@
 
 <body>
     <div id="imagem">
-        <img src="<%= foto %>" alt="fotofunc" id="fotoperfil">
+        <img src="<%= foto ? '/uploads/' + foto : '/images/perfil.png' %>" alt="Foto do usuário" id="fotoperfil"/>
     </div>
 
 

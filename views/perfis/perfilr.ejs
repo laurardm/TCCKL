@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,35 +9,43 @@
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/logo.css" />
 </head>
+
 <body>
   <div class="foto">
     <div class="fotoperfil">
-      <img src="" alt="Foto do usuário" />
-      <p id="nomeDisplay"><%= nome %></p>
+      <img src="<%= foto ? '/uploads/' + foto : '/images/perfil.png' %>" alt="Foto do usuário" />
+      <p id="nomeDisplay">
+        <%= nome %>
+      </p>
     </div>
     <div class="form-container">
       <% if (erro) { %>
-        <div class="erro-msg" style="color:red; margin-bottom: 10px;"><%= erro %></div>
-      <% } %>
-      <form id="perfilForm" method="POST" action="/perfilr">
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" name="nome" value="<%= nome %>" disabled required />
-
-        <label for="data">Data de nascimento</label>
-        <input type="date" id="data" name="data_nasc" value="<%= data_nasc %>" disabled required />
-
-        <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" value="<%= email %>" disabled required />
-
-        <label for="parentesco">Parentesco</label>
-        <input type="text" id="parentesco" value="<%= parentesco %>" disabled />
-
-        <div class="botoes">
-          <button type="button" id="voltar">Voltar</button>
-          <button type="button" id="editar">Editar</button>
-          <button type="submit" id="salvar" disabled>Salvar</button>
+        <div class="erro-msg" style="color:red; margin-bottom: 10px;">
+          <%= erro %>
         </div>
-      </form>
+        <% } %>
+          <form id="perfilForm" method="POST" action="/perfilr" enctype="multipart/form-data">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" name="nome" value="<%= nome %>" disabled required />
+
+            <label for="data">Data de nascimento</label>
+            <input type="date" id="data" name="data_nasc" value="<%= data_nasc %>" disabled required />
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" value="<%= email %>" disabled required />
+
+            <label for="parentesco">Parentesco</label>
+            <input type="text" id="parentesco" value="<%= parentesco %>" disabled />
+
+            <label for="foto">Foto de perfil</label>
+            <input type="file" id="foto" name="foto" accept="image/*" disabled />
+
+            <div class="botoes">
+              <button type="button" id="voltar">Voltar</button>
+              <button type="button" id="editar">Editar</button>
+              <button type="submit" id="salvar" disabled>Salvar</button>
+            </div>
+          </form>
     </div>
   </div>
   <div id="footer"></div>
@@ -46,4 +55,5 @@
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
 </body>
+
 </html>
