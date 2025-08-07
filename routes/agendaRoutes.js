@@ -113,4 +113,46 @@ router.post('/adicionar-evento', (req, res) => {
   });
 });
 
+// EDITAR recado
+router.put('/recados/:id', (req, res) => {
+  const { id } = req.params;
+  const { conteudo } = req.body;
+
+  const sql = 'UPDATE recados SET conteudo = ? WHERE id = ?';
+
+  db.query(sql, [conteudo, id], (err, result) => {
+    if (err) {
+      console.error('Erro ao editar recado:', err);
+      return res.status(500).json({ error: 'Erro ao editar recado' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Recado não encontrado' });
+    }
+
+    res.status(200).json({ message: 'Recado atualizado com sucesso!' });
+  });
+});
+
+// EDITAR evento
+router.put('/eventos/:id', (req, res) => {
+  const { id } = req.params;
+  const { conteudo } = req.body;
+
+  const sql = 'UPDATE eventos SET conteudo = ? WHERE id = ?';
+
+  db.query(sql, [conteudo, id], (err, result) => {
+    if (err) {
+      console.error('Erro ao editar evento:', err);
+      return res.status(500).json({ error: 'Erro ao editar evento' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Evento não encontrado' });
+    }
+
+    res.status(200).json({ message: 'Evento atualizado com sucesso!' });
+  });
+});
+
 module.exports = router;

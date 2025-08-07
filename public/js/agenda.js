@@ -53,8 +53,8 @@ function renderPage() {
   } else {
     conteudoDiv.innerHTML = pagina.contents.map((conteudo, index) => `
       <div class="conteudo-item">
-        <button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
-          <i class="fa-solid fa-trash"></i>
+        <button class="btn-editar" title="Editar" onclick="editarConteudo(${index})">
+          <i class="fa-solid fa-pen-to-square"></i>
         </button>
         <span class="conteudo-text">${conteudo}</span>
       </div>
@@ -97,6 +97,8 @@ function confirmarAdicao() {
     return;
   }
 
+  const isEdicao = window.edicaoAtiva !== undefined;
+
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -105,6 +107,22 @@ function confirmarAdicao() {
     .then((res) => res.json())
     .then((json) => {
       if (json.sucesso) {
+        // Remover antigo se for edição
+        if (isEdicao) {
+          const { index, data: dataAntiga } = window.edicaoAtiva;
+          const paginaAntiga = window.pagesData.find((p) => p.date === dataAntiga);
+          if (paginaAntiga && paginaAntiga.contents[index]) {
+            paginaAntiga.contents.splice(index, 1);
+
+            if (paginaAntiga.contents.length === 0) {
+              const idx = window.pagesData.findIndex((p) => p.date === dataAntiga);
+              if (idx > -1) window.pagesData.splice(idx, 1);
+              if (currentPageIndex >= window.pagesData.length) currentPageIndex = window.pagesData.length - 1;
+            }
+          }
+          delete window.edicaoAtiva;
+        }
+
         let pagina = window.pagesData.find((p) => p.date === data);
         if (!pagina) {
           pagina = { date: data, contents: [] };
@@ -112,12 +130,12 @@ function confirmarAdicao() {
           window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
           currentPageIndex = window.pagesData.findIndex((p) => p.date === data);
         }
-        pagina.contents.push(`${tipoAtual}: ${texto}`);
 
+        pagina.contents.push(`${tipoAtual}: ${texto}`);
         fecharModal();
         renderPage();
       } else {
-        alert('Erro ao adicionar: ' + (json.erro || ''));
+        alert('Erro ao salvar: ' + (json.erro || ''));
       }
     })
     .catch((err) => {
@@ -126,12 +144,23 @@ function confirmarAdicao() {
     });
 }
 
-function excluirConteudo(index) {
+function editarConteudo(index) {
   const pagina = window.pagesData[currentPageIndex];
-  if (pagina) {
-    pagina.contents.splice(index, 1);
-    renderPage();
-  }
+  if (!pagina || !pagina.contents[index]) return;
+
+  const conteudoCompleto = pagina.contents[index];
+  const [tipo, ...descricaoArr] = conteudoCompleto.split(':');
+  const descricao = descricaoArr.join(':').trim();
+
+  tipoAtual = tipo;
+  document.getElementById('modal-title').textContent = `Editar ${tipoAtual}`;
+  document.getElementById('modal-text').value = descricao;
+  document.getElementById('modal-date').value = pagina.date;
+
+  window.edicaoAtiva = { index, data: pagina.date };
+
+  document.getElementById('modal-bg').classList.add('active');
+  document.getElementById('modal-date').focus();
 }
 
 function avancarPagina() {
