@@ -114,13 +114,13 @@ router.post('/adicionar-evento', (req, res) => {
 });
 
 // EDITAR recado
-router.put('/recados/:id', (req, res) => {
-  const { id } = req.params;
-  const { conteudo } = req.body;
+router.put('/recados/:cod', (req, res) => {
+  const { cod } = req.params;
+  const { descricao } = req.body;
 
-  const sql = 'UPDATE recados SET conteudo = ? WHERE id = ?';
+  const sql = 'UPDATE recados SET descricao = ? WHERE cod = ?';
 
-  db.query(sql, [conteudo, id], (err, result) => {
+  db.query(sql, [descricao, cod], (err, result) => {
     if (err) {
       console.error('Erro ao editar recado:', err);
       return res.status(500).json({ error: 'Erro ao editar recado' });
@@ -135,13 +135,13 @@ router.put('/recados/:id', (req, res) => {
 });
 
 // EDITAR evento
-router.put('/eventos/:id', (req, res) => {
-  const { id } = req.params;
-  const { conteudo } = req.body;
+router.put('/eventos/:cod', (req, res) => {
+  const { cod } = req.params;
+  const { descricao } = req.body;
 
-  const sql = 'UPDATE eventos SET conteudo = ? WHERE id = ?';
+  const sql = 'UPDATE eventos SET descricao = ? WHERE cod = ?';
 
-  db.query(sql, [conteudo, id], (err, result) => {
+  db.query(sql, [descricao, cod], (err, result) => {
     if (err) {
       console.error('Erro ao editar evento:', err);
       return res.status(500).json({ error: 'Erro ao editar evento' });
