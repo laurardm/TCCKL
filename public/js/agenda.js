@@ -1,4 +1,3 @@
-// Pega os dados do elemento com data-attributes
 const agendaElem = document.getElementById('agenda-data');
 let rawAgendaId = null;
 let rawPages = '[]';
@@ -28,7 +27,7 @@ function formatarData(dataStr) {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
-  }).replace(/^\w/, (c) => c.toUpperCase());
+  }).replace(/^\w/, c => c.toUpperCase());
 }
 
 function renderPage() {
@@ -47,24 +46,19 @@ function renderPage() {
   if (currentPageIndex >= window.pagesData.length) currentPageIndex = window.pagesData.length - 1;
 
   const pagina = window.pagesData[currentPageIndex];
-
   titulo.textContent = formatarData(pagina.date);
 
   if (!pagina.contents || pagina.contents.length === 0) {
     conteudoDiv.innerHTML = '<p>Sem conteúdos nesta data.</p>';
   } else {
-    conteudoDiv.innerHTML = pagina.contents
-      .map(
-        (conteudo, index) => `
+    conteudoDiv.innerHTML = pagina.contents.map((conteudo, index) => `
       <div class="conteudo-item">
         <button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
           <i class="fa-solid fa-trash"></i>
         </button>
         <span class="conteudo-text">${conteudo}</span>
       </div>
-    `
-      )
-      .join('');
+    `).join('');
   }
 }
 
@@ -99,7 +93,7 @@ function confirmarAdicao() {
   if (tipoAtual === 'Recado') url = '/agenda/adicionar-recado';
   else if (tipoAtual === 'Evento') url = '/agenda/adicionar-evento';
   else {
-    alert('Tipo inválido para salvar no banco');
+    alert('Tipo inválido');
     return;
   }
 
@@ -123,12 +117,12 @@ function confirmarAdicao() {
         fecharModal();
         renderPage();
       } else {
-        alert('Erro ao adicionar conteúdo: ' + (json.erro || ''));
+        alert('Erro ao adicionar: ' + (json.erro || ''));
       }
     })
     .catch((err) => {
       console.error(err);
-      alert('Erro ao conectar ao servidor');
+      alert('Erro ao conectar');
     });
 }
 

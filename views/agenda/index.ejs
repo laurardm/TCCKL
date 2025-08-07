@@ -65,9 +65,9 @@
 
   <!-- Dados injetados via data-attributes -->
   <div id="agenda-data"
-       data-agenda-id="<%= agenda_id || '' %>"
-       data-recados='<%- JSON.stringify(recadosEventos || []) %>'>
-  </div>
+     data-agenda-id="<%= agenda_id || '' %>"
+     data-recados='<%- JSON.stringify(recadosEventos || []) %>'>
+</div>
 
   <script>
     const el = document.getElementById('agenda-data');

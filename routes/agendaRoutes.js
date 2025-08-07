@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
     }
 
     const nomeAluno = results[0].nome;
-    const agenda_id = results[0].agenda; // pega a agenda do aluno
+    const agenda_id = results[0].agenda;
 
     if (!agenda_id) {
       return res.render('agenda/index', {
@@ -46,8 +46,8 @@ router.get('/', (req, res) => {
       });
     }
 
-    const sqlRecados = 'SELECT descricao, datar AS data, "Recado" AS tipo FROM recados WHERE agenda_id = ?';
-    const sqlEventos = 'SELECT descricao, datae AS data, "Evento" AS tipo FROM eventos WHERE agenda_id = ?';
+    const sqlRecados = 'SELECT descricao, DATE_FORMAT(datar, "%Y-%m-%d") AS data, "Recado" AS tipo FROM recados WHERE agenda_id = ?';
+    const sqlEventos = 'SELECT descricao, DATE_FORMAT(datae, "%Y-%m-%d") AS data, "Evento" AS tipo FROM eventos WHERE agenda_id = ?';
 
     db.query(sqlRecados, [agenda_id], (errRec, recados) => {
       if (errRec) recados = [];
@@ -55,8 +55,8 @@ router.get('/', (req, res) => {
         if (errEvt) eventos = [];
 
         const todos = [...recados, ...eventos];
-
         const grouped = {};
+
         todos.forEach(item => {
           if (!grouped[item.data]) grouped[item.data] = [];
           grouped[item.data].push(`${item.tipo}: ${item.descricao}`);
@@ -71,7 +71,7 @@ router.get('/', (req, res) => {
           userImage: null,
           userName: null,
           selectedDate,
-          agenda_id, // passa corretamente
+          agenda_id,
           recadosEventos
         });
       });
