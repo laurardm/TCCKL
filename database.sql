@@ -15,7 +15,6 @@ CREATE TABLE genero (
 CREATE TABLE cargo (
   cod INT NOT NULL AUTO_INCREMENT,
   descricao VARCHAR(10) DEFAULT 'Professor',
-  PRIMARY KEY (cod)
 );
 
 CREATE TABLE fotosa (
@@ -29,6 +28,7 @@ CREATE TABLE fotosa (
 
 CREATE TABLE fotost (
   cod INT NOT NULL AUTO_INCREMENT,
+  linkt VARCHAR(150) NOT NULL,
   descricao VARCHAR(150),
   PRIMARY KEY (cod)
 );
@@ -61,8 +61,9 @@ CREATE TABLE turma (
 
 CREATE TABLE agenda (
   cod INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (cod)
-  -- Removed recados, fotosa, eventos fields as explained
+  aluno INT,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_agenda_aluno FOREIGN KEY (aluno) REFERENCES aluno(cod)
 );
 
 CREATE TABLE responsaveis (
@@ -99,11 +100,9 @@ CREATE TABLE aluno (
   cod INT NOT NULL AUTO_INCREMENT,
   nome VARCHAR(40) NOT NULL,
   turma INT,
-  agenda INT,
   foto VARCHAR(150),
   PRIMARY KEY (cod),
-  CONSTRAINT fk_aluno_turma FOREIGN KEY (turma) REFERENCES turma(cod),
-  CONSTRAINT fk_aluno_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod)
+  CONSTRAINT fk_aluno_turma FOREIGN KEY (turma) REFERENCES turma(cod)
 );
 
 CREATE TABLE alu_resp (
