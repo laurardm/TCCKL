@@ -46,8 +46,14 @@ router.get('/', (req, res) => {
       });
     }
 
-    const sqlRecados = 'SELECT descricao, DATE_FORMAT(datar, "%Y-%m-%d") AS data, "Recado" AS tipo FROM recados WHERE agenda_id = ?';
-    const sqlEventos = 'SELECT descricao, DATE_FORMAT(datae, "%Y-%m-%d") AS data, "Evento" AS tipo FROM eventos WHERE agenda_id = ?';
+    const sqlRecados = `
+      SELECT cod, descricao, DATE_FORMAT(datar, "%Y-%m-%d") AS data, "Recado" AS tipo 
+      FROM recados 
+      WHERE agenda_id = ?`;
+    const sqlEventos = `
+      SELECT cod, descricao, DATE_FORMAT(datae, "%Y-%m-%d") AS data, "Evento" AS tipo 
+      FROM eventos 
+      WHERE agenda_id = ?`;
 
     db.query(sqlRecados, [agenda_id], (errRec, recados) => {
       if (errRec) recados = [];
@@ -59,7 +65,11 @@ router.get('/', (req, res) => {
 
         todos.forEach(item => {
           if (!grouped[item.data]) grouped[item.data] = [];
-          grouped[item.data].push(`${item.tipo}: ${item.descricao}`);
+          grouped[item.data].push({
+            tipo: item.tipo,
+            descricao: item.descricao,
+            cod: item.cod
+          });
         });
 
         const recadosEventos = Object.keys(grouped)
@@ -114,43 +124,37 @@ router.post('/adicionar-evento', (req, res) => {
 });
 
 // EDITAR recado
-router.put('/recados/:id', (req, res) => {
-  const { id } = req.params;
-  const { conteudo } = req.body;
+router.put('/recados/:cod', (req, res) => {
+  const { cod } = req.params;
+  const { descricao } = req.body;
 
-  const sql = 'UPDATE recados SET conteudo = ? WHERE id = ?';
-
-  db.query(sql, [conteudo, id], (err, result) => {
+  const sql = 'UPDATE recados SET descricao = ? WHERE cod = ?';
+  db.query(sql, [descricao, cod], (err, result) => {
     if (err) {
       console.error('Erro ao editar recado:', err);
       return res.status(500).json({ error: 'Erro ao editar recado' });
     }
-
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Recado não encontrado' });
     }
-
     res.status(200).json({ message: 'Recado atualizado com sucesso!' });
   });
 });
 
 // EDITAR evento
-router.put('/eventos/:id', (req, res) => {
-  const { id } = req.params;
-  const { conteudo } = req.body;
+router.put('/eventos/:cod', (req, res) => {
+  const { cod } = req.params;
+  const { descricao } = req.body;
 
-  const sql = 'UPDATE eventos SET conteudo = ? WHERE id = ?';
-
-  db.query(sql, [conteudo, id], (err, result) => {
+  const sql = 'UPDATE eventos SET descricao = ? WHERE cod = ?';
+  db.query(sql, [descricao, cod], (err, result) => {
     if (err) {
       console.error('Erro ao editar evento:', err);
       return res.status(500).json({ error: 'Erro ao editar evento' });
     }
-
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Evento não encontrado' });
     }
-
     res.status(200).json({ message: 'Evento atualizado com sucesso!' });
   });
 });

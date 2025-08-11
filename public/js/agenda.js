@@ -1,24 +1,6 @@
-const agendaElem = document.getElementById('agenda-data');
-let rawAgendaId = null;
-let rawPages = '[]';
-
-if (agendaElem) {
-  rawAgendaId = agendaElem.getAttribute('data-agenda-id');
-  rawPages = agendaElem.getAttribute('data-recados') || '[]';
-}
-
-window.agendaId = rawAgendaId ? Number(rawAgendaId) : null;
-
-try {
-  window.pagesData = JSON.parse(rawPages);
-  if (!Array.isArray(window.pagesData)) window.pagesData = [];
-} catch (e) {
-  console.warn('Erro ao fazer parse de recadosEventos:', e);
-  window.pagesData = [];
-}
-
 let currentPageIndex = 0;
 let tipoAtual = '';
+window.edicaoAtiva = null;
 
 function formatarData(dataStr) {
   const d = new Date(dataStr + 'T00:00:00');
@@ -42,9 +24,6 @@ function renderPage() {
 
   window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
 
-  if (currentPageIndex < 0) currentPageIndex = 0;
-  if (currentPageIndex >= window.pagesData.length) currentPageIndex = window.pagesData.length - 1;
-
   const pagina = window.pagesData[currentPageIndex];
   titulo.textContent = formatarData(pagina.date);
 
@@ -53,10 +32,10 @@ function renderPage() {
   } else {
     conteudoDiv.innerHTML = pagina.contents.map((conteudo, index) => `
       <div class="conteudo-item">
-        <button class="btn-editar" title="Editar" onclick="editarConteudo(${index})">
+        <button class="btn-editar" onclick="editarConteudo(${index})">
           <i class="fa-solid fa-pen-to-square"></i>
         </button>
-        <span class="conteudo-text">${conteudo}</span>
+        <span class="conteudo-text">${conteudo.tipo}: ${conteudo.descricao}</span>
       </div>
     `).join('');
   }
@@ -64,16 +43,16 @@ function renderPage() {
 
 function abrirModal(tipo) {
   tipoAtual = tipo;
-  document.getElementById('modal-title').textContent = `Adicionar ${tipo}`;
-  document.getElementById('modal-text').value = '';
-  document.getElementById('modal-date').value =
-    window.pagesData.length > 0 ? window.pagesData[currentPageIndex].date : '';
+  document.getElementById('modal-title').textContent = `${window.edicaoAtiva ? 'Editar' : 'Adicionar'} ${tipo}`;
+  document.getElementById('modal-text').value = window.edicaoAtiva ? window.edicaoAtiva.descricao : '';
+  document.getElementById('modal-date').value = window.edicaoAtiva ? window.edicaoAtiva.data : (window.pagesData.length > 0 ? window.pagesData[currentPageIndex].date : '');
   document.getElementById('modal-bg').classList.add('active');
   document.getElementById('modal-date').focus();
 }
 
 function fecharModal() {
   document.getElementById('modal-bg').classList.remove('active');
+  window.edicaoAtiva = null;
 }
 
 function confirmarAdicao() {
@@ -89,78 +68,81 @@ function confirmarAdicao() {
     return;
   }
 
-  let url = '';
-  if (tipoAtual === 'Recado') url = '/agenda/adicionar-recado';
-  else if (tipoAtual === 'Evento') url = '/agenda/adicionar-evento';
-  else {
-    alert('Tipo inválido');
-    return;
-  }
+  if (window.edicaoAtiva) {
+    // EDIÇÃO
+    let url = '';
+    if (tipoAtual === 'Recado') url = `/agenda/recados/${window.edicaoAtiva.cod}`;
+    else if (tipoAtual === 'Evento') url = `/agenda/eventos/${window.edicaoAtiva.cod}`;
 
-  const isEdicao = window.edicaoAtiva !== undefined;
-
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ descricao: texto, data, agenda_id: window.agendaId })
-  })
-    .then((res) => res.json())
-    .then((json) => {
-      if (json.sucesso) {
-        // Remover antigo se for edição
-        if (isEdicao) {
-          const { index, data: dataAntiga } = window.edicaoAtiva;
-          const paginaAntiga = window.pagesData.find((p) => p.date === dataAntiga);
-          if (paginaAntiga && paginaAntiga.contents[index]) {
-            paginaAntiga.contents.splice(index, 1);
-
-            if (paginaAntiga.contents.length === 0) {
-              const idx = window.pagesData.findIndex((p) => p.date === dataAntiga);
-              if (idx > -1) window.pagesData.splice(idx, 1);
-              if (currentPageIndex >= window.pagesData.length) currentPageIndex = window.pagesData.length - 1;
-            }
-          }
-          delete window.edicaoAtiva;
-        }
-
-        let pagina = window.pagesData.find((p) => p.date === data);
-        if (!pagina) {
-          pagina = { date: data, contents: [] };
-          window.pagesData.push(pagina);
-          window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
-          currentPageIndex = window.pagesData.findIndex((p) => p.date === data);
-        }
-
-        pagina.contents.push(`${tipoAtual}: ${texto}`);
-        fecharModal();
-        renderPage();
-      } else {
-        alert('Erro ao salvar: ' + (json.erro || ''));
-      }
+    fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descricao: texto })
     })
-    .catch((err) => {
-      console.error(err);
-      alert('Erro ao conectar');
-    });
+      .then(res => res.json())
+      .then(json => {
+        if (json.message) {
+          const pagina = window.pagesData.find(p => p.date === window.edicaoAtiva.data);
+          if (pagina) pagina.contents[window.edicaoAtiva.index].descricao = texto;
+          fecharModal();
+          renderPage();
+        } else {
+          alert('Erro ao editar.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Erro ao conectar.');
+      });
+
+  } else {
+    // ADIÇÃO
+    let url = '';
+    if (tipoAtual === 'Recado') url = '/agenda/adicionar-recado';
+    else if (tipoAtual === 'Evento') url = '/agenda/adicionar-evento';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descricao: texto, data, agenda_id: window.agendaId })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.sucesso) {
+          let pagina = window.pagesData.find(p => p.date === data);
+          if (!pagina) {
+            pagina = { date: data, contents: [] };
+            window.pagesData.push(pagina);
+          }
+          pagina.contents.push({ tipo: tipoAtual, descricao: texto, cod: json.id });
+          fecharModal();
+          renderPage();
+        } else {
+          alert('Erro ao adicionar.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Erro ao conectar.');
+      });
+  }
 }
 
 function editarConteudo(index) {
   const pagina = window.pagesData[currentPageIndex];
   if (!pagina || !pagina.contents[index]) return;
 
-  const conteudoCompleto = pagina.contents[index];
-  const [tipo, ...descricaoArr] = conteudoCompleto.split(':');
-  const descricao = descricaoArr.join(':').trim();
+  const conteudo = pagina.contents[index];
+  tipoAtual = conteudo.tipo;
 
-  tipoAtual = tipo;
-  document.getElementById('modal-title').textContent = `Editar ${tipoAtual}`;
-  document.getElementById('modal-text').value = descricao;
-  document.getElementById('modal-date').value = pagina.date;
+  window.edicaoAtiva = {
+    index,
+    data: pagina.date,
+    cod: conteudo.cod,
+    descricao: conteudo.descricao
+  };
 
-  window.edicaoAtiva = { index, data: pagina.date };
-
-  document.getElementById('modal-bg').classList.add('active');
-  document.getElementById('modal-date').focus();
+  abrirModal(tipoAtual);
 }
 
 function avancarPagina() {
@@ -177,6 +159,4 @@ function voltarPagina() {
   }
 }
 
-window.onload = () => {
-  renderPage();
-};
+window.onload = renderPage;
