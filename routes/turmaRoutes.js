@@ -26,7 +26,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // --- ROTAS DE TURMAS ---
-
 // GET /turmas - listar turmas
 router.get("/", (req, res) => {
   const sql = "SELECT nome FROM turma ORDER BY nome";
@@ -56,14 +55,16 @@ router.get("/:nomeTurma", (req, res) => {
       SELECT a.cod, a.nome, a.agenda, a.foto
       FROM aluno a
       WHERE a.turma = ?
+      ORDER BY a.nome
     `;
 
     db.query(sqlAlunos, [codTurma], (err2, alunos) => {
       if (err2) {
+        console.error(err2);
         return res.render("turmas/turmanome", { nomeTurma: turmaResults[0].nome.trim(), alunos: [], tipoUsuario: null });
       }
 
-      const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" : 
+      const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" :
                           req.session.usuario?.tipo === "responsavel" ? "resp" : null;
 
       res.render("turmas/turmanome", {
@@ -80,16 +81,25 @@ router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
   const { nome } = req.body;
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
+  if (!nome || !nome.trim()) return res.status(400).send('Nome inválido');
+
   const sqlTurma = 'SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1';
   db.query(sqlTurma, [nomeTurma], (err, result) => {
-    if (err || result.length === 0) return res.status(400).send('Turma não encontrada');
+    if (err || result.length === 0) {
+      console.error(err);
+      return res.status(400).send('Turma não encontrada');
+    }
 
     const codTurma = result[0].cod;
     const sqlInsert = 'INSERT INTO aluno (nome, turma) VALUES (?, ?)';
-    db.query(sqlInsert, [nome, codTurma], (err2, resultInsert) => {
-      if (err2) return res.status(500).send('Erro ao adicionar aluno');
-      
-      res.status(200).json({ cod: resultInsert.insertId, nome });
+    db.query(sqlInsert, [nome.trim(), codTurma], (err2, resultInsert) => {
+      if (err2) {
+        console.error(err2);
+        return res.status(500).send('Erro ao adicionar aluno');
+      }
+
+      // Retorna id e nome para o frontend
+      res.status(200).json({ cod: resultInsert.insertId, nome: nome.trim(), foto: null });
     });
   });
 });
@@ -97,10 +107,14 @@ router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
 // PUT - Editar aluno (somente funcionário)
 router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod, nome } = req.body;
-  const sqlUpdate = "UPDATE aluno SET nome = ? WHERE cod = ?";
+  if (!cod || !nome) return res.status(400).send("Dados inválidos");
 
-  db.query(sqlUpdate, [nome, cod], (err) => {
-    if (err) return res.status(500).send("Erro ao editar aluno");
+  const sqlUpdate = "UPDATE aluno SET nome = ? WHERE cod = ?";
+  db.query(sqlUpdate, [nome.trim(), cod], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Erro ao editar aluno");
+    }
     res.status(200).send("Aluno atualizado");
   });
 });
@@ -108,10 +122,14 @@ router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
 // DELETE - Excluir aluno (somente funcionário)
 router.delete("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod } = req.body;
-  const sqlDelete = "DELETE FROM aluno WHERE cod = ?";
+  if (!cod) return res.status(400).send("Código inválido");
 
+  const sqlDelete = "DELETE FROM aluno WHERE cod = ?";
   db.query(sqlDelete, [cod], (err) => {
-    if (err) return res.status(500).send("Erro ao excluir aluno");
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Erro ao excluir aluno");
+    }
     res.status(200).send("Aluno excluído");
   });
 });
@@ -139,7 +157,6 @@ router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"),
 });
 
 // --- ROTA DA AGENDA ---
-
 // GET /agenda/aluno/:cod - Exibir agenda do aluno
 router.get('/aluno/:cod', (req, res) => {
   const codAluno = req.params.cod;
@@ -147,6 +164,7 @@ router.get('/aluno/:cod', (req, res) => {
   const sql = "SELECT cod, nome, agenda, foto FROM aluno WHERE cod = ?";
   db.query(sql, [codAluno], (err, results) => {
     if (err || results.length === 0) {
+      console.error(err);
       return res.status(404).send("Aluno não encontrado");
     }
 
