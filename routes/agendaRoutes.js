@@ -2,7 +2,30 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// GET agenda e carregar recados e eventos do aluno
+// GET /agenda/aluno/:cod - Exibir agenda do aluno
+router.get('/aluno/:cod', (req, res) => {
+  const codAluno = req.params.cod;
+
+  const sql = "SELECT cod, nome, agenda, foto FROM aluno WHERE cod = ?";
+  db.query(sql, [codAluno], (err, results) => {
+    if (err || results.length === 0) {
+      console.error(err);
+      return res.status(404).send("Aluno não encontrado");
+    }
+
+    const aluno = results[0];
+
+    res.render("agenda/index", {
+      userImage: aluno.foto || "/imagens/perfil.png",
+      nomeAluno: aluno.nome,
+      selectedDate: null,
+      agenda_id: aluno.agenda || null,
+      recadosEventos: []
+    });
+  });
+});
+
+// GET /agenda?aluno=1&data=YYYY-MM-DD - Carregar recados e eventos do aluno
 router.get('/', (req, res) => {
   const alunoCod = req.query.aluno;
   const selectedDate = req.query.data;
@@ -11,35 +34,34 @@ router.get('/', (req, res) => {
     return res.render('agenda/index', {
       nomeAluno: 'não definido',
       userImage: null,
-      userName: null,
       selectedDate,
       agenda_id: null,
       recadosEventos: []
     });
   }
 
-  const sqlAluno = 'SELECT nome, agenda FROM aluno WHERE cod = ?';
+  const sqlAluno = 'SELECT nome, agenda, foto FROM aluno WHERE cod = ?';
 
   db.query(sqlAluno, [alunoCod], (err, results) => {
     if (err || results.length === 0) {
       return res.render('agenda/index', {
         nomeAluno: 'não definido',
         userImage: null,
-        userName: null,
         selectedDate,
         agenda_id: null,
         recadosEventos: []
       });
     }
 
-    const nomeAluno = results[0].nome;
-    const agenda_id = results[0].agenda;
+    const aluno = results[0];
+    const nomeAluno = aluno.nome;
+    const agenda_id = aluno.agenda;
+    const userImage = aluno.foto || "/imagens/perfil.png";
 
     if (!agenda_id) {
       return res.render('agenda/index', {
         nomeAluno,
-        userImage: null,
-        userName: null,
+        userImage,
         selectedDate,
         agenda_id: null,
         recadosEventos: []
@@ -78,8 +100,7 @@ router.get('/', (req, res) => {
 
         res.render('agenda/index', {
           nomeAluno,
-          userImage: null,
-          userName: null,
+          userImage,
           selectedDate,
           agenda_id,
           recadosEventos
@@ -123,7 +144,7 @@ router.post('/adicionar-evento', (req, res) => {
   });
 });
 
-// EDITAR recado
+// PUT - editar recado
 router.put('/recados/:cod', (req, res) => {
   const { cod } = req.params;
   const { descricao } = req.body;
@@ -141,7 +162,7 @@ router.put('/recados/:cod', (req, res) => {
   });
 });
 
-// EDITAR evento
+// PUT - editar evento
 router.put('/eventos/:cod', (req, res) => {
   const { cod } = req.params;
   const { descricao } = req.body;

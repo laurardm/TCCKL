@@ -76,7 +76,7 @@ router.get("/:nomeTurma", (req, res) => {
   });
 });
 
-// POST - Adicionar aluno (somente funcionário)
+// POST - Adicionar aluno (somente funcionário) com criação automática de agenda
 router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
   const { nome } = req.body;
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
@@ -91,18 +91,48 @@ router.post('/:nomeTurma', verificarFuncionario, (req, res) => {
     }
 
     const codTurma = result[0].cod;
-    const sqlInsert = 'INSERT INTO aluno (nome, turma) VALUES (?, ?)';
-    db.query(sqlInsert, [nome.trim(), codTurma], (err2, resultInsert) => {
+
+    // 1️⃣ Inserir aluno sem agenda
+    const sqlInsertAluno = 'INSERT INTO aluno (nome, turma) VALUES (?, ?)';
+    db.query(sqlInsertAluno, [nome.trim(), codTurma], (err2, resultInsertAluno) => {
       if (err2) {
         console.error(err2);
         return res.status(500).send('Erro ao adicionar aluno');
       }
 
-      // Retorna id e nome para o frontend
-      res.status(200).json({ cod: resultInsert.insertId, nome: nome.trim(), foto: null });
+      const codAluno = resultInsertAluno.insertId;
+
+      // 2️⃣ Criar agenda para o aluno
+      const sqlInsertAgenda = 'INSERT INTO agenda (aluno_cod) VALUES (?)';
+      db.query(sqlInsertAgenda, [codAluno], (err3, resultInsertAgenda) => {
+        if (err3) {
+          console.error(err3);
+          return res.status(500).send('Erro ao criar agenda do aluno');
+        }
+
+        const codAgenda = resultInsertAgenda.insertId;
+
+        // 3️⃣ Atualizar aluno com a agenda criada
+        const sqlUpdateAluno = 'UPDATE aluno SET agenda = ? WHERE cod = ?';
+        db.query(sqlUpdateAluno, [codAgenda, codAluno], (err4) => {
+          if (err4) {
+            console.error(err4);
+            return res.status(500).send('Erro ao vincular agenda ao aluno');
+          }
+
+          // Retorna tudo já pronto para o frontend
+          res.status(200).json({ 
+            cod: codAluno, 
+            nome: nome.trim(), 
+            foto: null, 
+            agenda: codAgenda 
+          });
+        });
+      });
     });
   });
 });
+
 
 // PUT - Editar aluno (somente funcionário)
 router.put("/:nomeTurma", verificarFuncionario, (req, res) => {

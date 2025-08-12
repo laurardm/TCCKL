@@ -15,6 +15,7 @@ CREATE TABLE genero (
 CREATE TABLE cargo (
   cod INT NOT NULL AUTO_INCREMENT,
   descricao VARCHAR(10) DEFAULT 'Professor',
+  PRIMARY KEY (cod)
 );
 
 CREATE TABLE fotosa (
@@ -28,8 +29,8 @@ CREATE TABLE fotosa (
 
 CREATE TABLE fotost (
   cod INT NOT NULL AUTO_INCREMENT,
-  linkt VARCHAR(150) NOT NULL,
   descricao VARCHAR(150),
+  linkt VARCHAR(150),
   PRIMARY KEY (cod)
 );
 
@@ -37,7 +38,7 @@ CREATE TABLE recados (
   cod INT NOT NULL AUTO_INCREMENT,
   descricao VARCHAR(1000),
   datar DATE,
-  agenda INT NOT NULL,
+  agenda_id INT NOT NULL,
   PRIMARY KEY (cod),
   CONSTRAINT fk_recados_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
@@ -46,7 +47,7 @@ CREATE TABLE eventos (
   cod INT NOT NULL AUTO_INCREMENT,
   descricao VARCHAR(100),
   datae DATE,
-  agenda INT NOT NULL,
+  agenda_id INT NOT NULL,
   PRIMARY KEY (cod),
   CONSTRAINT fk_eventos_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
@@ -61,10 +62,10 @@ CREATE TABLE turma (
 
 CREATE TABLE agenda (
   cod INT NOT NULL AUTO_INCREMENT,
-  aluno INT,
-  PRIMARY KEY (cod),
-  CONSTRAINT fk_agenda_aluno FOREIGN KEY (aluno) REFERENCES aluno(cod)
-);
+  aluno_cod INT,
+  CONSTRAINT fk_turma_fotost FOREIGN KEY (aluno_cod) REFERENCES aluno(cod) ON DELETE SET NULL
+  PRIMARY KEY (cod)
+ );
 
 CREATE TABLE responsaveis (
   cod INT NOT NULL AUTO_INCREMENT,
@@ -100,9 +101,11 @@ CREATE TABLE aluno (
   cod INT NOT NULL AUTO_INCREMENT,
   nome VARCHAR(40) NOT NULL,
   turma INT,
+  agenda INT,
   foto VARCHAR(150),
   PRIMARY KEY (cod),
-  CONSTRAINT fk_aluno_turma FOREIGN KEY (turma) REFERENCES turma(cod)
+  CONSTRAINT fk_aluno_turma FOREIGN KEY (turma) REFERENCES turma(cod),
+  CONSTRAINT fk_aluno_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod)
 );
 
 CREATE TABLE alu_resp (
