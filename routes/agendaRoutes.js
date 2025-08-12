@@ -2,11 +2,16 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// GET /agenda/aluno/:cod - Exibir agenda do aluno
+// GET /agenda/aluno/:cod - Exibir agenda do aluno (cria se não existir)
 router.get('/aluno/:cod', (req, res) => {
   const codAluno = req.params.cod;
 
-  const sql = "SELECT cod, nome, agenda, foto FROM aluno WHERE cod = ?";
+  const sql = `
+    SELECT a.cod AS codAluno, a.nome, ag.cod AS agenda_id, a.foto
+    FROM aluno a
+    LEFT JOIN agenda ag ON ag.aluno_cod = a.cod
+    WHERE a.cod = ?`;
+
   db.query(sql, [codAluno], (err, results) => {
     if (err || results.length === 0) {
       console.error(err);
@@ -15,13 +20,36 @@ router.get('/aluno/:cod', (req, res) => {
 
     const aluno = results[0];
 
-    res.render("agenda/index", {
-      userImage: aluno.foto || "/imagens/perfil.png",
-      nomeAluno: aluno.nome,
-      selectedDate: null,
-      agenda_id: aluno.agenda || null,
-      recadosEventos: []
-    });
+    // Se não existir agenda para o aluno, cria
+    if (!aluno.agenda_id) {
+      const insertAgenda = 'INSERT INTO agenda (aluno_cod) VALUES (?)';
+      db.query(insertAgenda, [aluno.codAluno], (errInsert, insertResult) => {
+        if (errInsert) {
+          console.error(errInsert);
+          return res.status(500).send("Erro ao criar agenda do aluno");
+        }
+
+        // Atualiza o id da agenda
+        aluno.agenda_id = insertResult.insertId;
+
+        res.render("agenda/index", {
+          userImage: aluno.foto || "/imagens/perfil.png",
+          nomeAluno: aluno.nome,
+          selectedDate: null,
+          agenda_id: aluno.agenda_id,
+          recadosEventos: []
+        });
+      });
+    } else {
+      // Já existe agenda
+      res.render("agenda/index", {
+        userImage: aluno.foto || "/imagens/perfil.png",
+        nomeAluno: aluno.nome,
+        selectedDate: null,
+        agenda_id: aluno.agenda_id,
+        recadosEventos: []
+      });
+    }
   });
 });
 
@@ -40,7 +68,11 @@ router.get('/', (req, res) => {
     });
   }
 
-  const sqlAluno = 'SELECT nome, agenda, foto FROM aluno WHERE cod = ?';
+  const sqlAluno = `
+    SELECT a.nome, ag.cod AS agenda_id, a.foto
+    FROM aluno a
+    LEFT JOIN agenda ag ON ag.aluno_cod = a.cod
+    WHERE a.cod = ?`;
 
   db.query(sqlAluno, [alunoCod], (err, results) => {
     if (err || results.length === 0) {
@@ -55,7 +87,7 @@ router.get('/', (req, res) => {
 
     const aluno = results[0];
     const nomeAluno = aluno.nome;
-    const agenda_id = aluno.agenda;
+    const agenda_id = aluno.agenda_id;
     const userImage = aluno.foto || "/imagens/perfil.png";
 
     if (!agenda_id) {

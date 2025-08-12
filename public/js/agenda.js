@@ -2,6 +2,9 @@ let currentPageIndex = 0;
 let tipoAtual = '';
 window.edicaoAtiva = null;
 
+// Garante que a estrutura exista
+window.pagesData = window.pagesData || [];
+
 function formatarData(dataStr) {
   const d = new Date(dataStr + 'T00:00:00');
   return d.toLocaleDateString('pt-BR', {
@@ -113,6 +116,7 @@ function confirmarAdicao() {
           if (!pagina) {
             pagina = { date: data, contents: [] };
             window.pagesData.push(pagina);
+            window.pagesData.sort((a, b) => a.date.localeCompare(b.date));
           }
           pagina.contents.push({ tipo: tipoAtual, descricao: texto, cod: json.id });
           fecharModal();
