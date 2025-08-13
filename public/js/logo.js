@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function(){
-    fetch("../componentes/logo.html")
+    fetch("/componentes/logo.html")
     .then(response => response.text())
     .then(data => {
 

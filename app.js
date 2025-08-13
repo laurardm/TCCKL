@@ -14,7 +14,7 @@ const funcRoutes = require('./routes/funcRoutes');
 const turmaRoutes = require('./routes/turmaRoutes');
 const agendaRoutes = require('./routes/agendaRoutes');
 const esqueciRoutes = require('./routes/esquecisenha');
-const fotosTurmaRoutes = require('./routes/fotosTurmaRoutes');
+const fotosturma = require('./routes/fotosTurmaRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,7 +47,7 @@ app.use('/perfilf', perfilfuncRoutes);
 app.use('/perfilr', perfilrespRoutes);
 app.use('/resp', respRoutes);
 app.use('/turmas', turmaRoutes);
-app.use('/turmas', fotosTurmaRoutes);
+app.use('/fotosturma', fotosturma);
 app.use('/agenda', agendaRoutes);
 app.use('/esqueci-senha', esqueciRoutes);
 
