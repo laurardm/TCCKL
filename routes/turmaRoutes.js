@@ -4,6 +4,27 @@ const db = require("../config/db");
 const multer = require("multer");
 const path = require("path");
 
+
+router.get("/fotos-turma/:nomeTurma", (req, res) => {
+  const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
+
+  const sql = `
+    SELECT f.caminho
+    FROM fotos_turma f
+    INNER JOIN turma t ON t.cod = f.turma_cod
+    WHERE TRIM(UPPER(t.nome)) = ?
+    ORDER BY f.data_upload DESC
+  `;
+
+  db.query(sql, [nomeTurma], (err, fotos) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Erro ao buscar fotos da turma");
+    }
+    res.render("fotos/turma", { nomeTurma, fotos });
+  });
+});
+
 // Middleware para permitir só funcionários nas rotas que alteram dados
 function verificarFuncionario(req, res, next) {
   if (req.session.usuario && req.session.usuario.tipo === 'funcionario') {
@@ -208,4 +229,8 @@ router.get('/aluno/:cod', (req, res) => {
   });
 });
 
+
+
+
 module.exports = router;
+

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendinha Digital - Página Única</title>
+  <link rel="stylesheet" href="/css/fotosTurma.css" />
+  <link rel="stylesheet" href="/css/logo.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+  <div class="painel-turma">
+    <a href="/turmas/<%= encodedNomeTurma %>/fotos-turma">Fotos da turma</a>
+  </div>
+
+  <div class="container">
+    <h2 id="data-titulo"><%= dataTitulo %></h2>
+    <div id="conteudo-pagina">
+      <% if (conteudos && conteudos.length > 0) { %>
+        <% conteudos.forEach(function(item) { %>
+          <div class="conteudo-item">
+            <% if (item.tipo === 'texto') { %>
+              <p><%= item.valor %></p>
+            <% } else if (item.tipo === 'imagem') { %>
+              <img src="<%= item.valor %>" class="conteudo-img" alt="Imagem" />
+            <% } %>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p>Nenhum conteúdo disponível.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="painel-acoes">
+    <button class="btn-navegacao" onclick="voltarPagina()">
+      <i class="fa-solid fa-arrow-left"></i> Página Anterior
+    </button>
+    <button class="btn-adicionar" onclick="abrirModalImagem()">
+      <i class="fa-solid fa-image"></i> Adicionar Imagem
+    </button>
+    <button class="btn-navegacao" onclick="avancarPagina()">
+      Próxima Página <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
+
+  <!-- Modal -->
+  <div id="modal-bg" class="modal-bg">
+    <div class="modal">
+      <button class="modal-close" onclick="fecharModal()" title="Fechar">&times;</button>
+      <h3 id="modal-title">Adicionar</h3>
+      <input type="date" id="modal-date" value="<%= dataAtual %>" />
+      <textarea id="modal-text" placeholder="Digite o texto aqui..."></textarea>
+      <input type="file" id="modal-file" accept="image/*" style="display:none" />
+      <div class="modal-buttons">
+        <button onclick="confirmarAdicao()">Confirmar</button>
+        <button onclick="fecharModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+  <div id="logo"></div>
+  
+  <script src="/js/footer.js"></script>
+  <script src="/js/logo.js"></script>
+  <script src="/js/foto-turma.js"></script>
+</body>
+</html>

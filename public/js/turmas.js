@@ -328,3 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     existing.replaceWith(novo);
   });
 });
+
+
+const encodedNomeTurma = encodeURIComponent(nomeTurma);
+res.render('pagina', { nomeTurma, encodedNomeTurma });

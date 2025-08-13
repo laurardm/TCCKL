@@ -50,7 +50,9 @@
 
   <div class="botoes">
     <a href="/turmas"><button class="btn-voltar">Voltar</button></a>
-    <button id="btnFotos" class="botao">Fotos da turma</button>
+    <a href="/fotos-turma/<%= nomeTurma %>">
+  <button class="botao">Fotos da turma</button>
+</a>
 
     <% if (tipoUsuario === 'func') { %>
       <button id="btnAdicionar" class="botao">Adicionar aluno</button>
@@ -110,6 +112,8 @@
         });
       });
     });
+
+  
   </script>
 </body>
 
