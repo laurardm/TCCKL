@@ -27,11 +27,13 @@ CREATE TABLE fotosa (
   CONSTRAINT fk_fotosa_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE
 );
 
-CREATE TABLE fotost (
+CREATE TABLE fotos_turma (
   cod INT NOT NULL AUTO_INCREMENT,
+  turma_id INT NOT NULL,
   descricao VARCHAR(150),
-  linkt VARCHAR(150),
-  PRIMARY KEY (cod)
+  link VARCHAR(150) NOT NULL,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_fotos_turma FOREIGN KEY (turma_id) REFERENCES turma(cod) ON DELETE CASCADE
 );
 
 CREATE TABLE recados (
@@ -55,9 +57,7 @@ CREATE TABLE eventos (
 CREATE TABLE turma (
   cod INT NOT NULL AUTO_INCREMENT,
   nome CHAR(3),
-  fotost INT,
-  PRIMARY KEY (cod),
-  CONSTRAINT fk_turma_fotost FOREIGN KEY (fotost) REFERENCES fotost(cod) ON DELETE SET NULL
+  PRIMARY KEY (cod)
 );
 
 CREATE TABLE agenda (

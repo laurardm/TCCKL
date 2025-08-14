@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,25 +13,27 @@
 
 <body>
   <div class="painel-turma">
-    <a href="/turmas/<%= encodedNomeTurma %>/fotos-turma">Fotos da turma</a>
+<span class="nome-turma">Fotos da turma <%= decodeURIComponent(encodedNomeTurma) %></span>
   </div>
 
   <div class="container">
-    <h2 id="data-titulo"><%= dataTitulo %></h2>
+    <h2 id="data-titulo"></h2>
     <div id="conteudo-pagina">
-      <% if (conteudos && conteudos.length > 0) { %>
+      <% if (conteudos && conteudos.length> 0) { %>
         <% conteudos.forEach(function(item) { %>
           <div class="conteudo-item">
-            <% if (item.tipo === 'texto') { %>
-              <p><%= item.valor %></p>
-            <% } else if (item.tipo === 'imagem') { %>
-              <img src="<%= item.valor %>" class="conteudo-img" alt="Imagem" />
-            <% } %>
+            <% if (item.tipo==='texto' ) { %>
+              <p>
+                <%= item.valor %>
+              </p>
+              <% } else if (item.tipo==='imagem' ) { %>
+                <img src="<%= item.valor %>" class="conteudo-img" alt="Imagem" />
+                <% } %>
           </div>
-        <% }); %>
-      <% } else { %>
-        <p>Nenhum conteúdo disponível.</p>
-      <% } %>
+          <% }); %>
+            <% } else { %>
+              <p>Nenhum conteúdo disponível.</p>
+              <% } %>
     </div>
   </div>
 
@@ -65,9 +68,10 @@
 
   <div id="footer"></div>
   <div id="logo"></div>
-  
+
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
-  <script src="/js/foto-turma.js"></script>
+  <script src="/js/fotosTurma.js"></script>
 </body>
+
 </html>
