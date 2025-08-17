@@ -2,7 +2,16 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// GET /agenda/aluno/:cod - Exibir agenda do aluno com recados e eventos
+// Middleware para permitir só funcionários nas rotas que alteram dados
+function verificarFuncionario(req, res, next) {
+  if (req.session.usuario && req.session.usuario.tipo === "funcionario") {
+    next();
+  } else {
+    res.status(403).send("Acesso negado: apenas funcionários podem realizar esta ação.");
+  }
+}
+
+// GET /agenda/aluno/:cod - todos podem acessar (visualizar)
 router.get('/aluno/:cod', (req, res) => {
   const codAluno = req.params.cod;
 
@@ -50,13 +59,13 @@ router.get('/aluno/:cod', (req, res) => {
             nomeAluno: aluno.nome,
             selectedDate: null,
             agenda_id: aluno.agenda_id,
-            recadosEventos
+            recadosEventos,
+            tipoUsuario: req.session.usuario?.tipo || null
           });
         });
       });
     }
 
-    // Se não existir agenda para o aluno, cria
     if (!aluno.agenda_id) {
       const insertAgenda = 'INSERT INTO agenda (aluno_cod) VALUES (?)';
       db.query(insertAgenda, [aluno.codAluno], (errInsert, insertResult) => {
@@ -73,8 +82,8 @@ router.get('/aluno/:cod', (req, res) => {
   });
 });
 
-// POST adicionar recado
-router.post('/adicionar-recado', (req, res) => {
+// ROTAS PROTEGIDAS
+router.post('/adicionar-recado', verificarFuncionario, (req, res) => {
   const { descricao, data, agenda_id } = req.body;
   if (!descricao || !data || !agenda_id) return res.status(400).json({ erro: 'Campos obrigatórios' });
 
@@ -85,8 +94,7 @@ router.post('/adicionar-recado', (req, res) => {
   });
 });
 
-// POST adicionar evento
-router.post('/adicionar-evento', (req, res) => {
+router.post('/adicionar-evento', verificarFuncionario, (req, res) => {
   const { descricao, data, agenda_id } = req.body;
   if (!descricao || !data || !agenda_id) return res.status(400).json({ erro: 'Campos obrigatórios' });
 
@@ -97,8 +105,7 @@ router.post('/adicionar-evento', (req, res) => {
   });
 });
 
-// PUT editar recado
-router.put('/recados/:cod', (req, res) => {
+router.put('/recados/:cod', verificarFuncionario, (req, res) => {
   const { cod } = req.params;
   const { descricao } = req.body;
 
@@ -110,8 +117,7 @@ router.put('/recados/:cod', (req, res) => {
   });
 });
 
-// PUT editar evento
-router.put('/eventos/:cod', (req, res) => {
+router.put('/eventos/:cod', verificarFuncionario, (req, res) => {
   const { cod } = req.params;
   const { descricao } = req.body;
 

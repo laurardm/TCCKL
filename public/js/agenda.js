@@ -12,22 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let pagesData = window.pagesData || [];
   const agendaId = window.agendaId;
 
-  // ===================
-  // FORMATAÇÃO DE DATAS
-  // ===================
   function formatarData(dataStr) {
     const d = new Date(dataStr + 'T00:00:00');
-    return d.toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).replace(/^\w/, c => c.toUpperCase());
+    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
   }
 
-  // ===================
-  // RENDERIZAÇÃO DA PÁGINA
-  // ===================
   function renderPage() {
     if (!pagesData || pagesData.length === 0) {
       dataTitulo.textContent = "Nenhuma data adicionada";
@@ -35,10 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Ordena por data
     pagesData.sort((a, b) => a.date.localeCompare(b.date));
-
-    // Garante índice válido
     if (currentPageIndex >= pagesData.length) currentPageIndex = pagesData.length - 1;
     if (currentPageIndex < 0) currentPageIndex = 0;
 
@@ -59,10 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===================
-  // MODAL
-  // ===================
   window.abrirModal = function(tipo) {
+    if (window.tipoUsuario !== "funcionario") return; // bloqueia não funcionários
     tipoAtual = tipo;
     modalTitle.textContent = `${window.edicaoAtiva ? 'Editar' : 'Adicionar'} ${tipo}`;
     modalText.value = window.edicaoAtiva ? window.edicaoAtiva.descricao : '';
@@ -78,30 +62,18 @@ document.addEventListener("DOMContentLoaded", () => {
     window.edicaoAtiva = null;
   };
 
-  // ===================
-  // CONFIRMAR ADIÇÃO/EDIÇÃO
-  // ===================
   window.confirmarAdicao = function() {
-    if (!agendaId) {
-      alert("Agenda do aluno não definida.");
-      return;
-    }
-
+    if (!agendaId) { alert("Agenda do aluno não definida."); return; }
     const data = modalDate.value;
     const descricao = modalText.value.trim();
     if (!data || !descricao) return alert("Preencha data e descrição");
 
     if (window.edicaoAtiva) {
-      // Edição
       let url = tipoAtual === "Recado" ? `/agenda/recados/${window.edicaoAtiva.cod}` :
                 tipoAtual === "Evento" ? `/agenda/eventos/${window.edicaoAtiva.cod}` : null;
       if (!url) return alert("Edição deste tipo não suportada.");
 
-      fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ descricao })
-      })
+      fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao }) })
       .then(res => res.json())
       .then(json => {
         if (json.message) {
@@ -114,16 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(err => { console.error(err); alert("Erro ao conectar."); });
 
     } else {
-      // Adição
       let url = tipoAtual === "Recado" ? "/agenda/adicionar-recado" :
                 tipoAtual === "Evento" ? "/agenda/adicionar-evento" : null;
       if (!url) return alert("Adição deste tipo não suportada.");
 
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ descricao, data, agenda_id: Number(agendaId) })
-      })
+      fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao, data, agenda_id: Number(agendaId) }) })
       .then(res => res.json())
       .then(json => {
         if (json.sucesso) {
@@ -143,43 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // ===================
-  // EDITAR CONTEÚDO
-  // ===================
   window.editarConteudo = function(index) {
     const pagina = pagesData[currentPageIndex];
     if (!pagina || !pagina.contents[index]) return;
-
     const conteudo = pagina.contents[index];
     tipoAtual = conteudo.tipo;
-    window.edicaoAtiva = {
-      index,
-      data: pagina.date,
-      cod: conteudo.cod,
-      descricao: conteudo.descricao
-    };
+    window.edicaoAtiva = { index, data: pagina.date, cod: conteudo.cod, descricao: conteudo.descricao };
     abrirModal(tipoAtual);
   };
 
-  // ===================
-  // NAVEGAÇÃO
-  // ===================
-  window.avancarPagina = function() {
-    if (currentPageIndex < pagesData.length - 1) {
-      currentPageIndex++;
-      renderPage();
-    }
-  };
+  window.avancarPagina = function() { if (currentPageIndex < pagesData.length - 1) { currentPageIndex++; renderPage(); } };
+  window.voltarPagina = function() { if (currentPageIndex > 0) { currentPageIndex--; renderPage(); } };
 
-  window.voltarPagina = function() {
-    if (currentPageIndex > 0) {
-      currentPageIndex--;
-      renderPage();
-    }
-  };
-
-  // ===================
-  // INICIALIZAÇÃO
-  // ===================
   renderPage();
 });
