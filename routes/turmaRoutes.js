@@ -159,12 +159,38 @@ router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (r
     const codTurma = turmaResults[0].cod;
     const linkFoto = "/uploads/" + arquivo.filename;
 
-    db.query("INSERT INTO fotos_turma (turma_id, link, descricao) VALUES (?, ?, ?)", [codTurma, linkFoto, null], (err2) => {
+    db.query("INSERT INTO fotos_turma (turma_id, link, descricao) VALUES (?, ?, ?)", [codTurma, linkFoto, null], (err2, result) => {
       if (err2) return res.status(500).send("Erro ao adicionar foto");
-      res.status(200).json({ sucesso: true, link: linkFoto });
+      res.status(200).json({ sucesso: true, cod: result.insertId, link: linkFoto });
     });
   });
 });
+
+// DELETE /turmas/:nomeTurma/fotos - excluir foto da turma
+router.delete("/:nomeTurma/fotos", verificarFuncionario, (req, res) => {
+  const { cod } = req.body;
+  if (!cod) return res.status(400).send("Código da foto não fornecido");
+
+  // Pega o link da foto para excluir do disco
+  db.query("SELECT link FROM fotos_turma WHERE cod = ?", [cod], (err, results) => {
+    if (err || results.length === 0) return res.status(404).send("Foto não encontrada");
+
+    const fotoPath = path.join(__dirname, "../public", results[0].link);
+
+    db.query("DELETE FROM fotos_turma WHERE cod = ?", [cod], (err2) => {
+      if (err2) return res.status(500).send("Erro ao excluir foto");
+
+      // Tenta remover o arquivo do disco (não bloqueia em caso de erro)
+      const fs = require("fs");
+      fs.unlink(fotoPath, (errFs) => {
+        if (errFs) console.log("Erro ao remover arquivo:", errFs);
+      });
+
+      res.status(200).json({ sucesso: true });
+    });
+  });
+});
+
 
 // --- ROTA DA AGENDA ---
 // GET /agenda/aluno/:cod

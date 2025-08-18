@@ -97,22 +97,16 @@ function fecharModal() {
   document.getElementById('modal-bg').classList.remove('active');
 }
 
+
 function confirmarAdicao() {
   const data = document.getElementById('modal-date').value;
   const texto = document.getElementById('modal-text').value.trim();
   const fileInput = document.getElementById('modal-file');
+  const nomeTurma = decodeURIComponent(window.encodedNomeTurma || ""); // pega do EJS
 
   if (!data) {
     alert('Por favor, preencha a data.');
     return;
-  }
-
-  let pagina = pagesData.find(p => p.date === data);
-  if (!pagina) {
-    pagina = { date: data, contents: [] };
-    pagesData.push(pagina);
-    pagesData.sort((a, b) => a.date.localeCompare(b.date));
-    currentPageIndex = pagesData.findIndex(p => p.date === data);
   }
 
   if (tipoAtual === 'Imagem') {
@@ -120,21 +114,67 @@ function confirmarAdicao() {
       alert('Por favor, selecione uma imagem.');
       return;
     }
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      pagina.contents.push(`Imagem: <img src="${e.target.result}" alt="Imagem adicionada" class="conteudo-img" />`);
-      fecharModal();
-      renderPage();
-    };
-    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("foto", fileInput.files[0]);
+
+    fetch(`/turmas/${nomeTurma}/fotos`, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.sucesso) {
+        pagesData[currentPageIndex].contents.push(`Imagem: <img src="${data.link}" data-cod="${data.cod}" class="conteudo-img"/>`);
+        fecharModal();
+        renderPage();
+      } else {
+        alert("Erro ao adicionar a foto");
+      }
+    })
+    .catch(err => alert("Erro ao adicionar a foto: " + err));
+
   } else {
     if (!texto) {
       alert('Por favor, preencha o texto.');
       return;
     }
-    pagina.contents.push(`${tipoAtual}: ${texto}`);
+    pagesData[currentPageIndex].contents.push(`${tipoAtual}: ${texto}`);
     fecharModal();
+    renderPage();
+  }
+}
+
+function excluirConteudo(index) {
+  const pagina = pagesData[currentPageIndex];
+  if (!pagina) return;
+
+  const conteudo = pagina.contents[index];
+  const imgTagMatch = conteudo.match(/data-cod="(\d+)"/);
+
+  if (imgTagMatch) {
+    // é uma imagem -> excluir do backend
+    const codFoto = imgTagMatch[1];
+    const nomeTurma = decodeURIComponent(window.encodedNomeTurma || "");
+
+    fetch(`/turmas/${nomeTurma}/fotos`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cod: codFoto })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.sucesso) {
+        pagina.contents.splice(index, 1);
+        renderPage();
+      } else {
+        alert("Erro ao excluir a foto");
+      }
+    })
+    .catch(err => alert("Erro ao excluir a foto: " + err));
+  } else {
+    // é texto
+    pagina.contents.splice(index, 1);
     renderPage();
   }
 }
