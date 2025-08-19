@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= tituloPagina || "Recados da turma" %></title>
+  <link rel="stylesheet" href="css/recadosturma.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+  <link rel="stylesheet" href="css/logo.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="painel-turma">
+    <span class="nome-turma"><%= nomeTurma || "Nome da turma" %></span>
+  </div>
+
+  <div class="container">
+    <h2 id="data-titulo"><%= dataTitulo || "" %></h2>
+    <div id="conteudo-pagina">
+      <% if (conteudos && conteudos.length > 0) { %>
+        <% conteudos.forEach((c) => { %>
+          <div class="conteudo-item">
+            <i class="fa-solid fa-pen editar-btn" onclick="editarRecado('<%= c.id %>')"></i>
+            <span class="conteudo-text"><%= c.texto %></span>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>Nenhum recado adicionado ainda.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="painel-acoes">
+    <button class="btn-navegacao" onclick="voltarPagina()">
+      <i class="fa-solid fa-arrow-left"></i> Página anterior
+    </button>
+    <button class="btn-adicionar" onclick="abrirModalRecado()">
+      <i class="fa-solid fa-pen"></i> Adicionar recado
+    </button>
+    <button class="btn-navegacao" onclick="avancarPagina()">
+      Próxima página <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
+
+  <!-- Modal de adicionar/editar -->
+  <div id="modal-bg" class="modal-bg">
+    <div class="modal">
+      <button class="modal-close" onclick="fecharModal()" title="Fechar">&times;</button>
+      <h3 id="modal-title">Adicionar recado</h3>
+      <input type="date" id="modal-date" />
+      <textarea id="modal-text" placeholder="Digite o texto aqui..."></textarea>
+      <div class="modal-buttons">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-confirmar" onclick="confirmarAdicao()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Alerta -->
+  <div id="alerta-bg" class="alerta-bg">
+    <div class="alerta-box">
+      <p id="alerta-msg"></p>
+      <button onclick="fecharAlerta()">OK</button>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+  <div id="logo"></div>
+  
+  <script src="js/footer.js"></script>
+  <script src="js/logo.js"></script>
+  <script src="js/recadosturma.js"></script>
+</body>
+</html>
