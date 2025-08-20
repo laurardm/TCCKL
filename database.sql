@@ -128,3 +128,12 @@ CREATE TABLE usuario (
   CONSTRAINT fk_usuario_funcionario FOREIGN KEY (cod_funcionario) REFERENCES funcionario(cod),
   CONSTRAINT fk_usuario_responsavel FOREIGN KEY (cod_responsavel) REFERENCES responsaveis(cod)
 );
+
+CREATE TABLE recados_turma (
+  cod INT NOT NULL AUTO_INCREMENT,
+  turma_id INT NOT NULL,
+  descricao VARCHAR(150),
+  datar VARCHAR(150) NOT NULL,
+  PRIMARY KEY (cod),
+  CONSTRAINT fk_recados_turma FOREIGN KEY (turma_id) REFERENCES turma(cod) ON DELETE CASCADE
+);
