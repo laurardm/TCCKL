@@ -1,18 +1,40 @@
+const turmaDataEl = document.getElementById("turma-data");
+
+const encodedNomeTurma = turmaDataEl.getAttribute("data-nome");
+const conteudosServidor = JSON.parse(turmaDataEl.getAttribute("data-conteudos"));
+
 let today = new Date().toISOString().split('T')[0];
 
 let pagesData = [
-  { date: today, contents: [] }, // Começa com a data atual sem conteúdos
+  { 
+    date: today, 
+    contents: conteudosServidor.map(c => {
+      if (c.tipo === "imagem") {
+        return `Imagem: <img src="${c.valor}" data-cod="${c.cod}" class="conteudo-img"/>`;
+      } else {
+        return `${c.tipo}: ${c.valor}`;
+      }
+    }) 
+  }
 ];
 
 let currentPageIndex = 0;
 let tipoAtual = '';
 
+window.encodedNomeTurma = encodedNomeTurma;
+
+// ---------------------------
+// Formatar data para exibição
+// ---------------------------
 function formatarData(dataStr) {
   const d = new Date(dataStr + 'T00:00:00');
   return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
     .replace(/^\w/, c => c.toUpperCase());
 }
 
+// ---------------------------
+// Renderizar página
+// ---------------------------
 function renderPage() {
   const titulo = document.getElementById('data-titulo');
   const conteudoDiv = document.getElementById('conteudo-pagina');
@@ -29,15 +51,12 @@ function renderPage() {
   if (currentPageIndex >= pagesData.length) currentPageIndex = pagesData.length - 1;
 
   const pagina = pagesData[currentPageIndex];
-
   titulo.textContent = formatarData(pagina.date);
 
   if (pagina.contents.length === 0) {
-    if (pagina.date === today) {
-      conteudoDiv.innerHTML = '<p>Ainda não há conteúdo nesse dia.</p>';
-    } else {
-      conteudoDiv.innerHTML = '<p>Sem conteúdos nesta data.</p>';
-    }
+    conteudoDiv.innerHTML = pagina.date === today 
+      ? '<p>Ainda não há conteúdo nesse dia.</p>' 
+      : '<p>Sem conteúdos nesta data.</p>';
   } else {
     let textosHTML = '';
     let imagensHTML = '';
@@ -61,14 +80,13 @@ function renderPage() {
       }
     });
 
-    let htmlFinal = textosHTML;
-    if (imagensHTML) {
-      htmlFinal += `<div class="imagens-container">${imagensHTML}</div>`;
-    }
-    conteudoDiv.innerHTML = htmlFinal;
+    conteudoDiv.innerHTML = textosHTML + (imagensHTML ? `<div class="imagens-container">${imagensHTML}</div>` : '');
   }
 }
 
+// ---------------------------
+// Modal
+// ---------------------------
 function abrirModal(tipo) {
   tipoAtual = tipo;
   document.getElementById('modal-title').textContent = `Adicionar ${tipo}`;
@@ -78,7 +96,6 @@ function abrirModal(tipo) {
   document.getElementById('modal-file').value = '';
   document.getElementById('modal-date').value = pagesData[currentPageIndex].date;
   document.getElementById('modal-bg').classList.add('active');
-  document.getElementById('modal-date').focus();
 }
 
 function abrirModalImagem() {
@@ -90,19 +107,19 @@ function abrirModalImagem() {
   document.getElementById('modal-file').value = '';
   document.getElementById('modal-date').value = pagesData[currentPageIndex].date;
   document.getElementById('modal-bg').classList.add('active');
-  document.getElementById('modal-date').focus();
 }
 
 function fecharModal() {
   document.getElementById('modal-bg').classList.remove('active');
 }
 
-
+// ---------------------------
+// Confirmar adição
+// ---------------------------
 function confirmarAdicao() {
   const data = document.getElementById('modal-date').value;
   const texto = document.getElementById('modal-text').value.trim();
   const fileInput = document.getElementById('modal-file');
-  const nomeTurma = decodeURIComponent(window.encodedNomeTurma || ""); // pega do EJS
 
   if (!data) {
     alert('Por favor, preencha a data.');
@@ -118,14 +135,16 @@ function confirmarAdicao() {
     const formData = new FormData();
     formData.append("foto", fileInput.files[0]);
 
-    fetch(`/turmas/${nomeTurma}/fotos`, {
+    fetch(`/turmas/${encodedNomeTurma}/fotos`, {
       method: "POST",
       body: formData
     })
     .then(res => res.json())
     .then(data => {
       if (data.sucesso) {
-        pagesData[currentPageIndex].contents.push(`Imagem: <img src="${data.link}" data-cod="${data.cod}" class="conteudo-img"/>`);
+        pagesData[currentPageIndex].contents.push(
+          `Imagem: <img src="${data.link}" data-cod="${data.cod}" class="conteudo-img"/>`
+        );
         fecharModal();
         renderPage();
       } else {
@@ -133,7 +152,6 @@ function confirmarAdicao() {
       }
     })
     .catch(err => alert("Erro ao adicionar a foto: " + err));
-
   } else {
     if (!texto) {
       alert('Por favor, preencha o texto.');
@@ -145,6 +163,9 @@ function confirmarAdicao() {
   }
 }
 
+// ---------------------------
+// Excluir conteúdo
+// ---------------------------
 function excluirConteudo(index) {
   const pagina = pagesData[currentPageIndex];
   if (!pagina) return;
@@ -153,11 +174,8 @@ function excluirConteudo(index) {
   const imgTagMatch = conteudo.match(/data-cod="(\d+)"/);
 
   if (imgTagMatch) {
-    // é uma imagem -> excluir do backend
     const codFoto = imgTagMatch[1];
-    const nomeTurma = decodeURIComponent(window.encodedNomeTurma || "");
-
-    fetch(`/turmas/${nomeTurma}/fotos`, {
+    fetch(`/turmas/${encodedNomeTurma}/fotos`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cod: codFoto })
@@ -173,20 +191,14 @@ function excluirConteudo(index) {
     })
     .catch(err => alert("Erro ao excluir a foto: " + err));
   } else {
-    // é texto
     pagina.contents.splice(index, 1);
     renderPage();
   }
 }
 
-function excluirConteudo(index) {
-  const pagina = pagesData[currentPageIndex];
-  if (pagina) {
-    pagina.contents.splice(index, 1);
-    renderPage();
-  }
-}
-
+// ---------------------------
+// Paginação
+// ---------------------------
 function avancarPagina() {
   if (currentPageIndex < pagesData.length - 1) {
     currentPageIndex++;
@@ -201,10 +213,4 @@ function voltarPagina() {
   }
 }
 
-window.onload = () => {
-  renderPage();
-};
-
-if (imagensHTML) {
-  htmlFinal += `<div class="imagens-container">${imagensHTML}</div>`;
-}
+window.onload = renderPage;
