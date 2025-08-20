@@ -186,7 +186,7 @@ function excluirConteudo(index) {
         pagina.contents.splice(index, 1);
         renderPage();
       } else {
-        alert("Erro ao excluir a foto");
+        alert("Erro ao excluir a foto: " + (data.erro || ""));
       }
     })
     .catch(err => alert("Erro ao excluir a foto: " + err));

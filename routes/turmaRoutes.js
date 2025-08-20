@@ -9,7 +9,7 @@ function verificarFuncionario(req, res, next) {
   if (req.session.usuario && req.session.usuario.tipo === "funcionario") {
     next();
   } else {
-    res.status(403).send("Acesso negado: apenas funcionários podem realizar esta ação.");
+    res.status(403).json("Acesso negado: apenas funcionários podem realizar esta ação.");
   }
 }
 
@@ -27,7 +27,7 @@ const upload = multer({ storage });
 // GET /turmas - listar turmas
 router.get("/", (req, res) => {
   db.query("SELECT nome FROM turma ORDER BY nome", (err, turmas) => {
-    if (err) return res.status(500).send("Erro ao buscar turmas");
+    if (err) return res.status(500).json("Erro ao buscar turmas");
     res.render("turmas/index", { turmas });
   });
 });
@@ -62,25 +62,25 @@ router.get("/:nomeTurma", (req, res) => {
 router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { nome } = req.body;
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
-  if (!nome?.trim()) return res.status(400).send("Nome inválido");
+  if (!nome?.trim()) return res.status(400).json("Nome inválido");
 
   db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, result) => {
-    if (err || result.length === 0) return res.status(400).send("Turma não encontrada");
+    if (err || result.length === 0) return res.status(400).json("Turma não encontrada");
 
     const codTurma = result[0].cod;
 
     db.query("INSERT INTO aluno (nome, turma) VALUES (?, ?)", [nome.trim(), codTurma], (err2, resultInsertAluno) => {
-      if (err2) return res.status(500).send("Erro ao adicionar aluno");
+      if (err2) return res.status(500).json("Erro ao adicionar aluno");
 
       const codAluno = resultInsertAluno.insertId;
 
       db.query("INSERT INTO agenda (aluno_cod) VALUES (?)", [codAluno], (err3, resultInsertAgenda) => {
-        if (err3) return res.status(500).send("Erro ao criar agenda do aluno");
+        if (err3) return res.status(500).json("Erro ao criar agenda do aluno");
 
         const codAgenda = resultInsertAgenda.insertId;
 
         db.query("UPDATE aluno SET agenda = ? WHERE cod = ?", [codAgenda, codAluno], (err4) => {
-          if (err4) return res.status(500).send("Erro ao vincular agenda ao aluno");
+          if (err4) return res.status(500).json("Erro ao vincular agenda ao aluno");
 
           res.status(200).json({ cod: codAluno, nome: nome.trim(), foto: null, agenda: codAgenda });
         });
@@ -92,22 +92,22 @@ router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
 // PUT - Editar aluno
 router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod, nome } = req.body;
-  if (!cod || !nome) return res.status(400).send("Dados inválidos");
+  if (!cod || !nome) return res.status(400).json("Dados inválidos");
 
   db.query("UPDATE aluno SET nome = ? WHERE cod = ?", [nome.trim(), cod], (err) => {
-    if (err) return res.status(500).send("Erro ao editar aluno");
-    res.status(200).send("Aluno atualizado");
+    if (err) return res.status(500).json("Erro ao editar aluno");
+    res.status(200).json("Aluno atualizado");
   });
 });
 
 // DELETE - Excluir aluno
 router.delete("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod } = req.body;
-  if (!cod) return res.status(400).send("Código inválido");
+  if (!cod) return res.status(400).json("Código inválido");
 
   db.query("DELETE FROM aluno WHERE cod = ?", [cod], (err) => {
-    if (err) return res.status(500).send("Erro ao excluir aluno");
-    res.status(200).send("Aluno excluído");
+    if (err) return res.status(500).json("Erro ao excluir aluno");
+    res.status(200).json("Aluno excluído");
   });
 });
 
@@ -115,11 +115,11 @@ router.delete("/:nomeTurma", verificarFuncionario, (req, res) => {
 router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"), (req, res) => {
   const codAluno = req.body.cod;
   const novaFoto = req.file?.filename;
-  if (!codAluno || !novaFoto) return res.status(400).send("Dados incompletos");
+  if (!codAluno || !novaFoto) return res.status(400).json("Dados incompletos");
 
   const fotoLink = "/uploads/" + novaFoto;
   db.query("UPDATE aluno SET foto = ? WHERE cod = ?", [fotoLink, codAluno], (err) => {
-    if (err) return res.status(500).send("Erro ao atualizar foto");
+    if (err) return res.status(500).json("Erro ao atualizar foto");
     res.status(200).json({ novaFoto: fotoLink });
   });
 });
@@ -130,12 +130,12 @@ router.get("/:nomeTurma/fotos", (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
   db.query("SELECT cod, nome FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
-    if (err || turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
+    if (err || turmaResults.length === 0) return res.status(404).json("Turma não encontrada");
 
     const codTurma = turmaResults[0].cod;
 
     db.query("SELECT * FROM fotos_turma WHERE turma_id = ? ORDER BY cod DESC", [codTurma], (err2, fotos) => {
-      if (err2) return res.status(500).send("Erro ao buscar fotos da turma");
+      if (err2) return res.status(500).json("Erro ao buscar fotos da turma");
 
       res.render("turmas/fotosTurma", {
         encodedNomeTurma: encodeURIComponent(turmaResults[0].nome.trim()),
@@ -151,16 +151,16 @@ router.get("/:nomeTurma/fotos", (req, res) => {
 router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
   const arquivo = req.file;
-  if (!arquivo) return res.status(400).send("Nenhum arquivo enviado");
+  if (!arquivo) return res.status(400).json({ sucesso: false, erro: "Nenhum arquivo enviado" });
 
   db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
-    if (err || turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
+    if (err || turmaResults.length === 0) return res.status(404).json({ sucesso: false, erro: "Turma não encontrada" });
 
     const codTurma = turmaResults[0].cod;
     const linkFoto = "/uploads/" + arquivo.filename;
 
     db.query("INSERT INTO fotos_turma (turma_id, link, descricao) VALUES (?, ?, ?)", [codTurma, linkFoto, null], (err2, result) => {
-      if (err2) return res.status(500).send("Erro ao adicionar foto");
+      if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao adicionar foto" });
       res.status(200).json({ sucesso: true, cod: result.insertId, link: linkFoto });
     });
   });
@@ -169,18 +169,16 @@ router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (r
 // DELETE /turmas/:nomeTurma/fotos - excluir foto da turma
 router.delete("/:nomeTurma/fotos", verificarFuncionario, (req, res) => {
   const { cod } = req.body;
-  if (!cod) return res.status(400).send("Código da foto não fornecido");
+  if (!cod) return res.status(400).json({ sucesso: false, erro: "Código da foto não fornecido" });
 
-  // Pega o link da foto para excluir do disco
   db.query("SELECT link FROM fotos_turma WHERE cod = ?", [cod], (err, results) => {
-    if (err || results.length === 0) return res.status(404).send("Foto não encontrada");
+    if (err || results.length === 0) return res.status(404).json({ sucesso: false, erro: "Foto não encontrada" });
 
     const fotoPath = path.join(__dirname, "../public", results[0].link);
 
     db.query("DELETE FROM fotos_turma WHERE cod = ?", [cod], (err2) => {
-      if (err2) return res.status(500).send("Erro ao excluir foto");
+      if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao excluir foto" });
 
-      // Tenta remover o arquivo do disco (não bloqueia em caso de erro)
       const fs = require("fs");
       fs.unlink(fotoPath, (errFs) => {
         if (errFs) console.log("Erro ao remover arquivo:", errFs);
@@ -190,15 +188,13 @@ router.delete("/:nomeTurma/fotos", verificarFuncionario, (req, res) => {
     });
   });
 });
-
-
 // --- ROTA DA AGENDA ---
 // GET /agenda/aluno/:cod
 router.get("/aluno/:cod", (req, res) => {
   const codAluno = req.params.cod;
 
   db.query("SELECT cod, nome, agenda, foto FROM aluno WHERE cod = ?", [codAluno], (err, results) => {
-    if (err || results.length === 0) return res.status(404).send("Aluno não encontrado");
+    if (err || results.length === 0) return res.status(404).json("Aluno não encontrado");
 
     const aluno = results[0];
 
