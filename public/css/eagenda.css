@@ -68,7 +68,14 @@ h2 {
   flex: 1; /* ocupa o espaço restante e quebra linha */
 }
 
-/* Botões padrão - rosa */
+.conteudo-item img {
+  max-width: 40%;      
+  height: auto;        
+  border-radius: 6px;  
+  display: block;
+  margin: 5px 0;        
+}
+
 button {
   padding: 10px 18px;
   font-size: 16px;

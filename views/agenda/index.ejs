@@ -54,6 +54,7 @@
       <h3 id="modal-title"></h3>
       <input type="date" id="modal-date" />
       <textarea id="modal-text" placeholder="Digite aqui..."></textarea>
+      <input type="file" id="modal-file" style="display:none;" accept="image/*" />
       <div class="modal-buttons">
         <button onclick="confirmarAdicao()">Adicionar</button>
       </div>
@@ -76,7 +77,8 @@
     window.pagesData = JSON.parse(el.getAttribute('data-recados') || '[]');
     window.tipoUsuario = "<%= tipoUsuario || '' %>";
   </script>
-
+  <div id="footer"></div>
+  <div id="logo"></div>
   <script src="/js/agenda.js"></script>
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>

@@ -49,6 +49,16 @@ app.use('/turmas', turmaRoutes);
 app.use('/agenda', agendaRoutes);
 app.use('/esqueci-senha', esquecisenhaRoutes);
 
+app.use((err, req, res, next) => {
+  console.error("Erro capturado no servidor:", err); // Mostra o erro completo no terminal
+  res.status(500).send({
+    message: "Ocorreu um erro no servidor!",
+    error: err.message,       // mostra a mensagem do erro
+    stack: err.stack          // mostra o stack trace
+  });
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

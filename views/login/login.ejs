@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,8 +9,9 @@
     <link rel="stylesheet" href="/css/elogin.css">
     <link rel="stylesheet" href="/css/logo.css">
 </head>
+
 <body>
-    
+
     <div class="page">
         <form method="POST" action="/" class="formLogin">
             <img src="/imagens/fotosiei.png" alt="logo">
@@ -17,7 +19,8 @@
             <input type="text" id="email" name="email" placeholder="Digite seu e-mail ou matrícula" required />
             <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required />
 
-            <a href="/esqueci-senha" style="font-size: 0.9rem; display: block; margin-top: 10px; color: rgb(0, 0, 0)">Esqueceu a senha?</a>
+            <a href="/esqueci-senha"
+                style="font-size: 0.9rem; display: block; margin-top: 10px; color: rgb(0, 0, 0)">Esqueceu a senha?</a>
 
             <input type="submit" value="Entrar" class="entrar" />
 
@@ -33,6 +36,11 @@
                 A educação infantil é o primeiro passo para um futuro brilhante.
             </span>
         </div>
+    </div>
+
+    <div id="alert" class="alert" style="<%= erro ? 'display:flex' : 'display:none' %>">
+        <%= erro %>
+            <span id="close-alert">&times;</span>
     </div>
 
     <div id="logo"></div>
@@ -67,5 +75,25 @@
 
     <!-- Script do logo (garanta que ele não tem carrossel duplicado) -->
     <script src="../js/logo.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertBox = document.getElementById('alert');
+            const closeBtn = document.getElementById('close-alert');
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    alertBox.style.display = 'none';
+                });
+            }
+
+            // Auto-fechar após 4 segundos
+            if (alertBox) {
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 4000);
+            }
+        });
+    </script>
 </body>
+
 </html>

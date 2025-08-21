@@ -48,11 +48,33 @@ document.addEventListener("DOMContentLoaded", () => {
   window.abrirModal = function(tipo) {
     if (window.tipoUsuario !== "funcionario") return; // bloqueia não funcionários
     tipoAtual = tipo;
+
     modalTitle.textContent = `${window.edicaoAtiva ? 'Editar' : 'Adicionar'} ${tipo}`;
     modalText.value = window.edicaoAtiva ? window.edicaoAtiva.descricao : '';
     modalDate.value = window.edicaoAtiva ? window.edicaoAtiva.data :
                       (pagesData.length > 0 ? pagesData[currentPageIndex].date : '');
     document.querySelector('.modal-buttons button').textContent = window.edicaoAtiva ? 'Salvar' : 'Adicionar';
+
+    // ======== Apenas para fotos ========
+    if(tipo === "Foto") {
+      modalText.style.display = "none"; // esconder textarea
+      let fileInput = document.getElementById("modal-file");
+      if(!fileInput) {
+        fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.id = "modal-file";
+        fileInput.accept = "image/*";
+        modalDate.parentNode.insertBefore(fileInput, modalDate.nextSibling);
+      } else {
+        fileInput.style.display = "block";
+      }
+    } else {
+      // Mostrar textarea normal para recados/eventos
+      modalText.style.display = "block";
+      const fileInput = document.getElementById("modal-file");
+      if(fileInput) fileInput.style.display = "none";
+    }
+
     modalBg.classList.add('active');
     modalDate.focus();
   };
@@ -65,48 +87,79 @@ document.addEventListener("DOMContentLoaded", () => {
   window.confirmarAdicao = function() {
     if (!agendaId) { alert("Agenda do aluno não definida."); return; }
     const data = modalDate.value;
-    const descricao = modalText.value.trim();
-    if (!data || !descricao) return alert("Preencha data e descrição");
+    if (!data) return alert("Preencha a data");
 
-    if (window.edicaoAtiva) {
-      let url = tipoAtual === "Recado" ? `/agenda/recados/${window.edicaoAtiva.cod}` :
-                tipoAtual === "Evento" ? `/agenda/eventos/${window.edicaoAtiva.cod}` : null;
-      if (!url) return alert("Edição deste tipo não suportada.");
+    if(tipoAtual === "Foto") {
+      const fileInput = document.getElementById("modal-file");
+      if(!fileInput || !fileInput.files[0]) return alert("Selecione uma imagem.");
 
-      fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao }) })
-      .then(res => res.json())
-      .then(json => {
-        if (json.message) {
-          const pagina = pagesData.find(p => p.date === window.edicaoAtiva.data);
-          if (pagina) pagina.contents[window.edicaoAtiva.index].descricao = descricao;
-          fecharModal();
-          renderPage();
-        } else alert("Erro ao editar.");
-      })
-      .catch(err => { console.error(err); alert("Erro ao conectar."); });
+      const formData = new FormData();
+      formData.append("imagem", fileInput.files[0]);
+      formData.append("data", data);
+      formData.append("agenda_id", Number(agendaId));
+
+      fetch("/agenda/adicionar-foto", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(json => {
+          if(json.sucesso) {
+            let pagina = pagesData.find(p => p.date === data);
+            if(!pagina) {
+              pagina = { date: data, contents: [] };
+              pagesData.push(pagina);
+              pagesData.sort((a,b) => a.date.localeCompare(b.date));
+            }
+            pagina.contents.push({ tipo: "Foto", descricao: json.url, cod: json.id });
+            currentPageIndex = pagesData.findIndex(p => p.date === data);
+            fecharModal();
+            renderPage();
+          } else alert("Erro ao adicionar imagem.");
+        })
+        .catch(err => { console.error(err); alert("Erro ao conectar."); });
 
     } else {
-      let url = tipoAtual === "Recado" ? "/agenda/adicionar-recado" :
-                tipoAtual === "Evento" ? "/agenda/adicionar-evento" : null;
-      if (!url) return alert("Adição deste tipo não suportada.");
+      const descricao = modalText.value.trim();
+      if (!descricao) return alert("Preencha descrição");
 
-      fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao, data, agenda_id: Number(agendaId) }) })
-      .then(res => res.json())
-      .then(json => {
-        if (json.sucesso) {
-          let pagina = pagesData.find(p => p.date === data);
-          if (!pagina) {
-            pagina = { date: data, contents: [] };
-            pagesData.push(pagina);
-            pagesData.sort((a, b) => a.date.localeCompare(b.date));
-          }
-          pagina.contents.push({ tipo: tipoAtual, descricao, cod: json.id });
-          currentPageIndex = pagesData.findIndex(p => p.date === data);
-          fecharModal();
-          renderPage();
-        } else alert("Erro ao adicionar.");
-      })
-      .catch(err => { console.error(err); alert("Erro ao conectar."); });
+      if (window.edicaoAtiva) {
+        let url = tipoAtual === "Recado" ? `/agenda/recados/${window.edicaoAtiva.cod}` :
+                  tipoAtual === "Evento" ? `/agenda/eventos/${window.edicaoAtiva.cod}` : null;
+        if (!url) return alert("Edição deste tipo não suportada.");
+
+        fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao }) })
+        .then(res => res.json())
+        .then(json => {
+          if (json.message) {
+            const pagina = pagesData.find(p => p.date === window.edicaoAtiva.data);
+            if (pagina) pagina.contents[window.edicaoAtiva.index].descricao = descricao;
+            fecharModal();
+            renderPage();
+          } else alert("Erro ao editar.");
+        })
+        .catch(err => { console.error(err); alert("Erro ao conectar."); });
+
+      } else {
+        let url = tipoAtual === "Recado" ? "/agenda/adicionar-recado" :
+                  tipoAtual === "Evento" ? "/agenda/adicionar-evento" : null;
+        if (!url) return alert("Adição deste tipo não suportada.");
+
+        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ descricao, data, agenda_id: Number(agendaId) }) })
+        .then(res => res.json())
+        .then(json => {
+          if (json.sucesso) {
+            let pagina = pagesData.find(p => p.date === data);
+            if (!pagina) {
+              pagina = { date: data, contents: [] };
+              pagesData.push(pagina);
+              pagesData.sort((a, b) => a.date.localeCompare(b.date));
+            }
+            pagina.contents.push({ tipo: tipoAtual, descricao, cod: json.id });
+            currentPageIndex = pagesData.findIndex(p => p.date === data);
+            fecharModal();
+            renderPage();
+          } else alert("Erro ao adicionar.");
+        })
+        .catch(err => { console.error(err); alert("Erro ao conectar."); });
+      }
     }
   };
 

@@ -291,3 +291,20 @@ body {
     max-width: 300px;
   }
 }
+
+.btn-fofo {
+  font-size: 0.9rem;       /* menor que o normal */
+  padding: 6px 12px;       /* botões menores */
+  border: 1px solid #ccc;  /* borda discreta */
+  border-radius: 12px;     /* cantos arredondados */
+  background: none;        /* sem cor */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;                /* espaço entre emoji e texto */
+  transition: transform 0.1s ease;
+}
+
+.btn-fofo:hover {
+  transform: scale(1.05);  /* leve efeito fofo ao passar o mouse */
+}

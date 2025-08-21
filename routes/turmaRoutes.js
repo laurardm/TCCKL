@@ -206,4 +206,78 @@ router.get("/aluno/:cod", (req, res) => {
   });
 });
 
+// rota GET: listar recados da turma
+router.get("/:nomeTurma/recados", (req, res) => {
+  const { nomeTurma } = req.params;
+
+  db.query("SELECT * FROM turma WHERE nome = ?", [nomeTurma], (err, turmaResults) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Erro ao buscar turma");
+    }
+    if (turmaResults.length === 0) {
+      return res.status(404).send("Turma não encontrada");
+    }
+
+    const turmaId = turmaResults[0].cod;
+
+    db.query("SELECT * FROM recados_turma WHERE turma_id = ?", [turmaId], (err, recados) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Erro ao buscar recados");
+      }
+
+      res.render("turmas/recadosTurma", {
+        encodedNomeTurma: encodeURIComponent(turmaResults[0].nome.trim()),
+        nomeTurma: turmaResults[0].nome.trim(), // 👈 agora vai pro EJS
+        tituloPagina: `Recados da turma ${turmaResults[0].nome.trim()}`,
+        conteudos: recados.map(r => ({
+          data: r.datar,
+          texto: r.descricao
+        })),
+        dataAtual: new Date().toISOString().split("T")[0],
+      });
+    });
+  });
+});
+
+// rota POST: adicionar novo recado
+router.post("/:nomeTurma/recados", (req, res) => {
+  const { nomeTurma } = req.params;
+  const { descricao, datar } = req.body;
+
+  db.query("SELECT * FROM turma WHERE nome = ?", [nomeTurma], (err, turmaResults) => {
+    if (err) return res.status(500).send("Erro ao buscar turma");
+    if (turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
+
+    const turmaId = turmaResults[0].cod;
+
+    db.query(
+      "INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)",
+      [turmaId, descricao, datar],
+      (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Erro ao salvar recado");
+        }
+        res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+      }
+    );
+  });
+});
+
+// rota DELETE: excluir recado
+router.post("/:nomeTurma/recados/:cod/delete", (req, res) => {
+  const { nomeTurma, cod } = req.params;
+
+  db.query("DELETE FROM recados_turma WHERE cod = ?", [cod], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Erro ao excluir recado");
+    }
+    res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+  });
+});
+
+
 module.exports = router;
