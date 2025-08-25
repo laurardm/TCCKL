@@ -1,35 +1,45 @@
 const turmaDataEl = document.getElementById("turma-data");
-
 const encodedNomeTurma = turmaDataEl.getAttribute("data-nome");
 const conteudosServidor = JSON.parse(turmaDataEl.getAttribute("data-conteudos"));
+const tipoUsuario = turmaDataEl.getAttribute("data-tipo") || null; // 'func' ou 'resp'
 
 let today = new Date().toISOString().split('T')[0];
 
-let pagesData = [
-  { 
-    date: today, 
-    contents: conteudosServidor.map(c => {
-      if (c.tipo === "imagem") {
-        return `Imagem: <img src="${c.valor}" data-cod="${c.cod}" class="conteudo-img"/>`;
-      } else {
-        return `${c.tipo}: ${c.valor}`;
-      }
-    }) 
+// ---------------------------
+// Organizar conteúdos por data
+// ---------------------------
+let pagesData = [];
+
+conteudosServidor.forEach(c => {
+  const dataItem = c.dataf ? c.dataf.split('T')[0] : today;
+  let pagina = pagesData.find(p => p.date === dataItem);
+  if (!pagina) {
+    pagina = { date: dataItem, contents: [] };
+    pagesData.push(pagina);
   }
-];
+
+  if (c.tipo === "imagem") {
+    pagina.contents.push({ tipo: "imagem", valor: c.valor, cod: c.cod });
+  } else {
+    pagina.contents.push({ tipo: c.tipo, valor: c.valor });
+  }
+});
+
+// Garantir que a página de hoje exista
+if (!pagesData.find(p => p.date === today)) {
+  pagesData.push({ date: today, contents: [] });
+}
 
 let currentPageIndex = 0;
-let tipoAtual = '';
-
-window.encodedNomeTurma = encodedNomeTurma;
 
 // ---------------------------
 // Formatar data para exibição
 // ---------------------------
 function formatarData(dataStr) {
   const d = new Date(dataStr + 'T00:00:00');
+  if (isNaN(d)) return dataStr;
   return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
-    .replace(/^\w/, c => c.toUpperCase());
+          .replace(/^\w/, c => c.toUpperCase());
 }
 
 // ---------------------------
@@ -54,28 +64,29 @@ function renderPage() {
   titulo.textContent = formatarData(pagina.date);
 
   if (pagina.contents.length === 0) {
-    conteudoDiv.innerHTML = pagina.date === today 
-      ? '<p>Ainda não há conteúdo nesse dia.</p>' 
+    conteudoDiv.innerHTML = pagina.date === today
+      ? '<p>Ainda não há conteúdo nesse dia.</p>'
       : '<p>Sem conteúdos nesta data.</p>';
   } else {
     let textosHTML = '';
     let imagensHTML = '';
 
     pagina.contents.forEach((conteudo, index) => {
-      if (conteudo.startsWith('Imagem:')) {
-        const imgTag = conteudo.replace('Imagem: ', '');
+      const btnExcluirHTML = tipoUsuario === 'func' 
+        ? `<button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
+             <i class="fa-solid fa-trash"></i>
+           </button>` 
+        : '';
+
+      if (conteudo.tipo === 'imagem') {
         imagensHTML += `<div class="imagem-item">
-                          <button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
-                            <i class="fa-solid fa-trash"></i>
-                          </button>
-                          ${imgTag}
+                          <img src="${conteudo.valor}" data-cod="${conteudo.cod}" class="conteudo-img"/>
+                          ${btnExcluirHTML}
                         </div>`;
       } else {
         textosHTML += `<div class="conteudo-item">
-                         <button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
-                           <i class="fa-solid fa-trash"></i>
-                         </button>
-                         <span class="conteudo-text">${conteudo}</span>
+                         <span class="conteudo-text">${conteudo.valor}</span>
+                         ${btnExcluirHTML}
                        </div>`;
       }
     });
@@ -87,25 +98,11 @@ function renderPage() {
 // ---------------------------
 // Modal
 // ---------------------------
-function abrirModal(tipo) {
-  tipoAtual = tipo;
-  document.getElementById('modal-title').textContent = `Adicionar ${tipo}`;
-  document.getElementById('modal-text').style.display = 'block';
-  document.getElementById('modal-text').value = '';
-  document.getElementById('modal-file').style.display = 'none';
-  document.getElementById('modal-file').value = '';
-  document.getElementById('modal-date').value = pagesData[currentPageIndex].date;
-  document.getElementById('modal-bg').classList.add('active');
-}
-
 function abrirModalImagem() {
-  tipoAtual = 'Imagem';
   document.getElementById('modal-title').textContent = 'Adicionar Imagem';
-  document.getElementById('modal-text').style.display = 'none';
-  document.getElementById('modal-text').value = '';
   document.getElementById('modal-file').style.display = 'block';
   document.getElementById('modal-file').value = '';
-  document.getElementById('modal-date').value = pagesData[currentPageIndex].date;
+  document.getElementById('modal-date').value = pagesData[currentPageIndex]?.date || today;
   document.getElementById('modal-bg').classList.add('active');
 }
 
@@ -117,50 +114,33 @@ function fecharModal() {
 // Confirmar adição
 // ---------------------------
 function confirmarAdicao() {
-  const data = document.getElementById('modal-date').value;
-  const texto = document.getElementById('modal-text').value.trim();
   const fileInput = document.getElementById('modal-file');
+  const dataf = document.getElementById('modal-date').value;
 
-  if (!data) {
-    alert('Por favor, preencha a data.');
-    return;
-  }
+  if (!fileInput.files.length) { alert('Selecione uma imagem.'); return; }
+  if (!dataf) { alert('Preencha a data.'); return; }
 
-  if (tipoAtual === 'Imagem') {
-    if (fileInput.files.length === 0) {
-      alert('Por favor, selecione uma imagem.');
-      return;
-    }
+  const formData = new FormData();
+  formData.append("foto", fileInput.files[0]);
+  formData.append("dataf", dataf);
 
-    const formData = new FormData();
-    formData.append("foto", fileInput.files[0]);
-
-    fetch(`/turmas/${encodedNomeTurma}/fotos`, {
-      method: "POST",
-      body: formData
-    })
+  fetch(`/turmas/${encodedNomeTurma}/fotos`, { method: "POST", body: formData })
     .then(res => res.json())
     .then(data => {
       if (data.sucesso) {
-        pagesData[currentPageIndex].contents.push(
-          `Imagem: <img src="${data.link}" data-cod="${data.cod}" class="conteudo-img"/>`
-        );
+        let pagina = pagesData.find(p => p.date === dataf);
+        if (!pagina) {
+          pagina = { date: dataf, contents: [] };
+          pagesData.push(pagina);
+        }
+        pagina.contents.push({ tipo: 'imagem', valor: data.link, cod: data.cod });
         fecharModal();
         renderPage();
       } else {
-        alert("Erro ao adicionar a foto");
+        alert("Erro ao adicionar a foto: " + (data.erro || ""));
       }
     })
     .catch(err => alert("Erro ao adicionar a foto: " + err));
-  } else {
-    if (!texto) {
-      alert('Por favor, preencha o texto.');
-      return;
-    }
-    pagesData[currentPageIndex].contents.push(`${tipoAtual}: ${texto}`);
-    fecharModal();
-    renderPage();
-  }
 }
 
 // ---------------------------
@@ -171,25 +151,18 @@ function excluirConteudo(index) {
   if (!pagina) return;
 
   const conteudo = pagina.contents[index];
-  const imgTagMatch = conteudo.match(/data-cod="(\d+)"/);
-
-  if (imgTagMatch) {
-    const codFoto = imgTagMatch[1];
-    fetch(`/turmas/${encodedNomeTurma}/fotos`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cod: codFoto })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.sucesso) {
-        pagina.contents.splice(index, 1);
-        renderPage();
-      } else {
-        alert("Erro ao excluir a foto: " + (data.erro || ""));
-      }
-    })
-    .catch(err => alert("Erro ao excluir a foto: " + err));
+  if (conteudo.tipo === 'imagem') {
+    fetch(`/turmas/${encodedNomeTurma}/fotos/${conteudo.cod}`, { method: "DELETE" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.sucesso) {
+          pagina.contents.splice(index, 1);
+          renderPage();
+        } else {
+          alert("Erro ao excluir a foto: " + (data.erro || ""));
+        }
+      })
+      .catch(err => alert("Erro ao excluir a foto: " + err));
   } else {
     pagina.contents.splice(index, 1);
     renderPage();
@@ -199,18 +172,7 @@ function excluirConteudo(index) {
 // ---------------------------
 // Paginação
 // ---------------------------
-function avancarPagina() {
-  if (currentPageIndex < pagesData.length - 1) {
-    currentPageIndex++;
-    renderPage();
-  }
-}
-
-function voltarPagina() {
-  if (currentPageIndex > 0) {
-    currentPageIndex--;
-    renderPage();
-  }
-}
+function avancarPagina() { if (currentPageIndex < pagesData.length - 1) { currentPageIndex++; renderPage(); } }
+function voltarPagina() { if (currentPageIndex > 0) { currentPageIndex--; renderPage(); } }
 
 window.onload = renderPage;

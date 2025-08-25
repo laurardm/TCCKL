@@ -30,8 +30,8 @@ CREATE TABLE fotosa (
 CREATE TABLE fotos_turma (
   cod INT NOT NULL AUTO_INCREMENT,
   turma_id INT NOT NULL,
-  descricao VARCHAR(150),
   link VARCHAR(150) NOT NULL,
+  dataf DATE,
   PRIMARY KEY (cod),
   CONSTRAINT fk_fotos_turma FOREIGN KEY (turma_id) REFERENCES turma(cod) ON DELETE CASCADE
 );

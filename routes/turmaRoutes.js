@@ -3,17 +3,17 @@ const router = express.Router();
 const db = require("../config/db");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// Middleware para permitir só funcionários nas rotas que alteram dados
+// --- Middleware ---
 function verificarFuncionario(req, res, next) {
   if (req.session.usuario && req.session.usuario.tipo === "funcionario") {
-    next();
-  } else {
-    res.status(403).json("Acesso negado: apenas funcionários podem realizar esta ação.");
+    return next();
   }
+  return res.status(403).json("Acesso negado: apenas funcionários podem realizar esta ação.");
 }
 
-// Configuração do multer para upload de fotos
+// --- Configuração do multer ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "public/uploads/"),
   filename: (req, file, cb) => {
@@ -23,7 +23,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// --- ROTAS DE TURMAS ---
+/* ===========================
+   ROTAS DE TURMAS
+=========================== */
+
 // GET /turmas - listar turmas
 router.get("/", (req, res) => {
   db.query("SELECT nome FROM turma ORDER BY nome", (err, turmas) => {
@@ -58,7 +61,7 @@ router.get("/:nomeTurma", (req, res) => {
   });
 });
 
-// POST - Adicionar aluno (somente funcionário) com criação de agenda
+// POST /turmas/:nomeTurma - adicionar aluno
 router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { nome } = req.body;
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
@@ -89,7 +92,7 @@ router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
   });
 });
 
-// PUT - Editar aluno
+// PUT /turmas/:nomeTurma - editar aluno
 router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod, nome } = req.body;
   if (!cod || !nome) return res.status(400).json("Dados inválidos");
@@ -100,10 +103,9 @@ router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
   });
 });
 
-// DELETE - Excluir aluno
-router.delete("/:nomeTurma", verificarFuncionario, (req, res) => {
-  const { cod } = req.body;
-  if (!cod) return res.status(400).json("Código inválido");
+// DELETE /turmas/:nomeTurma/:cod - excluir aluno
+router.delete("/:nomeTurma/:cod", verificarFuncionario, (req, res) => {
+  const { cod } = req.params;
 
   db.query("DELETE FROM aluno WHERE cod = ?", [cod], (err) => {
     if (err) return res.status(500).json("Erro ao excluir aluno");
@@ -111,7 +113,7 @@ router.delete("/:nomeTurma", verificarFuncionario, (req, res) => {
   });
 });
 
-// POST - Alterar foto do aluno
+// POST /turmas/alunos/alterar-foto - alterar foto do aluno
 router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"), (req, res) => {
   const codAluno = req.body.cod;
   const novaFoto = req.file?.filename;
@@ -124,7 +126,10 @@ router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"),
   });
 });
 
-// --- ROTAS DE FOTOS DA TURMA ---
+/* ===========================
+   ROTAS DE FOTOS DA TURMA
+=========================== */
+
 // GET /turmas/:nomeTurma/fotos
 router.get("/:nomeTurma/fotos", (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
@@ -134,42 +139,75 @@ router.get("/:nomeTurma/fotos", (req, res) => {
 
     const codTurma = turmaResults[0].cod;
 
-    db.query("SELECT * FROM fotos_turma WHERE turma_id = ? ORDER BY cod DESC", [codTurma], (err2, fotos) => {
+    db.query("SELECT * FROM fotos_turma WHERE turma_id = ? ORDER BY dataf DESC, cod DESC", [codTurma], (err2, fotos) => {
       if (err2) return res.status(500).json("Erro ao buscar fotos da turma");
+
+      const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" :
+                          req.session.usuario?.tipo === "responsavel" ? "resp" : null;
+
+      const conteudos = fotos.map(f => ({
+        tipo: "imagem",
+        valor: f.link,
+        cod: f.cod,
+        dataf: f.dataf ? new Date(f.dataf).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]
+      }));
 
       res.render("turmas/fotosTurma", {
         encodedNomeTurma: encodeURIComponent(turmaResults[0].nome.trim()),
         dataTitulo: `Fotos da turma ${turmaResults[0].nome.trim()}`,
-        conteudos: fotos.map(f => ({ tipo: "imagem", valor: f.link })),
+        conteudos,
         dataAtual: new Date().toISOString().split("T")[0],
+        tipoUsuario
       });
     });
   });
 });
 
-// POST /turmas/:nomeTurma/fotos - adicionar foto da turma
+// POST /turmas/:nomeTurma/fotos - adicionar foto
+
 router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
   const arquivo = req.file;
+
   if (!arquivo) return res.status(400).json({ sucesso: false, erro: "Nenhum arquivo enviado" });
 
+  // pega a data enviada pelo front-end ou usa a data atual
+  let dataf;
+  if (req.body.dataf) {
+    // transforma a string enviada em 'YYYY-MM-DD'
+    const dateObj = new Date(req.body.dataf);
+    dataf = dateObj.toISOString().split("T")[0];
+  } else {
+    dataf = new Date().toISOString().split("T")[0];
+  }
+
   db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
-    if (err || turmaResults.length === 0) return res.status(404).json({ sucesso: false, erro: "Turma não encontrada" });
+    if (err || turmaResults.length === 0) 
+      return res.status(404).json({ sucesso: false, erro: "Turma não encontrada" });
 
     const codTurma = turmaResults[0].cod;
     const linkFoto = "/uploads/" + arquivo.filename;
 
-    db.query("INSERT INTO fotos_turma (turma_id, link, descricao) VALUES (?, ?, ?)", [codTurma, linkFoto, null], (err2, result) => {
-      if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao adicionar foto" });
-      res.status(200).json({ sucesso: true, cod: result.insertId, link: linkFoto });
-    });
+    // INSERT com a string da data correta
+    db.query(
+      "INSERT INTO fotos_turma (turma_id, link, dataf) VALUES (?, ?, ?)",
+      [codTurma, linkFoto, dataf],
+      (err2, result) => {
+        if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao adicionar foto" });
+
+        res.status(200).json({ 
+          sucesso: true, 
+          cod: result.insertId, 
+          link: linkFoto, 
+          dataf
+        });
+      }
+    );
   });
 });
-
-// DELETE /turmas/:nomeTurma/fotos - excluir foto da turma
-router.delete("/:nomeTurma/fotos", verificarFuncionario, (req, res) => {
-  const { cod } = req.body;
-  if (!cod) return res.status(400).json({ sucesso: false, erro: "Código da foto não fornecido" });
+// DELETE /turmas/:nomeTurma/fotos/:cod - excluir foto
+router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
+  const { cod } = req.params;
 
   db.query("SELECT link FROM fotos_turma WHERE cod = ?", [cod], (err, results) => {
     if (err || results.length === 0) return res.status(404).json({ sucesso: false, erro: "Foto não encontrada" });
@@ -179,16 +217,19 @@ router.delete("/:nomeTurma/fotos", verificarFuncionario, (req, res) => {
     db.query("DELETE FROM fotos_turma WHERE cod = ?", [cod], (err2) => {
       if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao excluir foto" });
 
-      const fs = require("fs");
       fs.unlink(fotoPath, (errFs) => {
-        if (errFs) console.log("Erro ao remover arquivo:", errFs);
+        if (errFs) console.log("⚠️ Erro ao remover arquivo:", errFs);
       });
 
       res.status(200).json({ sucesso: true });
     });
   });
 });
-// --- ROTA DA AGENDA ---
+
+/* ===========================
+   ROTAS DE AGENDA / RECADOS
+=========================== */
+
 // GET /agenda/aluno/:cod
 router.get("/aluno/:cod", (req, res) => {
   const codAluno = req.params.cod;
@@ -206,30 +247,22 @@ router.get("/aluno/:cod", (req, res) => {
   });
 });
 
-// rota GET: listar recados da turma
+// GET recados
 router.get("/:nomeTurma/recados", (req, res) => {
   const { nomeTurma } = req.params;
 
   db.query("SELECT * FROM turma WHERE nome = ?", [nomeTurma], (err, turmaResults) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Erro ao buscar turma");
-    }
-    if (turmaResults.length === 0) {
-      return res.status(404).send("Turma não encontrada");
-    }
+    if (err) return res.status(500).send("Erro ao buscar turma");
+    if (turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
 
     const turmaId = turmaResults[0].cod;
 
     db.query("SELECT * FROM recados_turma WHERE turma_id = ?", [turmaId], (err, recados) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Erro ao buscar recados");
-      }
+      if (err) return res.status(500).send("Erro ao buscar recados");
 
       res.render("turmas/recadosTurma", {
         encodedNomeTurma: encodeURIComponent(turmaResults[0].nome.trim()),
-        nomeTurma: turmaResults[0].nome.trim(), // 👈 agora vai pro EJS
+        nomeTurma: turmaResults[0].nome.trim(),
         tituloPagina: `Recados da turma ${turmaResults[0].nome.trim()}`,
         conteudos: recados.map(r => ({
           data: r.datar,
@@ -241,8 +274,8 @@ router.get("/:nomeTurma/recados", (req, res) => {
   });
 });
 
-// rota POST: adicionar novo recado
-router.post("/:nomeTurma/recados", (req, res) => {
+// POST recados
+router.post("/:nomeTurma/recados", verificarFuncionario, (req, res) => {
   const { nomeTurma } = req.params;
   const { descricao, datar } = req.body;
 
@@ -252,32 +285,21 @@ router.post("/:nomeTurma/recados", (req, res) => {
 
     const turmaId = turmaResults[0].cod;
 
-    db.query(
-      "INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)",
-      [turmaId, descricao, datar],
-      (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Erro ao salvar recado");
-        }
-        res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
-      }
-    );
+    db.query("INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)", [turmaId, descricao, datar], (err) => {
+      if (err) return res.status(500).send("Erro ao salvar recado");
+      res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+    });
   });
 });
 
-// rota DELETE: excluir recado
-router.post("/:nomeTurma/recados/:cod/delete", (req, res) => {
+// DELETE recados
+router.post("/:nomeTurma/recados/:cod/delete", verificarFuncionario, (req, res) => {
   const { nomeTurma, cod } = req.params;
 
   db.query("DELETE FROM recados_turma WHERE cod = ?", [cod], (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Erro ao excluir recado");
-    }
+    if (err) return res.status(500).send("Erro ao excluir recado");
     res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
   });
 });
-
 
 module.exports = router;
