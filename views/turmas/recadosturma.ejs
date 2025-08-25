@@ -7,76 +7,38 @@
   <link rel="stylesheet" href="/css/recadosturma.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/logo.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <div class="painel-turma">
-    <span class="nome-turma">Turma <%= nomeTurma || "Nome da turma" %></span>
+    <span class="nome-turma">Turma <%= nomeTurma %></span>
   </div>
 
   <div class="container">
-    <h2 id="data-titulo"></h2>
-    <div id="conteudo-pagina">
-      <% if (conteudos && conteudos.length > 0) { %>
-        <ul>
-          <% conteudos.forEach(c => { %>
-            <li>
-              <strong><%= c.data %>:</strong> <%= c.texto %>
-              <form action="/turmas/<%= encodedNomeTurma %>/recados/<%= c.cod %>/delete" method="POST" style="display:inline;">
-                <button type="submit">Excluir</button>
-              </form>
-            </li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p>Nenhum recado cadastrado ainda.</p>
-      <% } %>
-    </div>
+    <% if (conteudos && conteudos.length > 0) { %>
+      <ul>
+        <% conteudos.forEach(c => { %>
+          <li>
+            <strong><%= c.data %>:</strong> <%= c.texto %>
+            <form action="/turmas/<%= encodedNomeTurma %>/recados/<%= c.cod %>/delete" method="POST" style="display:inline;">
+              <button type="submit">Excluir</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>Nenhum recado cadastrado ainda.</p>
+    <% } %>
   </div>
 
   <div class="painel-acoes">
-    <button class="btn-navegacao" onclick="voltarPagina()">
-      <i class="fa-solid fa-arrow-left"></i> Página anterior
-    </button>
-    <button class="btn-adicionar" onclick="abrirModalRecado()">
-      <i class="fa-solid fa-pen"></i> Adicionar recado
-    </button>
-    <button class="btn-navegacao" onclick="avancarPagina()">
-      Próxima página <i class="fa-solid fa-arrow-right"></i>
-    </button>
+    <form action="/turmas/<%= encodedNomeTurma %>/recados" method="POST">
+      <input type="date" name="datar" value="<%= dataAtual %>" required />
+      <input type="text" name="descricao" placeholder="Digite o recado" required />
+      <button type="submit">Adicionar recado</button>
+    </form>
   </div>
 
-  <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
-
-  <!-- Modal de adicionar/editar -->
-  <div id="modal-bg" class="modal-bg">
-    <div class="modal">
-      <button class="modal-close" onclick="fecharModal()" title="Fechar">&times;</button>
-      <h3 id="modal-title">Adicionar recado</h3>
-      <input type="date" id="modal-date" value="<%= dataAtual %>" />
-      <textarea id="modal-text" placeholder="Digite o texto aqui..."></textarea>
-      <div class="modal-buttons">
-        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-        <button class="btn-confirmar" onclick="confirmarAdicao()">Confirmar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Alerta -->
-  <div id="alerta-bg" class="alerta-bg">
-    <div class="alerta-box">
-      <p id="alerta-msg"></p>
-      <button onclick="fecharAlerta()">OK</button>
-    </div>
-  </div>
-
-  <div id="footer"></div>
-  <div id="logo"></div>
-  
-  <script src="/js/footer.js"></script>
-  <script src="/js/logo.js"></script>
-  <script src="/js/recadosturma.js"></script>
+  <button onclick="window.history.back()">Voltar</button>
 </body>
 </html>

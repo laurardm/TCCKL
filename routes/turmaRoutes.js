@@ -226,11 +226,8 @@ router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
   });
 });
 
-/* ===========================
-   ROTAS DE AGENDA / RECADOS
-=========================== */
 
-// GET /agenda/aluno/:cod
+// GET agenda de um aluno
 router.get("/aluno/:cod", (req, res) => {
   const codAluno = req.params.cod;
 
@@ -247,7 +244,7 @@ router.get("/aluno/:cod", (req, res) => {
   });
 });
 
-// GET recados
+// GET recados da turma
 router.get("/:nomeTurma/recados", (req, res) => {
   const { nomeTurma } = req.params;
 
@@ -265,6 +262,7 @@ router.get("/:nomeTurma/recados", (req, res) => {
         nomeTurma: turmaResults[0].nome.trim(),
         tituloPagina: `Recados da turma ${turmaResults[0].nome.trim()}`,
         conteudos: recados.map(r => ({
+          cod: r.cod,
           data: r.datar,
           texto: r.descricao
         })),
@@ -274,7 +272,7 @@ router.get("/:nomeTurma/recados", (req, res) => {
   });
 });
 
-// POST recados
+// POST adicionar recado
 router.post("/:nomeTurma/recados", verificarFuncionario, (req, res) => {
   const { nomeTurma } = req.params;
   const { descricao, datar } = req.body;
@@ -285,14 +283,15 @@ router.post("/:nomeTurma/recados", verificarFuncionario, (req, res) => {
 
     const turmaId = turmaResults[0].cod;
 
-    db.query("INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)", [turmaId, descricao, datar], (err) => {
+    db.query("INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)", 
+      [turmaId, descricao, datar], (err) => {
       if (err) return res.status(500).send("Erro ao salvar recado");
       res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
     });
   });
 });
 
-// DELETE recados
+// DELETE recado
 router.post("/:nomeTurma/recados/:cod/delete", verificarFuncionario, (req, res) => {
   const { nomeTurma, cod } = req.params;
 
@@ -301,5 +300,4 @@ router.post("/:nomeTurma/recados/:cod/delete", verificarFuncionario, (req, res) 
     res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
   });
 });
-
 module.exports = router;
