@@ -71,7 +71,14 @@ body {
   gap: 10px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.aluno:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* sombra um pouco mais intensa */
+}
+
 
 /* Foto do aluno */
 .aluno .foto-wrapper {
@@ -249,6 +256,41 @@ body {
   background-color: #f44336;
 }
 
+.aluno .acoes {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+
+/* Botão de excluir */
+.aluno .btn-excluir {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #fbe9f1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.aluno .btn-excluir:hover {
+  background-color: #f9cde6;
+}
+
+/* Ícone da câmera */
+.aluno .camera-overlay {
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none; /* padrão invisível */
+}
+
+.aluno.editando .camera-overlay {
+  display: inline-block; /* aparece só no modo edição */
+}
+
 /* Responsivo para celulares */
 @media (max-width: 600px) {
   .turma-titulo {
@@ -264,13 +306,6 @@ body {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-
-  .aluno {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
   .nome-aluno {
     width: 100%;
   }

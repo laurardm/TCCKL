@@ -22,7 +22,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      height: 400px;            
+      height: 380px;            
       width: 850px;
       background: white;
       border-radius: 25px;
@@ -51,7 +51,6 @@
       border-radius: 30px;
       border: 2px solid #d9d9d9;
       padding: 10px 30px;
-      margin-top: -200px;
       font-weight: bold;
       cursor: pointer;
       font-family: "Questrial", sans-serif;
@@ -106,6 +105,10 @@
   background-color: #0056b3;
 }
 
-.botoes{
-  margin-top: 60px;
+.botoes {
+  display: flex;
+  flex-wrap: wrap;        /* permite que quebrem linha se necessário */
+  justify-content: center; /* centraliza horizontalmente */
+  gap: 5px;               /* espaço entre os botões */
+  margin-top: 40px;        /* ajuste para o topo */
 }

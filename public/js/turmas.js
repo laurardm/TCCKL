@@ -6,11 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const alunosContainer = document.querySelector(".grade-alunos");
-  const btnFotos = document.getElementById("btnFotos");
   const btnAdicionar = document.getElementById("btnAdicionar");
   const btnEditar = document.getElementById("btnEditar");
   const btnSalvar = document.getElementById("btnSalvar");
-
   const tipoUsuario = window.tipoUsuario || "";
   let modoEdicao = false;
 
@@ -31,25 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.style.borderRadius = "6px";
     toast.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
     toastContainer.appendChild(toast);
-
     setTimeout(() => {
       toast.style.opacity = "0";
       setTimeout(() => toast.remove(), 400);
     }, duracao);
   }
 
-  // --------------- MODAL CONFIRMAÇÃO (assume que existe no HTML) ----------------
+  // --------------- MODAL CONFIRMAÇÃO ----------------
   function mostrarConfirmacao(msg) {
     return new Promise((resolve) => {
       const modal = document.getElementById("modalConfirm");
       const mensagem = document.getElementById("modalConfirmMessage");
       const btnSim = document.getElementById("modalConfirmYes");
       const btnNao = document.getElementById("modalConfirmNo");
-
-      if (!modal) {
-        resolve(confirm(msg));
-        return;
-      }
+      if (!modal) { resolve(confirm(msg)); return; }
 
       mensagem.textContent = msg;
       modal.style.display = "flex";
@@ -71,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------- FOTO ----------------
   document.body.addEventListener("change", async (e) => {
     if (!e.target.classList.contains("input-foto")) return;
-
     const file = e.target.files[0];
     const codAluno = e.target.dataset.cod;
     if (!file || !codAluno) return;
@@ -81,17 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("cod", codAluno);
 
     try {
-      const res = await fetch("/turmas/alunos/alterar-foto", {
-        method: "POST",
-        body: formData,
-      });
-
+      const res = await fetch("/turmas/alunos/alterar-foto", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Erro ao enviar imagem");
 
       const data = await res.json();
       const imgTag = e.target.closest(".aluno").querySelector("img");
       imgTag.src = `${data.novaFoto}?t=${Date.now()}`;
-
       showToast("Foto alterada com sucesso", "success");
     } catch (err) {
       console.error(err);
@@ -99,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Bloqueia botões para não funcionários
+  // ---------------- BLOQUEIO PARA NÃO FUNCIONÁRIOS ----------------
   if (tipoUsuario !== "func") {
     [btnAdicionar, btnEditar, btnSalvar].forEach(btn => {
       if (btn) { btn.style.display = "none"; btn.disabled = true; }
@@ -107,12 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modoEdicao = false;
   }
 
-  // Cria elemento de aluno (usado para novos e existentes)
+  // ---------------- FUNÇÕES DE ALUNO ----------------
   function criarAlunoElemento(cod, nome, foto, alunoNovo = false) {
     const div = document.createElement("div");
     div.className = "aluno";
-    if (cod) div.dataset.cod = cod;
-    else div.dataset.cod = "";
+    div.dataset.cod = cod || "";
 
     div.innerHTML = `
       <div class="foto-wrapper">
@@ -121,105 +107,97 @@ document.addEventListener("DOMContentLoaded", () => {
       <span ${alunoNovo ? 'contenteditable="true" style="border-bottom: 1px dashed #000;"' : ''}>${nome || ''}</span>
     `;
 
-    // se for modo edição, adiciona câmera e input
-    if (modoEdicao) {
-      adicionarCameraEInput(div);
-      adicionarBotaoExcluir(div);
-    }
-
-    // clique para abrir agenda (somente quando não estiver em edição)
+    // Bloqueia clique durante edição
     div.addEventListener('click', (ev) => {
       if (modoEdicao) return;
-      if (ev.target.closest('.camera-icon') || ev.target.closest('.input-foto') || ev.target.classList.contains('btn-excluir')) return;
+      if (ev.target.closest('.camera-overlay') || ev.target.closest('input') || ev.target.classList.contains('btn-excluir')) return;
       const codLocal = div.dataset.cod;
       if (codLocal) window.location.href = `/agenda/aluno/${codLocal}`;
     });
 
+    const span = div.querySelector("span");
+    span.addEventListener("click", ev => ev.stopPropagation());
+    const imgWrapper = div.querySelector(".foto-wrapper img");
+    imgWrapper.addEventListener("click", ev => ev.stopPropagation());
+
+    if (modoEdicao) {
+      div.classList.add("editando");
+      adicionarAcoes(div);
+    }
+
     return div;
   }
 
-  function adicionarCameraEInput(divAluno) {
-    if (divAluno.querySelector(".camera-overlay")) return;
-    const cod = divAluno.dataset.cod || '';
-    const overlay = document.createElement("div");
-    overlay.className = "camera-overlay";
-    overlay.innerHTML = "📷";
-    overlay.title = "Clique para alterar a foto";
-    overlay.style.position = "absolute";
-    overlay.style.right = "6px";
-    overlay.style.bottom = "6px";
-    overlay.style.cursor = "pointer";
-
-    overlay.addEventListener("click", () => {
-      let inputFile = divAluno.querySelector("input.input-foto");
-      if (!inputFile) {
-        inputFile = document.createElement("input");
-        inputFile.type = "file";
-        inputFile.accept = "image/*";
-        inputFile.classList.add("input-foto");
-        inputFile.dataset.cod = cod;
-        inputFile.style.display = "none";
-        divAluno.appendChild(inputFile);
-      }
-      inputFile.click();
-    });
-
-    divAluno.style.position = "relative";
-    divAluno.appendChild(overlay);
-  }
-
-  // Excluir aluno (adiciona botão)
-  function adicionarBotaoExcluir(divAluno) {
-    if (divAluno.querySelector(".btn-excluir")) return;
-
-    const btnExcluir = document.createElement("button");
-    btnExcluir.textContent = "❌";
-    btnExcluir.title = "Excluir aluno";
-    btnExcluir.className = "btn-excluir";
-    btnExcluir.style.marginLeft = "8px";
-    btnExcluir.style.position = "absolute";
-    btnExcluir.style.top = "6px";
-    btnExcluir.style.right = "6px";
-
-    btnExcluir.addEventListener("click", async (ev) => {
-      ev.stopPropagation();
-      const confirmado = await mostrarConfirmacao("Confirma exclusão do aluno?");
-      if (!confirmado) return;
-
-      const cod = divAluno.dataset.cod;
-      if (!cod) {
-        // item não salvo no servidor ainda: remove apenas do DOM
-        divAluno.remove();
-        showToast("Aluno removido", "success");
-        return;
-      }
-
-      try {
-        const res = await fetch(`/turmas/${nomeTurma}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cod }),
-        });
-
-        if (!res.ok) throw new Error("Erro ao excluir");
-        divAluno.remove();
-        showToast("Aluno excluído", "success");
-      } catch (err) {
-        console.error(err);
-        showToast("Erro ao excluir aluno", "error");
-      }
-    });
-
-    divAluno.appendChild(btnExcluir);
-  }
-
-  // Ativa modo edição
-  function ativarEdicao() {
-    if (tipoUsuario !== "func") {
-      showToast("Você não tem permissão para editar alunos.", "error");
-      return;
+  function adicionarAcoes(divAluno) {
+    let acoes = divAluno.querySelector(".acoes");
+    if (!acoes) {
+      acoes = document.createElement("div");
+      acoes.className = "acoes";
+      acoes.style.position = "absolute";
+      acoes.style.top = "8px";
+      acoes.style.right = "6px";
+      acoes.style.display = "flex";
+      acoes.style.gap = "6px";
+      divAluno.appendChild(acoes);
     }
 
+    // Botão excluir
+    if (!acoes.querySelector(".btn-excluir")) {
+      const btnExcluir = document.createElement("button");
+      btnExcluir.className = "btn-excluir";
+      btnExcluir.textContent = "❌";
+      btnExcluir.title = "Excluir aluno";
+      btnExcluir.addEventListener("click", async (ev) => {
+        ev.stopPropagation();
+        const confirmado = await mostrarConfirmacao("Confirma exclusão do aluno?");
+        if (!confirmado) return;
+
+        const cod = divAluno.dataset.cod;
+        if (!cod) { divAluno.remove(); showToast("Aluno removido", "success"); return; }
+
+        try {
+          const res = await fetch(`/turmas/${nomeTurma}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cod }),
+          });
+          if (!res.ok) throw new Error("Erro ao excluir");
+          divAluno.remove();
+          showToast("Aluno excluído", "success");
+        } catch (err) {
+          console.error(err);
+          showToast("Erro ao excluir aluno", "error");
+        }
+      });
+      acoes.appendChild(btnExcluir);
+    }
+
+    // Ícone da câmera
+    if (!acoes.querySelector(".camera-overlay")) {
+      const camera = document.createElement("div");
+      camera.className = "camera-overlay";
+      camera.innerHTML = "📷";
+      camera.title = "Alterar foto do aluno";
+      camera.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        let inputFile = divAluno.querySelector("input.input-foto");
+        if (!inputFile) {
+          inputFile = document.createElement("input");
+          inputFile.type = "file";
+          inputFile.accept = "image/*";
+          inputFile.classList.add("input-foto");
+          inputFile.dataset.cod = divAluno.dataset.cod || '';
+          inputFile.style.display = "none";
+          divAluno.appendChild(inputFile);
+        }
+        inputFile.click();
+      });
+      acoes.appendChild(camera);
+    }
+  }
+
+  function ativarEdicao() {
+    if (tipoUsuario !== "func") { showToast("Você não tem permissão para editar alunos.", "error"); return; }
     modoEdicao = true;
     btnAdicionar.disabled = false;
     if (btnEditar) btnEditar.style.display = "none";
@@ -229,13 +207,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const span = divAluno.querySelector("span");
       span.setAttribute("contenteditable", "true");
       span.style.borderBottom = "1px dashed #000";
-
-      adicionarBotaoExcluir(divAluno);
-      adicionarCameraEInput(divAluno);
+      span.addEventListener("click", ev => ev.stopPropagation());
+      divAluno.querySelector(".foto-wrapper img")?.addEventListener("click", ev => ev.stopPropagation());
+      adicionarAcoes(divAluno);
+      divAluno.classList.add("editando");
     });
   }
 
-  // Salva edições e novos alunos
   async function salvarEdicao() {
     const alunos = Array.from(alunosContainer.querySelectorAll(".aluno"));
     let erro = false;
@@ -246,55 +224,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const nome = span.textContent.trim();
 
       if (!cod) {
-        // novo aluno: exige nome
-        if (!nome) {
-          showToast("Nome do aluno não pode ser vazio", "error");
-          return;
-        }
-
+        if (!nome) { showToast("Nome do aluno não pode ser vazio", "error"); return; }
         try {
           const res = await fetch(`/turmas/${nomeTurma}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nome }),
           });
-
           if (!res.ok) throw new Error("Erro ao criar");
           const data = await res.json();
-
           aluno.dataset.cod = data.cod;
           span.textContent = data.nome;
-          span.removeAttribute("contenteditable");
-          span.style.borderBottom = "none";
-          aluno.querySelector(".btn-excluir")?.remove();
-          // adiciona input-foto com cod atualizado
-          const existingInput = aluno.querySelector("input.input-foto");
-          if (existingInput) existingInput.dataset.cod = data.cod;
-        } catch (err) {
-          console.error(err);
-          erro = true;
-          break;
-        }
+        } catch (err) { console.error(err); erro = true; break; }
       } else {
-        // aluno existente: só envia se nome mudou (opcional)
         try {
           const res = await fetch(`/turmas/${nomeTurma}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ cod, nome }),
           });
-
           if (!res.ok) throw new Error("Erro ao atualizar");
-          span.removeAttribute("contenteditable");
-          span.style.borderBottom = "none";
-          aluno.querySelector(".btn-excluir")?.remove();
-          // remove overlay de camera (iremos recriar quando entrar em edição novamente)
-          aluno.querySelector(".camera-overlay")?.remove();
-        } catch (err) {
-          console.error(err);
-          erro = true;
-          break;
-        }
+        } catch (err) { console.error(err); erro = true; break; }
       }
     }
 
@@ -303,32 +253,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnEditar) btnEditar.style.display = "inline-block";
     if (btnSalvar) btnSalvar.style.display = "none";
 
+    alunosContainer.querySelectorAll(".aluno").forEach(divAluno => {
+      divAluno.classList.remove("editando");
+      divAluno.querySelector(".camera-overlay")?.remove();
+      divAluno.querySelector(".btn-excluir")?.remove();
+      const span = divAluno.querySelector("span");
+      span.removeAttribute("contenteditable");
+      span.style.borderBottom = "none";
+    });
+
     showToast(erro ? "Erro ao salvar alunos" : "Alunos salvos com sucesso", erro ? "error" : "success");
   }
 
-  // Botões
+  // ---------------- BOTÕES ----------------
   btnAdicionar?.addEventListener("click", () => {
     if (!modoEdicao) return showToast("Ative o modo edição para adicionar", "info");
     const novoAluno = criarAlunoElemento("", "Novo Aluno", "/imagens/perfil.png", true);
     alunosContainer.appendChild(novoAluno);
-    // rolar para o novo elemento
     novoAluno.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
   btnEditar?.addEventListener("click", ativarEdicao);
   btnSalvar?.addEventListener("click", salvarEdicao);
 
-  // transforma os .aluno iniciais em elementos com listeners corretos (caso a página já tenha alunos carregados)
+  // Inicializa elementos existentes
   document.querySelectorAll(".aluno").forEach(existing => {
     const cod = existing.dataset.cod || "";
     const nome = existing.querySelector("span")?.textContent || "";
     const img = existing.querySelector("img")?.src || "/imagens/perfil.png";
     const novo = criarAlunoElemento(cod, nome, img, false);
-    // substituir o existente pelo novo (mantendo ordem)
     existing.replaceWith(novo);
   });
 });
-
-
-const encodedNomeTurma = encodeURIComponent(nomeTurma);
-res.render('pagina', { nomeTurma, encodedNomeTurma });
