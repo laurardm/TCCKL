@@ -35,13 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
       conteudoPagina.innerHTML = "<p>Sem conteúdos nesta data.</p>";
     } else {
       conteudoPagina.innerHTML = pagina.contents.map((conteudo, index) => `
-        <div class="conteudo-item">
-          <button class="btn-editar" onclick="editarConteudo(${index})" title="Editar">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-          <span class="conteudo-text">${conteudo.tipo}: ${conteudo.descricao}</span>
-        </div>
-      `).join('');
+  <div class="conteudo-item">
+    ${window.tipoUsuario === "funcionario" ? `
+      <button class="btn-editar" onclick="editarConteudo(${index})" title="Editar">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+    ` : ""}
+    <span class="conteudo-text">
+      ${conteudo.tipo === "Foto" 
+        ? `<img src="${conteudo.descricao}" alt="Foto" class="foto-conteudo" />` 
+        : `${conteudo.tipo}: ${conteudo.descricao}`
+      }
+    </span>
+  </div>
+`).join('');
+
     }
   }
 
