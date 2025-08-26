@@ -226,6 +226,7 @@ router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
   });
 });
 
+//recados turma
 
 // GET agenda de um aluno
 router.get("/aluno/:cod", (req, res) => {
