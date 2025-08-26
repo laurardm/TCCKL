@@ -39,7 +39,7 @@ h2 {
 .container li {
   display: flex;
   align-items: center;
-  background: #f3f6fb; /* Mantém o fundo azul claro */
+  background: #f3f6fb;
   padding: 10px 15px;
   border-radius: 6px;
   margin-bottom: 10px;
@@ -62,19 +62,24 @@ h2 {
 }
 
 /* Botão excluir */
-.btn-excluir {
-  background: transparent;
-  border: none;
-  color: #cc0000;
-  font-size: 18px;
+.container form button {
+  padding: 10px 18px;
+  font-size: 16px;
+  border: 2px solid #d9d9d9;
+  border-radius: 40px;
   cursor: pointer;
-  margin-right: 10px;
-  padding: 0;
+  background-color: #cc0000;
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-family: 'Questrial', sans-serif;
+  color: #333;
+  transition: all linear 160ms;
+  margin-right: 11px;
+  margin-left: -11px;
 }
 
-.btn-excluir:hover { color: #ff4444; }
+.container form button { color: #d9d9d9; }
 
 /* Botão editar */
 .btn-editar {
