@@ -35,8 +35,8 @@ h2 {
   font-weight: 600;
 }
 
-/* Itens de conteúdo */
-.container li {
+/* Itens de conteúdo adaptados */
+.conteudo-item {
   display: flex;
   align-items: center;
   background: #f3f6fb;
@@ -49,46 +49,33 @@ h2 {
   word-break: break-word;
 }
 
-.conteudo-item span {
-  display: block;
-  white-space: pre-wrap; /* respeita quebras */
-  overflow: visible;
-  font-size: 1rem;
-}
-
-.conteudo-text {
-  white-space: normal;
+.conteudo-item span.conteudo-text {
   flex: 1;
+  white-space: pre-wrap; /* respeita quebras de linha */
 }
 
-/* Botão excluir */
-.container form button {
+/* Botão excluir dentro do item */
+.conteudo-item form button {
   padding: 10px 18px;
   font-size: 16px;
-  border: 2px solid #d9d9d9;
   border-radius: 40px;
-  cursor: pointer;
   background-color: #cc0000;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Questrial', sans-serif;
-  color: #333;
-  transition: all linear 160ms;
-  margin-right: 11px;
-  margin-left: -11px;
+  color: #d9d9d9;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
 }
 
-.container form button { color: #d9d9d9; }
-
 /* Botão editar */
-.btn-editar {
+.conteudo-item .btn-editar {
   background: none;
   border: none;
   cursor: pointer;
-  margin-right: 8px;
+  margin-left: 8px;
 }
-.btn-editar i { font-size: 14px; }
+.conteudo-item .btn-editar i {
+  font-size: 14px;
+}
 
 /* Botões gerais */
 button {

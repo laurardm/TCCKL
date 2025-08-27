@@ -1,100 +1,55 @@
-let today = new Date().toISOString().split('T')[0];
-
-let pagesData = [
-  { date: today, contents: [] }
-];
-
 let currentPageIndex = 0;
 let editIndex = null;
 
 function formatarData(dataStr) {
-  const d = new Date(dataStr + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
-    .replace(/^\w/, c => c.toUpperCase());
+  const d = new Date(dataStr + "T00:00:00");
+  return d.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).replace(/^\w/, c => c.toUpperCase());
 }
 
 function renderPage() {
-  const titulo = document.getElementById('data-titulo');
-  const conteudoDiv = document.getElementById('conteudo-pagina');
+  const titulo = document.getElementById("data-titulo");
+  const conteudoDiv = document.getElementById("conteudo-pagina");
 
-  if (pagesData.length === 0) {
-    titulo.textContent = 'Nenhuma data adicionada';
-    conteudoDiv.innerHTML = '<p>Adicione um recado para começar.</p>';
+  if (!pagesData || pagesData.length === 0) {
+    titulo.textContent = "Nenhuma data adicionada";
+    conteudoDiv.innerHTML = "<p>Nenhum recado cadastrado ainda.</p>";
     return;
   }
 
-  pagesData.sort((a, b) => a.date.localeCompare(b.date));
+  // Ordenar por data
+  pagesData.sort((a, b) => a.data.localeCompare(b.data));
   if (currentPageIndex < 0) currentPageIndex = 0;
   if (currentPageIndex >= pagesData.length) currentPageIndex = pagesData.length - 1;
 
   const pagina = pagesData[currentPageIndex];
-  titulo.textContent = formatarData(pagina.date);
+  titulo.textContent = formatarData(pagina.data);
 
-  if (pagina.contents.length === 0) {
-    conteudoDiv.innerHTML = '<p>Ainda não há recados nesse dia.</p>';
-  } else {
-    conteudoDiv.innerHTML = pagina.contents.map((conteudo, index) => `
-      <div class="conteudo-item">
-        <span class="conteudo-text">${conteudo}</span>
-        <button class="btn-editar" onclick="editarConteudo(${index})">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-      </div>
-    `).join('');
-  }
+  conteudoDiv.innerHTML = `
+    <div class="conteudo-item">
+      <span class="conteudo-text">${pagina.texto}</span>
+      <form action="/turmas/${document.body.dataset.nomeTurma}/recados/${pagina.cod}/delete" method="POST" style="display:inline;">
+        <button type="submit">Excluir</button>
+      </form>
+      <button onclick="abrirModalEditar('${pagina.cod}', '${pagina.data}', '${pagina.texto}')">Editar</button>
+    </div>
+  `;
 }
 
 function abrirModalRecado() {
   editIndex = null;
-  document.getElementById('modal-title').textContent = 'Adicionar recado';
-  document.getElementById('modal-text').value = '';
-  document.getElementById('modal-date').value = pagesData[currentPageIndex].date;
-  document.getElementById('modal-bg').classList.add('active');
-  document.getElementById('modal-date').focus();
+  document.getElementById("modal-title").textContent = "Adicionar recado";
+  document.getElementById("modal-text").value = "";
+  document.getElementById("modal-date").value = new Date().toISOString().split("T")[0];
+  document.getElementById("modal-bg").classList.add("active");
 }
 
 function fecharModal() {
-  document.getElementById('modal-bg').classList.remove('active');
-}
-
-function confirmarAdicao() {
-  const data = document.getElementById('modal-date').value;
-  const texto = document.getElementById('modal-text').value.trim();
-
-  if (!data) {
-    mostrarAlerta('Por favor, selecione uma data.');
-    return;
-  }
-  if (!texto) {
-    mostrarAlerta('Por favor, insira um recado.');
-    return;
-  }
-
-  let pagina = pagesData.find(p => p.date === data);
-  if (!pagina) {
-    pagina = { date: data, contents: [] };
-    pagesData.push(pagina);
-    pagesData.sort((a, b) => a.date.localeCompare(b.date));
-    currentPageIndex = pagesData.findIndex(p => p.date === data);
-  }
-
-  if (editIndex !== null) {
-    pagina.contents[editIndex] = texto;
-  } else {
-    pagina.contents.push(texto);
-  }
-
-  fecharModal();
-  renderPage();
-}
-
-function editarConteudo(index) {
-  const pagina = pagesData[currentPageIndex];
-  editIndex = index;
-  document.getElementById('modal-title').textContent = 'Editar recado';
-  document.getElementById('modal-date').value = pagina.date;
-  document.getElementById('modal-text').value = pagina.contents[index];
-  document.getElementById('modal-bg').classList.add('active');
+  document.getElementById("modal-bg").classList.remove("active");
 }
 
 function avancarPagina() {
@@ -120,10 +75,6 @@ function fecharAlerta() {
   document.getElementById("alerta-bg").style.display = "none";
 }
 
-window.onload = () => {
-  renderPage();
-};
-
 function abrirModalEditar(cod, data, texto) {
   const nomeTurma = document.body.dataset.nomeTurma;
 
@@ -137,3 +88,6 @@ function abrirModalEditar(cod, data, texto) {
   document.getElementById("modal-bg").classList.add("active");
 }
 
+window.onload = () => {
+  renderPage();
+};

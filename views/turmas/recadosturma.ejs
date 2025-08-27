@@ -18,24 +18,11 @@
   </div>
 
   <div class="container">
-    <h2 id="data-titulo"></h2>
-      <% if (conteudos && conteudos.length > 0) { %>
-        <ul>
-          <% conteudos.forEach(c => { %>
-            <li>
-              <form action="/turmas/<%= encodedNomeTurma %>/recados/<%= c.cod %>/delete" method="POST" style="display:inline;">
-                <button type="submit">Excluir</button>
-              </form>
-              <button type="button" onclick="abrirModalEditar('<%= c.cod %>', '<%= c.data %>', '<%= c.texto %>')">Editar</button>
-              Recado: <%= c.texto %>
-            </li>
-          <% }) %>
-      </ul>
-
-      <% } else { %>
-        <p>Nenhum recado cadastrado ainda.</p>
-      <% } %>
+    <h2 id="data-titulo">Nenhuma data selecionada</h2>
+    <div id="conteudo-pagina">
+      <p>Carregando recados...</p>
     </div>
+  </div>
 
   <div class="painel-acoes">
     <button class="btn-navegacao" onclick="voltarPagina()">
@@ -51,20 +38,19 @@
 
   <button class="btn-voltar" onclick="window.history.back()">Voltar</button>
 
-  <!-- Modal de adicionar recado -->
+  <!-- Modal de adicionar/editar recado -->
   <div id="modal-bg" class="modal-bg">
     <div class="modal">
       <button class="modal-close" onclick="fecharModal()" title="Fechar">&times;</button>
       <h3 id="modal-title">Adicionar recado</h3>
       <form id="modal-form" method="POST">
-  <input type="date" name="datar" id="modal-date" value="<%= dataAtual %>" required />
-  <textarea name="descricao" id="modal-text" placeholder="Digite o recado" required></textarea>
-  <div class="modal-buttons">
-    <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-    <button type="submit" class="btn-confirmar">Confirmar</button>
-  </div>
-</form>
-
+        <input type="date" name="datar" id="modal-date" required />
+        <textarea name="descricao" id="modal-text" placeholder="Digite o recado" required></textarea>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+          <button type="submit" class="btn-confirmar">Confirmar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -76,8 +62,18 @@
     </div>
   </div>
 
+  <!-- Dados da turma/recados injetados pelo servidor -->
+  <div id="agenda-data"
+       data-recados='<%- JSON.stringify(conteudos || []) %>'>
+  </div>
+
   <div id="footer"></div>
   <div id="logo"></div>
+
+  <script>
+    const el = document.getElementById("agenda-data");
+    window.pagesData = JSON.parse(el.getAttribute("data-recados") || "[]");
+  </script>
 
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
