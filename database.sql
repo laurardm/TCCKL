@@ -21,7 +21,7 @@ CREATE TABLE cargo (
 CREATE TABLE fotosa (
   cod INT NOT NULL AUTO_INCREMENT,
   linkf VARCHAR(150) NOT NULL,
-  descricao VARCHAR(40),
+  datafotoa DATE,
   agenda INT NOT NULL,
   PRIMARY KEY (cod),
   CONSTRAINT fk_fotosa_agenda FOREIGN KEY (agenda) REFERENCES agenda(cod) ON DELETE CASCADE

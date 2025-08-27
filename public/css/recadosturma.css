@@ -39,6 +39,7 @@ h2 {
 .conteudo-item {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* separa texto e botões */
   background: #f3f6fb;
   padding: 10px 15px;
   border-radius: 6px;
@@ -54,27 +55,45 @@ h2 {
   white-space: pre-wrap; /* respeita quebras de linha */
 }
 
-/* Botão excluir dentro do item */
-.conteudo-item form button {
-  padding: 10px 18px;
-  font-size: 16px;
-  border-radius: 40px;
-  background-color: #cc0000;
-  color: #d9d9d9;
-  border: none;
-  cursor: pointer;
-  margin-left: 10px;
+/* Grupo de botões lado a lado */
+.botao-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-/* Botão editar */
-.conteudo-item .btn-editar {
+/* Botões de ícones (Editar / Excluir) */
+.botao-group button,
+.botao-group form button {
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
 }
-.conteudo-item .btn-editar i {
-  font-size: 14px;
+
+.botao-group button i,
+.botao-group form button i {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Hover para destaque */
+.botao-group button:hover i,
+.botao-group form button:hover i {
+  transform: scale(1.2);
+}
+
+/* Excluir específico: vermelho */
+.botao-group form button i {
+  color: #cc0000;
+}
+.botao-group form button:hover i {
+  color: #ff4c4c;
 }
 
 /* Botões gerais */

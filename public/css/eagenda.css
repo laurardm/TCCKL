@@ -14,15 +14,16 @@ body {
 }
 
 .container {
-  margin-top: 1px;
+  margin-top: 5px;
   width: 600px;
+  max-width: 1170px;
   background: white;
   border-radius: 30px;
   padding: 20px 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 430px;
   overflow-y: auto;
   border: 2px solid #d9d9d9;
 }
@@ -34,10 +35,12 @@ h2 {
   font-weight: 600;
 }
 
+/* Itens de conteúdo */
 .conteudo-item {
   display: flex;
   align-items: center;
-  background: #f3f6fb; /* Mantém o fundo azul claro */
+  justify-content: space-between; /* separa texto e botões */
+  background: #f3f6fb;
   padding: 10px 15px;
   border-radius: 6px;
   margin-bottom: 10px;
@@ -47,35 +50,60 @@ h2 {
   word-break: break-word;
 }
 
-.btn-excluir {
-  background: transparent;
-  border: none;
-  color: #cc0000;
-  font-size: 18px;
-  cursor: pointer;
-  margin-right: 10px; /* Espaço entre lixeira e texto */
-  padding: 0;
-  display: flex;
-  align-items: center;
-}
-
-.btn-excluir:hover {
-  color: #ff4444;
-}
-
 .conteudo-text {
-  white-space: normal;
-  flex: 1; /* ocupa o espaço restante e quebra linha */
+  flex: 1;
+  white-space: pre-wrap;
 }
 
 .conteudo-item img {
-  max-width: 40%;      
-  height: auto;        
-  border-radius: 6px;  
+  max-width: 60%;
+  height: auto;
+  border-radius: 6px;
   display: block;
-  margin: 5px 0;        
+  margin: 5px 0;
 }
 
+/* Grupo de botões lado a lado */
+.botao-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Botões de ícones (Editar / Excluir) */
+.botao-group button,
+.botao-group form button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+}
+
+.botao-group button i,
+.botao-group form button i {
+  font-size: 16px;
+  color: #333;
+}
+
+.botao-group button:hover i,
+.botao-group form button:hover i {
+  transform: scale(1.2);
+}
+
+.botao-group form button i {
+  color: #cc0000; /* cor padrão da lixeira */
+}
+.botao-group form button:hover i {
+  color: #ff4c4c; /* vermelho mais forte ao passar o mouse */
+  transform: scale(1.2); /* efeito de leve aumento */
+}
+
+/* Botões gerais */
 button {
   padding: 10px 18px;
   font-size: 16px;
@@ -89,10 +117,7 @@ button {
   font-family: 'Questrial', sans-serif;
   color: #333;
   transition: all linear 160ms;
-  margin-right: 11px;
-  margin-left: -11px;
 }
-
 button:hover {
   background-color: #f8d2e0;
   transform: scale(1.05);
@@ -102,7 +127,6 @@ button:hover {
 .btn-azul {
   background-color: #dff9fd;
 }
-
 .btn-azul:hover {
   background-color: #c9f8ff;
 }
@@ -122,13 +146,12 @@ button:hover {
   cursor: pointer;
   transition: all 160ms ease-in-out;
 }
-
 .btn-navegacao:hover {
   background-color: #f8d2e0;
   transform: scale(1.05);
 }
 
-/* Painel de ações alinhado */
+/* Painel de ações */
 .painel-acoes {
   margin-top: 20px;
   width: 600px;
@@ -158,10 +181,7 @@ button:hover {
   align-items: center;
   z-index: 9999;
 }
-
-.modal-bg.active {
-  display: flex;
-}
+.modal-bg.active { display: flex; }
 
 .modal {
   background: white;
@@ -170,8 +190,9 @@ button:hover {
   max-width: 400px;
   width: 90%;
   box-sizing: border-box;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 15px rgba(0,0,0,0.25);
   position: relative;
+  font-family: 'Questrial', sans-serif;
 }
 
 .modal h3 {
@@ -182,17 +203,17 @@ button:hover {
 
 .modal textarea {
   width: 100%;
-  height: 100px;
-  resize: none;
+  min-height: 120px;
+  resize: vertical;
   padding: 10px;
   font-size: 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  font-family: 'Questrial', sans-serif;
 }
 
-.modal input[type="date"] {
+.modal input[type="date"],
+.modal input[type="file"] {
   width: 100%;
   padding: 8px 10px;
   font-size: 14px;
@@ -200,28 +221,28 @@ button:hover {
   border-radius: 6px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  font-family: 'Questrial', sans-serif;
 }
 
 .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
   margin-top: 15px;
-  text-align: right;
 }
 
 .modal-buttons button {
-  background-color: #fddde6;
-  color: rgb(0, 0, 0);
   padding: 8px 14px;
   border-radius: 40px;
   border: none;
   cursor: pointer;
   font-size: 14px;
-  transition: all linear 160ms;
+  background-color: #fddde6;
+  transition: all 160ms;
 }
 
 .modal-buttons button:hover {
-  transform: scale(1.05);
   background-color: #f8d2e0;
+  transform: scale(1.05);
 }
 
 .modal-close {
@@ -230,21 +251,17 @@ button:hover {
   top: 12px;
   font-size: 18px;
   cursor: pointer;
-  color: #888;
-  transition: color 0.3s;
   border: none;
   background: transparent;
+  transition: color 0.3s;
 }
+.modal-close:hover { color: #444; }
 
-.modal-close:hover {
-  color: #444;
-}
-
-/* Botão de voltar no canto inferior esquerdo */
+/* Botão de voltar */
 .btn-voltar {
   position: fixed;
   bottom: 100px;
-  left: 748px;
+  left: 20px;
   background-color: #fddde6;
   color: #333;
   padding: 10px 20px;
@@ -256,12 +273,12 @@ button:hover {
   z-index: 1000;
   transition: all 0.2s ease;
 }
-
 .btn-voltar:hover {
   background-color: #f8d2e0;
   transform: scale(1.05);
 }
 
+/* Painel perfil */
 .painel-perfil {
   width: 200px;
   background-color: white;

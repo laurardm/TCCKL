@@ -13,7 +13,7 @@
 <body>
   <div class="foto">
     <div class="fotoperfil">
-      <img src="<%= foto ? '/uploads/' + foto : '/images/perfil.png' %>" alt="Foto do usuário" />
+      <img src="<%= foto ? '/uploads/' + foto : '/imagens/perfil.png' %>" alt="Foto do usuário" />
       <p id="nomeDisplay">
         <%= nome %>
       </p>
@@ -35,7 +35,16 @@
             <input type="email" id="email" name="email" value="<%= email %>" disabled required />
 
             <label for="parentesco">Parentesco</label>
-            <input type="text" id="parentesco" value="<%= parentesco %>" disabled />
+            <select id="parentesco" name="parentesco" disabled required>
+              <option value="1" <%=parentesco==='1' ? 'selected' : '' %>>Avó</option>
+              <option value="2" <%=parentesco==='2' ? 'selected' : '' %>>Avô</option>
+              <option value="3" <%=parentesco==='3' ? 'selected' : '' %>>Irmão</option>
+              <option value="4" <%=parentesco==='4' ? 'selected' : '' %>>Pai</option>
+              <option value="5" <%=parentesco==='5' ? 'selected' : '' %>>Mãe</option>
+              <option value="6" <%=parentesco==='6' ? 'selected' : '' %>>Outros</option>
+            </select>
+
+
 
             <label for="foto">Foto de perfil</label>
             <input type="file" id="foto" name="foto" accept="image/*" disabled />

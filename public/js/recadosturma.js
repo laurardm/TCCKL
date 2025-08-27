@@ -32,10 +32,16 @@ function renderPage() {
   conteudoDiv.innerHTML = `
     <div class="conteudo-item">
       <span class="conteudo-text">${pagina.texto}</span>
-      <form action="/turmas/${document.body.dataset.nomeTurma}/recados/${pagina.cod}/delete" method="POST" style="display:inline;">
-        <button type="submit">Excluir</button>
-      </form>
-      <button onclick="abrirModalEditar('${pagina.cod}', '${pagina.data}', '${pagina.texto}')">Editar</button>
+      <div class="botao-group">
+        <form action="/turmas/${document.body.dataset.nomeTurma}/recados/${pagina.cod}/delete" method="POST" style="display:inline;">
+          <button type="submit" class="btn-excluir" title="Excluir">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
+        <button class="btn-editar" onclick="abrirModalEditar('${pagina.cod}', '${pagina.data}', '${pagina.texto}')" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+      </div>
     </div>
   `;
 }

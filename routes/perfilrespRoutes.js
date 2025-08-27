@@ -62,29 +62,29 @@ router.get('/', (req, res) => {
       data_nasc: formatarData(dados.data_nasc),
       email: dados.email,
       genero: dados.genero || 'Não informado',
-      parentesco: dados.descricao_parentesco || 'Nenhum parentesco vinculado',
+      parentesco: dados.parentesco || 'Nenhum parentesco vinculado',
       foto: dados.foto || null,
       erro: null
     });
   });
 });
 
-// POST /perfilr - Atualiza dados do responsável (com imagem)
+// POST /perfilr - Atualiza dados do responsável (com imagem e parentesco)
 router.post('/', upload.single('foto'), (req, res) => {
   if (!req.session.usuario) {
     return res.redirect('/');
   }
 
   const responsaveis = req.session.usuario;
-  const { nome, data_nasc, email } = req.body;
+  const { nome, data_nasc, email, parentesco } = req.body; // captura o select
   const novaFoto = req.file ? req.file.filename : responsaveis.foto;
 
   const sqlUpdateResp = `
     UPDATE responsaveis
-    SET nome = ?, data_nasc = ?, email = ?, foto = ?
+    SET nome = ?, data_nasc = ?, email = ?, foto = ?, parentesco = ?
     WHERE cod = ?`;
 
-  db.query(sqlUpdateResp, [nome, data_nasc, email, novaFoto, responsaveis.cod], (err) => {
+  db.query(sqlUpdateResp, [nome, data_nasc, email, novaFoto, parentesco, responsaveis.cod], (err) => {
     if (err) {
       console.error('Erro ao atualizar dados do responsável:', err);
       return res.render('perfis/perfilr', {
@@ -92,7 +92,7 @@ router.post('/', upload.single('foto'), (req, res) => {
         data_nasc,
         email,
         genero: responsaveis.genero || '',
-        parentesco: responsaveis.parentesco || '',
+        parentesco: parentesco || '',
         foto: novaFoto,
         erro: 'Erro ao atualizar dados.'
       });
@@ -111,7 +111,7 @@ router.post('/', upload.single('foto'), (req, res) => {
           data_nasc,
           email,
           genero: responsaveis.genero || '',
-          parentesco: responsaveis.parentesco || '',
+          parentesco: parentesco || '',
           foto: novaFoto,
           erro: 'Dados do responsável foram atualizados, mas houve erro ao atualizar login.'
         });
@@ -122,6 +122,7 @@ router.post('/', upload.single('foto'), (req, res) => {
       req.session.usuario.data_nasc = data_nasc;
       req.session.usuario.email = email;
       req.session.usuario.foto = novaFoto;
+      req.session.usuario.parentesco = parentesco; // salva também o parentesco na sessão
 
       res.redirect('/perfilr');
     });

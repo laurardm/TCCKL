@@ -12,11 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let pagesData = window.pagesData || [];
   const agendaId = window.agendaId;
 
+  // ====== Formatar data ======
   function formatarData(dataStr) {
     const d = new Date(dataStr + 'T00:00:00');
-    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
+             .replace(/^\w/, c => c.toUpperCase());
   }
 
+  // ====== Renderizar página ======
   function renderPage() {
     if (!pagesData || pagesData.length === 0) {
       dataTitulo.textContent = "Nenhuma data adicionada";
@@ -33,28 +36,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!pagina.contents || pagina.contents.length === 0) {
       conteudoPagina.innerHTML = "<p>Sem conteúdos nesta data.</p>";
-    } else {
-      conteudoPagina.innerHTML = pagina.contents.map((conteudo, index) => `
-  <div class="conteudo-item">
-    ${window.tipoUsuario === "funcionario" ? `
-      <button class="btn-editar" onclick="editarConteudo(${index})" title="Editar">
-        <i class="fa-solid fa-pen-to-square"></i>
-      </button>
-    ` : ""}
-    <span class="conteudo-text">
-      ${conteudo.tipo === "Foto" 
-        ? `<img src="${conteudo.descricao}" alt="Foto" class="foto-conteudo" />` 
-        : `${conteudo.tipo}: ${conteudo.descricao}`
-      }
-    </span>
-  </div>
-`).join('');
-
+      return;
     }
+
+    conteudoPagina.innerHTML = '';
+    pagina.contents.forEach((conteudo, index) => {
+      const divItem = document.createElement('div');
+      divItem.className = 'conteudo-item';
+
+      // Texto ou imagem
+      const divTexto = document.createElement('div');
+      divTexto.className = 'conteudo-text';
+      if (conteudo.tipo === 'Foto') {
+        const img = document.createElement('img');
+        img.src = conteudo.descricao;
+        img.className = 'foto-conteudo';
+        divTexto.appendChild(img);
+      } else {
+        divTexto.textContent = `${conteudo.tipo}: ${conteudo.descricao}`;
+      }
+      divItem.appendChild(divTexto);
+
+      // Botões (Editar / Excluir) para funcionários
+      if (window.tipoUsuario === 'funcionario') {
+        const divBotoes = document.createElement('div');
+        divBotoes.className = 'botao-group';
+        divBotoes.style.display = 'flex';
+        divBotoes.style.gap = '5px';
+
+        const btnEditar = document.createElement('button');
+        btnEditar.className = 'btn-editar';
+        btnEditar.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+        btnEditar.onclick = () => editarConteudo(index);
+
+        const btnExcluir = document.createElement('button');
+        btnExcluir.className = 'btn-excluir';
+        btnExcluir.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        btnExcluir.onclick = () => excluirConteudo(index);
+
+        divBotoes.appendChild(btnEditar);
+        divBotoes.appendChild(btnExcluir);
+        divItem.appendChild(divBotoes);
+      }
+
+      conteudoPagina.appendChild(divItem);
+    });
   }
 
+  // ====== Abrir modal ======
   window.abrirModal = function(tipo) {
-    if (window.tipoUsuario !== "funcionario") return; // bloqueia não funcionários
+    if (window.tipoUsuario !== "funcionario") return; 
     tipoAtual = tipo;
 
     modalTitle.textContent = `${window.edicaoAtiva ? 'Editar' : 'Adicionar'} ${tipo}`;
@@ -63,9 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
                       (pagesData.length > 0 ? pagesData[currentPageIndex].date : '');
     document.querySelector('.modal-buttons button').textContent = window.edicaoAtiva ? 'Salvar' : 'Adicionar';
 
-    // ======== Apenas para fotos ========
+    // Fotos
     if(tipo === "Foto") {
-      modalText.style.display = "none"; // esconder textarea
+      modalText.style.display = "none"; 
       let fileInput = document.getElementById("modal-file");
       if(!fileInput) {
         fileInput = document.createElement("input");
@@ -77,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.style.display = "block";
       }
     } else {
-      // Mostrar textarea normal para recados/eventos
       modalText.style.display = "block";
       const fileInput = document.getElementById("modal-file");
       if(fileInput) fileInput.style.display = "none";
@@ -87,11 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
     modalDate.focus();
   };
 
+  // ====== Fechar modal ======
   window.fecharModal = function() {
     modalBg.classList.remove('active');
     window.edicaoAtiva = null;
   };
 
+  // ====== Confirmar adição/edição ======
   window.confirmarAdicao = function() {
     if (!agendaId) { alert("Agenda do aluno não definida."); return; }
     const data = modalDate.value;
@@ -171,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // ====== Editar conteúdo ======
   window.editarConteudo = function(index) {
     const pagina = pagesData[currentPageIndex];
     if (!pagina || !pagina.contents[index]) return;
@@ -180,8 +213,29 @@ document.addEventListener("DOMContentLoaded", () => {
     abrirModal(tipoAtual);
   };
 
+  // ====== Excluir conteúdo ======
+  window.excluirConteudo = function(index) {
+    const pagina = pagesData[currentPageIndex];
+    if (!pagina || !pagina.contents[index]) return;
+    const conteudo = pagina.contents[index];
+
+    fetch(`/agenda/${conteudo.tipo.toLowerCase()}s/${conteudo.cod}`, { method: "DELETE" })
+      .then(res => res.ok ? res.json() : res.text().then(t => Promise.reject(t)))
+      .then(() => {
+        pagina.contents.splice(index, 1);
+        if(pagina.contents.length === 0 && pagesData.length > 1) {
+          pagesData.splice(currentPageIndex,1);
+          currentPageIndex = Math.max(0, currentPageIndex -1);
+        }
+        renderPage();
+      })
+      .catch(err => { console.error(err); alert("Erro ao excluir item."); });
+  };
+
+  // ====== Navegação ======
   window.avancarPagina = function() { if (currentPageIndex < pagesData.length - 1) { currentPageIndex++; renderPage(); } };
   window.voltarPagina = function() { if (currentPageIndex > 0) { currentPageIndex--; renderPage(); } };
 
+  // ====== Inicializar ======
   renderPage();
 });
