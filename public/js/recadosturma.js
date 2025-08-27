@@ -123,3 +123,17 @@ function fecharAlerta() {
 window.onload = () => {
   renderPage();
 };
+
+function abrirModalEditar(cod, data, texto) {
+  const nomeTurma = document.body.dataset.nomeTurma;
+
+  document.getElementById("modal-title").textContent = "Editar recado";
+  document.getElementById("modal-date").value = data.split("T")[0];
+  document.getElementById("modal-text").value = texto;
+
+  const form = document.getElementById("modal-form");
+  form.action = `/turmas/${nomeTurma}/recados/${cod}/edit`;
+
+  document.getElementById("modal-bg").classList.add("active");
+}
+

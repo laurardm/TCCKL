@@ -301,4 +301,19 @@ router.post("/:nomeTurma/recados/:cod/delete", verificarFuncionario, (req, res) 
     res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
   });
 });
+
+// PUT atualizar recado
+router.post("/:nomeTurma/recados/:cod/edit", verificarFuncionario, (req, res) => {
+  const { nomeTurma, cod } = req.params;
+  const { descricao, datar } = req.body;
+
+  db.query("UPDATE recados_turma SET descricao = ?, datar = ? WHERE cod = ?", 
+    [descricao, datar, cod], (err) => {
+      if (err) return res.status(500).send("Erro ao atualizar recado");
+      res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+    }
+  );
+});
+
+
 module.exports = router;

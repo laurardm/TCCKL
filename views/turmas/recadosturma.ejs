@@ -11,7 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-nome-turma="<%= encodedNomeTurma %>">
+
   <div class="painel-turma">
     <span class="nome-turma">Turma <%= nomeTurma || "Nome da turma" %></span>
   </div>
@@ -25,10 +26,12 @@
               <form action="/turmas/<%= encodedNomeTurma %>/recados/<%= c.cod %>/delete" method="POST" style="display:inline;">
                 <button type="submit">Excluir</button>
               </form>
-               Recado: <%= c.texto %>
+              <button type="button" onclick="abrirModalEditar('<%= c.cod %>', '<%= c.data %>', '<%= c.texto %>')">Editar</button>
+              Recado: <%= c.texto %>
             </li>
           <% }) %>
-        </ul>
+      </ul>
+
       <% } else { %>
         <p>Nenhum recado cadastrado ainda.</p>
       <% } %>
@@ -53,14 +56,15 @@
     <div class="modal">
       <button class="modal-close" onclick="fecharModal()" title="Fechar">&times;</button>
       <h3 id="modal-title">Adicionar recado</h3>
-      <form id="modal-form" action="/turmas/<%= encodedNomeTurma %>/recados" method="POST">
-        <input type="date" name="datar" id="modal-date" value="<%= dataAtual %>" required />
-        <textarea name="descricao" id="modal-text" placeholder="Digite o recado" required></textarea>
-        <div class="modal-buttons">
-          <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-          <button type="submit" class="btn-confirmar">Confirmar</button>
-        </div>
-      </form>
+      <form id="modal-form" method="POST">
+  <input type="date" name="datar" id="modal-date" value="<%= dataAtual %>" required />
+  <textarea name="descricao" id="modal-text" placeholder="Digite o recado" required></textarea>
+  <div class="modal-buttons">
+    <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    <button type="submit" class="btn-confirmar">Confirmar</button>
+  </div>
+</form>
+
     </div>
   </div>
 
