@@ -41,7 +41,7 @@ router.get('/', (req, res) => {
         data_nasc: responsaveis.data_nasc,
         email: responsaveis.email,
         genero: '',
-        parentesco: '',
+        parentesco: '',   // sem código, nada selecionado
         foto: null,
         erro: 'Erro ao carregar dados.'
       });
@@ -62,12 +62,13 @@ router.get('/', (req, res) => {
       data_nasc: formatarData(dados.data_nasc),
       email: dados.email,
       genero: dados.genero || 'Não informado',
-      parentesco: dados.parentesco || 'Nenhum parentesco vinculado',
+      parentesco: String(dados.parentesco) || '', // 👈 aqui vai o código numérico
       foto: dados.foto || null,
       erro: null
     });
   });
 });
+
 
 // POST /perfilr - Atualiza dados do responsável (com imagem e parentesco)
 router.post('/', upload.single('foto'), (req, res) => {
