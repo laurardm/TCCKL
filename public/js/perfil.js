@@ -6,7 +6,7 @@ dataInput.setAttribute('max', hoje);
 const editarBtn = document.getElementById('editar');
 const salvarBtn = document.getElementById('salvar');
 const voltarBtn = document.getElementById('voltar');
-const inputs = document.querySelectorAll('#perfilForm input:not(#turmas), #perfilForm input[type="file"], #perfilForm select'); // inclui select
+const inputs = document.querySelectorAll('#perfilForm input:not(#cargo), #perfilForm input[type="file"], #perfilForm select');
 
 const fotoInput = document.getElementById('foto');
 
