@@ -156,11 +156,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!cod) { divAluno.remove(); showToast("Aluno removido", "success"); return; }
 
         try {
-          const res = await fetch(`/turmas/${nomeTurma}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cod }),
-          });
+          const res = await fetch(`/turmas/${nomeTurma}/${cod}`, {
+          method: "DELETE"
+        });
           if (!res.ok) throw new Error("Erro ao excluir");
           divAluno.remove();
           showToast("Aluno excluído", "success");
