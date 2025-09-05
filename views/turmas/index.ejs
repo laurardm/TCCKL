@@ -13,15 +13,33 @@
 <body>
   
   <div class="caixabotao" id="turmasContainer">
-    <div class="botoes">
-      <% turmas.forEach(turma => { %>
+  <div class="botoes">
+    <% turmas.forEach(turma => { %>
+      <div class="turma-item">
         <a href="/turmas/<%= turma.nome %>">
           <button class="botao"><%= turma.nome %></button>
         </a>
-      <% }) %>
-    </div>
-    <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+
+        <% if (usuario?.tipo === "funcionario") { %>
+          <form action="/turmas/<%= turma.cod %>/arquivar?_method=PUT" method="POST" style="display:inline;">
+            <input type="hidden" name="arquivada" value="1">
+            <button type="submit" class="arquivar">Arquivar</button>
+          </form>
+        <% } %>
+      </div>
+    <% }) %>
   </div>
+
+  <!-- Botão para visualizar turmas arquivadas -->
+  <div class="ver-arquivadas">
+    <a href="/turmas/arquivadas">
+      <button class="botao botao-arquivadas">Ver Turmas Arquivadas</button>
+    </a>
+  </div>
+
+  <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+</div>
+
 
   <div id="footer"></div>
   <div id="logo"></div>

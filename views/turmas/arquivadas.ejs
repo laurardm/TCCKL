@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   <h1>Turmas Arquivadas</h1>
+
+<div class="botoes">
+  <% turmas.forEach(turma => { %>
+    <div class="turma-item">
+      <a href="/turmas/<%= turma.nome %>">
+        <button class="botao"><%= turma.nome %></button>
+      </a>
+
+      <% if (usuario?.tipo === "funcionario") { %>
+        <!-- Botão Desarquivar -->
+        <form action="/turmas/<%= turma.cod %>/arquivar?_method=PUT" method="POST" style="display:inline;">
+          <input type="hidden" name="arquivada" value="0">
+          <button type="submit" class="botao-desarquivar">Desarquivar</button>
+        </form>
+      <% } %>
+    </div>
+  <% }) %>
+</div>
+
+<!-- Botão para voltar às turmas ativas -->
+<div class="ver-ativas">
+  <a href="/turmas">
+    <button class="botao botao-ativas">Voltar para Turmas Ativas</button>
+  </a>
+</div>
+
+
+
+</body>
+</html>

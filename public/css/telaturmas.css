@@ -15,6 +15,19 @@
       background-repeat: no-repeat;
     }
 
+    .botao-arquivadas {
+      background-color: #888;
+      color: #fff;
+      margin-top: 15px;
+      padding: 10px 20px;
+      border-radius: 12px;
+    }
+
+    .botao-arquivadas:hover {
+      background-color: #555;
+    }
+
+
     .caixabotao {
       display: flex;
       flex-direction: column;   
