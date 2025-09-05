@@ -11,116 +11,103 @@
 </head>
 
 <body>
-  
   <div class="caixabotao" id="turmasContainer">
-  <div class="botoes">
-    <% turmas.forEach(turma => { %>
-      <div class="turma-item">
-        <a href="/turmas/<%= turma.nome %>">
-          <button class="botao"><%= turma.nome %></button>
-        </a>
-      </div>
-    <% }) %>
-  </div>
-
- <!-- Botão único para arquivar -->
-<% if (usuario?.tipo === "funcionario") { %>
-  <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
-<% } %>
-
-<!-- Modal -->
-<div id="modalArquivar" class="modal">
-  <div class="modal-conteudo">
-    <h2>Selecionar Turmas para Arquivar</h2>
-    <div id="listaTurmasModal">
+    <div class="botoes">
       <% turmas.forEach(turma => { %>
-        <div>
-          <input type="checkbox" class="turma-modal" value="<%= turma.cod %>">
-          <label><%= turma.nome %></label>
+        <div class="turma-item">
+          <a href="/turmas/<%= turma.nome %>">
+            <button class="botao"><%= turma.nome %></button>
+          </a>
         </div>
       <% }) %>
     </div>
-    <button id="confirmarArquivar">Arquivar Selecionadas</button>
-    <button id="fecharModal">Cancelar</button>
+
+    <!-- Botões finais (Voltar, Arquivar, Ver Arquivadas) -->
+    <div class="botoes-finais">
+      <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+
+      <% if (usuario?.tipo === "funcionario") { %>
+        <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
+      <% } %>
+
+      <a href="/turmas/arquivadas">
+        <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
+      </a>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalArquivar" class="modal">
+      <div class="modal-conteudo">
+        <h2>Selecionar Turmas para Arquivar</h2>
+        <div id="listaTurmasModal">
+          <% turmas.forEach(turma => { %>
+            <div>
+              <input type="checkbox" class="turma-modal" value="<%= turma.cod %>">
+              <label><%= turma.nome %></label>
+            </div>
+          <% }) %>
+        </div>
+        <button id="confirmarArquivar">Arquivar Selecionadas</button>
+        <button id="fecharModal">Cancelar</button>
+      </div>
+    </div>
   </div>
-</div>
-
-
-  <!-- Botão para visualizar turmas arquivadas -->
-  <div class="ver-arquivadas">
-    <a href="/turmas/arquivadas">
-      <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
-    </a>
-  </div>
-
-  <button onclick="voltar()" class="botaodevoltar">Voltar</button>
-</div>
-
-
 
   <div id="footer"></div>
   <div id="logo"></div>
 
-<script>
-const abrirModal = document.getElementById("abrirArquivarModal");
-const modal = document.getElementById("modalArquivar");
-const fecharModal = document.getElementById("fecharModal");
-const confirmarArquivar = document.getElementById("confirmarArquivar");
-
-abrirModal?.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
-
-fecharModal?.addEventListener("click", () => {
-  modal.style.display = "none";
-});
-
-confirmarArquivar?.addEventListener("click", () => {
-  const selecionadas = document.querySelectorAll(".turma-modal:checked");
-  if (selecionadas.length === 0) {
-    alert("Selecione ao menos uma turma.");
-    return;
-  }
-
-  const confirmar = confirm(`Deseja arquivar ${selecionadas.length} turma(s)?`);
-  if (!confirmar) return;
-
-  selecionadas.forEach(cb => {
-    fetch(`/turmas/${cb.value}/arquivar`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ arquivada: 1 })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.sucesso) {
-        cb.disabled = true;
-        cb.parentElement.style.opacity = 0.5;
-      }
-    })
-    .catch(err => console.error(err));
-  });
-});
-</script>
-
-
-
-  <script src="/js/footer.js"></script>
-  <script src="/js/logo.js"></script>
-
   <script>
+    const abrirModal = document.getElementById("abrirArquivarModal");
+    const modal = document.getElementById("modalArquivar");
+    const fecharModal = document.getElementById("fecharModal");
+    const confirmarArquivar = document.getElementById("confirmarArquivar");
+
+    abrirModal?.addEventListener("click", () => {
+      modal.style.display = "flex";
+    });
+
+    fecharModal?.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    confirmarArquivar?.addEventListener("click", () => {
+      const selecionadas = document.querySelectorAll(".turma-modal:checked");
+      if (selecionadas.length === 0) {
+        alert("Selecione ao menos uma turma.");
+        return;
+      }
+
+      const confirmar = confirm(`Deseja arquivar ${selecionadas.length} turma(s)?`);
+      if (!confirmar) return;
+
+      selecionadas.forEach(cb => {
+        fetch(`/turmas/${cb.value}/arquivar`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ arquivada: 1 })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            cb.disabled = true;
+            cb.parentElement.style.opacity = 0.5;
+          }
+        })
+        .catch(err => console.error(err));
+      });
+    });
+
     function voltar() {
       const paginaAnterior = sessionStorage.getItem("voltarPara");
-
-      // Se for diferente da página atual, volta para ela
       if (paginaAnterior && paginaAnterior !== location.pathname) {
         window.location.href = paginaAnterior;
       } else {
-        // Se não houver registro ou for a mesma, redireciona para login ou outra rota segura
         window.location.href = "/";
       }
     }
   </script>
 
+  <script src="/js/footer.js"></script>
+  <script src="/js/logo.js"></script>
 </body>
 </html>
