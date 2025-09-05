@@ -56,7 +56,9 @@ CREATE TABLE eventos (
 
 CREATE TABLE turma (
   cod INT NOT NULL AUTO_INCREMENT,
-  nome CHAR(3),
+  nome VARCHAR(50),
+  arquivada BOOLEAN NOT NULL DEFAULT 0,
+  ano YEAR NOT NULL,
   PRIMARY KEY (cod)
 );
 
