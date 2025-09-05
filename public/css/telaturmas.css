@@ -15,18 +15,164 @@
       background-repeat: no-repeat;
     }
 
-    .botao-arquivadas {
-      background-color: #888;
-      color: #fff;
-      margin-top: 15px;
+    .caixabotao {
+      display: flex;
+      flex-direction: column;   
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 380px;            
+      width: 850px;
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 0 40px rgba(0,0,0,1);
       padding: 10px 20px;
-      border-radius: 12px;
+      text-align: center;
+      overflow: hidden;
+      border: 2px solid #d6d6d6;
     }
 
-    .botao-arquivadas:hover {
-      background-color: #555;
+    .botao {
+      background: #f6f6f6;
+      border: 3px solid #d9d9d9;
+      border-radius: 30px;
+      padding: 15px;
+      margin: 10px 10px;
+      font-size: 1.2em;
+      width: 150px;
+      cursor: pointer;
+      font-family: "Questrial", sans-serif;
     }
 
+    .botaodevoltar {
+      background: #fddde6;
+      color: black;
+      border-radius: 30px;
+      border: 2px solid #d9d9d9;
+      padding: 10px 30px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: "Questrial", sans-serif;
+      position: absolute;
+      bottom: 25px;
+      right: 45%;
+    }
+
+    
+
+.botaodevoltar:hover,
+.botao:hover {
+  transform: scale(1.05);
+}
+
+#custom-alert {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#custom-alert .alert-content {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  max-width: 320px;
+  text-align: center;
+  font-family: 'Questrial', sans-serif;
+  font-size: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  user-select: none;
+}
+
+#custom-alert #alert-ok-button {
+  margin-top: 15px;
+  padding: 10px 22px;
+  cursor: pointer;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#custom-alert #alert-ok-button:hover {
+  background-color: #0056b3;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;           /* permite quebra de linha se necessário */
+  justify-content: center;   /* centraliza horizontalmente */
+  gap: 15px;                 /* espaço uniforme entre os botões */
+  margin-top: 40px;          /* distância do topo do container */
+}
+
+.botao-principal {
+  background: #fddde6;
+  color: black;
+  border-radius: 30px;
+  border: 2px solid #d9d9d9;
+  padding: 12px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Questrial", sans-serif;
+  font-size: 1.1em;
+  min-width: 160px;          /* largura mínima igual para todos */
+  transition: transform 0.2s;
+}
+
+.botao-principal:hover {
+  transform: scale(1.05);
+}
+
+/* Container específico para o botão "Ver Turmas Arquivadas" */
+.ver-arquivadas {
+  margin-top: 20px;           /* separa do grupo de botões acima */
+  display: flex;
+  justify-content: center;
+}
+
+/* Botões arquivar e ver turmas arquivadas igual ao voltar */
+.botaoverarquivadas,
+.arquivar {
+  background: #fddde6;
+  color: black;
+  border-radius: 30px;
+  border: 2px solid #d9d9d9;
+  padding: 10px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Questrial", sans-serif;
+  transition: transform 0.2s;
+}
+
+.botaoverarquivadas:hover,
+.arquivar:hover {
+  transform: scale(1.05);
+}
+
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap');
+   
+    body {
+      margin: 0;
+      font-family: "Questrial", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+      background-image: url('../imagens/fotofundo2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
 
     .caixabotao {
       display: flex;
@@ -120,8 +266,96 @@
 
 .botoes {
   display: flex;
-  flex-wrap: wrap;        /* permite que quebrem linha se necessário */
-  justify-content: center; /* centraliza horizontalmente */
-  gap: 5px;               /* espaço entre os botões */
-  margin-top: 40px;        /* ajuste para o topo */
+  flex-wrap: wrap;           /* permite quebra de linha se necessário */
+  justify-content: center;   /* centraliza horizontalmente */
+  gap: 15px;                 /* espaço uniforme entre os botões */
+  margin-top: 40px;          /* distância do topo do container */
+}
+
+.botao-principal {
+  background: #fddde6;
+  color: black;
+  border-radius: 30px;
+  border: 2px solid #d9d9d9;
+  padding: 12px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Questrial", sans-serif;
+  font-size: 1.1em;
+  min-width: 160px;          /* largura mínima igual para todos */
+  transition: transform 0.2s;
+}
+
+.botao-principal:hover {
+  transform: scale(1.05);
+}
+
+/* Container específico para o botão "Ver Turmas Arquivadas" */
+.ver-arquivadas {
+  margin-top: 20px;           /* separa do grupo de botões acima */
+  display: flex;
+  justify-content: center;
+}
+
+/* Botões arquivar e ver turmas arquivadas igual ao voltar */
+.botaoverarquivadas,
+.arquivar {
+  background: #fddde6;
+  color: black;
+  border-radius: 30px;
+  border: 2px solid #d9d9d9;
+  padding: 10px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Questrial", sans-serif;
+  transition: transform 0.2s;
+}
+
+.botaoverarquivadas:hover,
+.arquivar:hover {
+  transform: scale(1.05);
+}
+.modal {
+  display: none;
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-conteudo {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+}
+
+#listaTurmasModal {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+#listaTurmasModal div {
+  margin-bottom: 8px;
+}
+
+#confirmarArquivar, #fecharModal {
+  margin: 5px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+}
+
+#confirmarArquivar {
+  background-color: #fddde6;
+  font-weight: bold;
+}
+
+#fecharModal {
+  background-color: #ccc;
 }
