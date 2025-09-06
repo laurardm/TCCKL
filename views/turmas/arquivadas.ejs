@@ -3,37 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Turmas Arquivadas</title>
+    <link rel="stylesheet" href="/css/turmasArquivadas.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/logo.css">
 </head>
 <body>
-   <h1>Turmas Arquivadas</h1>
+    <h1>Turmas Arquivadas</h1>
 
-<div class="botoes">
-  <% turmas.forEach(turma => { %>
-    <div class="turma-item">
-      <a href="/turmas/<%= turma.nome %>">
-        <button class="botao"><%= turma.nome %></button>
-      </a>
+    <!-- Mensagem de sucesso/erro -->
+    <div id="mensagem-sucesso"></div>
 
-      <% if (usuario?.tipo === "funcionario") { %>
-        <!-- Botão Desarquivar -->
-        <form action="/turmas/<%= turma.cod %>/arquivar?_method=PUT" method="POST" style="display:inline;">
-          <input type="hidden" name="arquivada" value="0">
-          <button type="submit" class="botao-desarquivar">Desarquivar</button>
-        </form>
-      <% } %>
+    <div class="caixabotao">
+        <div class="botoes">
+            <% turmas.forEach(turma => { %>
+                <div class="turma-item">
+                    <a href="/turmas/<%= turma.nome %>">
+                        <button class="botao"><%= turma.nome %></button>
+                    </a>
+
+                    <% if (usuario?.tipo === "funcionario") { %>
+                        <!-- Botão Desarquivar com JS -->
+                        <button class="botao-desarquivar" data-cod="<%= turma.cod %>">Desarquivar</button>
+                    <% } %>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Botão para voltar às turmas ativas -->
+        <div class="ver-ativas">
+            <a href="/turmas">
+                <button class="botao botao-ativas">Voltar para Turmas Ativas</button>
+            </a>
+        </div>
     </div>
-  <% }) %>
-</div>
 
-<!-- Botão para voltar às turmas ativas -->
-<div class="ver-ativas">
-  <a href="/turmas">
-    <button class="botao botao-ativas">Voltar para Turmas Ativas</button>
-  </a>
-</div>
+    <div id="footer"></div>
+    <div id="logo"></div>
 
+    <script src="/js/footer.js"></script>
+    <script src="/js/logo.js"></script>
 
+    <!-- Script para desarquivar com popup animado -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const botoesDesarquivar = document.querySelectorAll(".botao-desarquivar");
+            const mensagem = document.getElementById("mensagem-sucesso");
 
+            function mostrarMensagem(texto, tipo = "success") {
+                mensagem.textContent = texto;
+                mensagem.classList.remove("error");
+                if (tipo === "error") mensagem.classList.add("error");
+                mensagem.classList.add("show");
+
+                setTimeout(() => {
+                    mensagem.classList.remove("show");
+                }, 3000);
+            }
+
+            botoesDesarquivar.forEach(botao => {
+                botao.addEventListener("click", async () => {
+                    const cod = botao.dataset.cod;
+                    try {
+                        const response = await fetch(`/turmas/${cod}/arquivar?_method=PUT`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: "arquivada=0"
+                        });
+                        if (response.ok) {
+                            botao.closest(".turma-item").remove();
+                            mostrarMensagem("Turma desarquivada com sucesso!", "success");
+                        } else {
+                            mostrarMensagem("Erro ao desarquivar a turma.", "error");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        mostrarMensagem("Erro na requisição.", "error");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

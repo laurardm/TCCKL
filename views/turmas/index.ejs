@@ -14,7 +14,7 @@
   <div class="caixabotao" id="turmasContainer">
     <div class="botoes">
       <% turmas.forEach(turma => { %>
-        <div class="turma-item">
+        <div class="turma-item" data-cod="<%= turma.cod %>">
           <a href="/turmas/<%= turma.nome %>">
             <button class="botao"><%= turma.nome %></button>
           </a>
@@ -53,59 +53,85 @@
     </div>
   </div>
 
+  <!-- Popup de mensagem -->
+  <div id="mensagem-popup"></div>
+
   <div id="footer"></div>
   <div id="logo"></div>
+<script>
+const abrirModal = document.getElementById("abrirArquivarModal");
+const modal = document.getElementById("modalArquivar");
+const fecharModal = document.getElementById("fecharModal");
+const confirmarArquivar = document.getElementById("confirmarArquivar");
+const mensagemPopup = document.getElementById("mensagem-popup");
 
-  <script>
-    const abrirModal = document.getElementById("abrirArquivarModal");
-    const modal = document.getElementById("modalArquivar");
-    const fecharModal = document.getElementById("fecharModal");
-    const confirmarArquivar = document.getElementById("confirmarArquivar");
+function mostrarMensagem(texto, tipo = "success") {
+  mensagemPopup.textContent = texto;
+  mensagemPopup.classList.remove("error");
+  if (tipo === "error") mensagemPopup.classList.add("error");
+  mensagemPopup.classList.add("show");
 
-    abrirModal?.addEventListener("click", () => {
-      modal.style.display = "flex";
-    });
+  setTimeout(() => {
+    mensagemPopup.classList.remove("show");
+  }, 3000);
+}
 
-    fecharModal?.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
+abrirModal?.addEventListener("click", () => {
+  modal.style.display = "flex";
+});
 
-    confirmarArquivar?.addEventListener("click", () => {
-      const selecionadas = document.querySelectorAll(".turma-modal:checked");
-      if (selecionadas.length === 0) {
-        alert("Selecione ao menos uma turma.");
-        return;
-      }
+fecharModal?.addEventListener("click", () => {
+  modal.style.display = "none";
+});
 
-      const confirmar = confirm(`Deseja arquivar ${selecionadas.length} turma(s)?`);
-      if (!confirmar) return;
+confirmarArquivar?.addEventListener("click", () => {
+  const selecionadas = document.querySelectorAll(".turma-modal:checked");
+  if (selecionadas.length === 0) {
+    mostrarMensagem("Selecione ao menos uma turma.", "error");
+    return;
+  }
 
-      selecionadas.forEach(cb => {
-        fetch(`/turmas/${cb.value}/arquivar`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ arquivada: 1 })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.sucesso) {
-            cb.disabled = true;
-            cb.parentElement.style.opacity = 0.5;
-          }
-        })
-        .catch(err => console.error(err));
-      });
-    });
+  const confirmar = confirm(`Deseja arquivar ${selecionadas.length} turma(s)?`);
+  if (!confirmar) return;
 
-    function voltar() {
-      const paginaAnterior = sessionStorage.getItem("voltarPara");
-      if (paginaAnterior && paginaAnterior !== location.pathname) {
-        window.location.href = paginaAnterior;
+  // Fecha o modal imediatamente após confirmação
+  modal.style.display = "none";
+
+  // Processa cada turma arquivada
+  selecionadas.forEach(cb => {
+    fetch(`/turmas/${cb.value}/arquivar`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ arquivada: 1 })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.sucesso) {
+        // Remove a turma da lista principal suavemente
+        const turmaItemPrincipal = document.querySelector(`.turma-item[data-cod='${cb.value}']`);
+        if (turmaItemPrincipal) {
+          turmaItemPrincipal.style.transition = "opacity 0.5s ease, height 0.5s ease, margin 0.5s ease";
+          turmaItemPrincipal.style.opacity = 0;
+          turmaItemPrincipal.style.height = 0;
+          turmaItemPrincipal.style.margin = 0;
+          setTimeout(() => {
+            turmaItemPrincipal.remove();
+          }, 500);
+        }
+
+        mostrarMensagem("Turma(s) arquivada(s) com sucesso!", "success");
       } else {
-        window.location.href = "/";
+        mostrarMensagem("Erro ao arquivar a turma.", "error");
       }
-    }
-  </script>
+    })
+    .catch(err => {
+      console.error(err);
+      mostrarMensagem("Erro na requisição.", "error");
+    });
+  });
+});
+</script>
+
 
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
