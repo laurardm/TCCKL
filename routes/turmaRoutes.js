@@ -27,6 +27,19 @@ const upload = multer({ storage });
    ROTAS DE TURMAS
 =========================== */
 
+// POST /turmas/criar - criar nova turma
+router.post("/criar", verificarFuncionario, (req, res) => {
+  const { nome } = req.body;
+  if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: "Nome inválido" });
+
+  db.query("INSERT INTO turma (nome, arquivada) VALUES (?, 0)", [nome.trim()], (err, result) => {
+    if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao criar turma" });
+
+    res.status(200).json({ sucesso: true, cod: result.insertId, nome: nome.trim() });
+  });
+});
+
+
 // GET /turmas - listar turmas ativas
 router.get("/", (req, res) => {
   db.query("SELECT cod, nome, arquivada FROM turma WHERE arquivada = 0 ORDER BY nome", (err, turmas) => {

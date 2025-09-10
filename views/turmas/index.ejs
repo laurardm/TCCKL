@@ -22,18 +22,20 @@
       <% }) %>
     </div>
 
-    <!-- Botões finais (Voltar, Arquivar, Ver Arquivadas) -->
     <div class="botoes-finais">
-      <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+  <button onclick="voltar()" class="botaodevoltar">Voltar</button>
 
-      <% if (usuario?.tipo === "funcionario") { %>
-        <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
-      <% } %>
+  <% if (usuario?.tipo === "funcionario") { %>
+    <button id="abrirCriarTurmaModal" class="criar">Criar Turma</button>
+    <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
+  <% } %>
 
-      <a href="/turmas/arquivadas">
-        <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
-      </a>
-    </div>
+  <a href="/turmas/arquivadas">
+    <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
+  </a>
+</div>
+
+
 
     <!-- Modal -->
     <div id="modalArquivar" class="modal">
@@ -53,17 +55,85 @@
     </div>
   </div>
 
+  <!-- Modal Criar Turma -->
+<div id="modalCriarTurma" class="modal">
+  <div class="modal-conteudo">
+    <h2>Criar Nova Turma</h2>
+    <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" />
+    <button id="confirmarCriarTurma">Criar</button>
+    <button id="fecharCriarTurma">Cancelar</button>
+  </div>
+</div>
+
+
   <!-- Popup de mensagem -->
   <div id="mensagem-popup"></div>
 
   <div id="footer"></div>
   <div id="logo"></div>
+
 <script>
 const abrirModal = document.getElementById("abrirArquivarModal");
 const modal = document.getElementById("modalArquivar");
 const fecharModal = document.getElementById("fecharModal");
 const confirmarArquivar = document.getElementById("confirmarArquivar");
 const mensagemPopup = document.getElementById("mensagem-popup");
+
+// Criar turma
+const abrirCriarModal = document.getElementById("abrirCriarTurmaModal");
+const modalCriar = document.getElementById("modalCriarTurma");
+const fecharCriar = document.getElementById("fecharCriarTurma");
+const confirmarCriar = document.getElementById("confirmarCriarTurma");
+
+abrirCriarModal?.addEventListener("click", () => {
+  modalCriar.style.display = "flex";
+});
+
+fecharCriar?.addEventListener("click", () => {
+  modalCriar.style.display = "none";
+});
+
+confirmarCriar?.addEventListener("click", () => {
+  const nome = document.getElementById("nomeNovaTurma").value.trim();
+  if (!nome) {
+    mostrarMensagem("Digite um nome válido para a turma.", "error");
+    return;
+  }
+
+  fetch("/turmas/criar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome })
+  })
+  .then(async res => {
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.sucesso) {
+      throw new Error(data.erro || "Erro ao criar turma");
+    }
+    return data;
+  })
+  .then(data => {
+    mostrarMensagem("Turma criada com sucesso!");
+    modalCriar.style.display = "none";
+
+    // Adiciona a turma na lista
+    const container = document.querySelector(".botoes");
+    const div = document.createElement("div");
+    div.className = "turma-item";
+    div.setAttribute("data-cod", data.cod);
+    div.innerHTML = `
+      <a href="/turmas/${encodeURIComponent(data.nome)}">
+        <button class="botao">${data.nome}</button>
+      </a>
+    `;
+    container.appendChild(div);
+  })
+  .catch(err => {
+    console.error(err);
+    mostrarMensagem(err.message, "error");
+  });
+});
+
 
 function mostrarMensagem(texto, tipo = "success") {
   mensagemPopup.textContent = texto;
@@ -130,8 +200,21 @@ confirmarArquivar?.addEventListener("click", () => {
     });
   });
 });
-</script>
 
+function voltar() {
+  const tipoUsuario = "<%= usuario?.tipo || '' %>";
+
+  if (tipoUsuario === "funcionario") {
+    window.location.href = "/func";
+  } else if (tipoUsuario === "responsavel") {
+    window.location.href = "/resp";
+  } else {
+    window.location.href = "/";
+  }
+}
+
+
+</script>
 
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
