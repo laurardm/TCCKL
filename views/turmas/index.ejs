@@ -22,20 +22,17 @@
       <% }) %>
     </div>
 
-    <div class="botoes-finais">
+<div class="botoes-finais">
   <button onclick="voltar()" class="botaodevoltar">Voltar</button>
 
   <% if (usuario?.tipo === "funcionario") { %>
     <button id="abrirCriarTurmaModal" class="criar">Criar Turma</button>
     <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
+    <a href="/turmas/arquivadas">
+      <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
+    </a>
   <% } %>
-
-  <a href="/turmas/arquivadas">
-    <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
-  </a>
 </div>
-
-
 
     <!-- Modal -->
     <div id="modalArquivar" class="modal">
@@ -202,17 +199,16 @@ confirmarArquivar?.addEventListener("click", () => {
 });
 
 function voltar() {
-  const tipoUsuario = "<%= usuario?.tipo || '' %>";
+      const paginaAnterior = sessionStorage.getItem("voltarPara");
 
-  if (tipoUsuario === "funcionario") {
-    window.location.href = "/func";
-  } else if (tipoUsuario === "responsavel") {
-    window.location.href = "/resp";
-  } else {
-    window.location.href = "/";
-  }
-}
-
+      // Se for diferente da página atual, volta para ela
+      if (paginaAnterior && paginaAnterior !== location.pathname) {
+        window.location.href = paginaAnterior;
+      } else {
+        // Se não houver registro ou for a mesma, redireciona para login ou outra rota segura
+        window.location.href = "/";
+      }
+    }
 
 </script>
 
