@@ -23,13 +23,13 @@
     </div>
 
     <div class="botoes-finais">
-      <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+      <button onclick="voltar()" class="botaofinal">Voltar</button>
 
       <% if (usuario?.tipo === "funcionario") { %>
-        <button id="abrirCriarTurmaModal" class="criar">Criar Turma</button>
-        <button id="arquivarTodas" class="arquivar">Arquivar Todas</button>
+        <button id="abrirCriarTurmaModal" class="botaofinal">Criar Turma</button>
+        <button id="arquivarTodas" class="botaofinal">Arquivar Todas</button>
         <a href="/turmas/arquivadas">
-          <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
+          <button class="botaofinal">Ver Turmas Arquivadas</button>
         </a>
       <% } %>
     </div>
@@ -40,8 +40,8 @@
     <div class="modal-conteudo">
       <h2>Criar Nova Turma</h2>
       <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" />
-      <button id="confirmarCriarTurma">Criar</button>
-      <button id="fecharCriarTurma">Cancelar</button>
+      <button id="confirmarCriarTurma" class="botaofinal">Criar</button>
+      <button id="fecharCriarTurma" class="botaofinal">Cancelar</button>
     </div>
   </div>
 
