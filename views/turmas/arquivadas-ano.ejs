@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turmas Arquivadas - <%= ano %></title>
+  <link rel="stylesheet" href="/css/turmasArquivadas.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/logo.css">
+</head>
+<body>
+  <h1>Turmas Arquivadas - <%= ano %></h1>
+
+  <div id="mensagem-sucesso"></div>
+
+  <div class="caixabotao">
+    <% if (turmas.length > 0) { %>
+      <% turmas.forEach(turma => { %>
+        <div class="turma-item">
+          <a href="/turmas/<%= turma.nome %>">
+            <button class="botao"><%= turma.nome %></button>
+          </a>
+          <% if (usuario?.tipo === "funcionario") { %>
+            <button class="botao-desarquivar" data-cod="<%= turma.cod %>">Desarquivar</button>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>Não há turmas arquivadas para este ano.</p>
+    <% } %>
+
+    <div class="ver-anos">
+      <a href="/turmas/arquivadas">
+        <button class="botao">Voltar para Anos</button>
+      </a>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+  <div id="logo"></div>
+
+  <script src="/js/footer.js"></script>
+  <script src="/js/logo.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const botoesDesarquivar = document.querySelectorAll(".botao-desarquivar");
+      const mensagem = document.getElementById("mensagem-sucesso");
+
+      function mostrarMensagem(texto, tipo = "success") {
+        mensagem.textContent = texto;
+        mensagem.classList.remove("error");
+        if (tipo === "error") mensagem.classList.add("error");
+        mensagem.classList.add("show");
+        setTimeout(() => mensagem.classList.remove("show"), 3000);
+      }
+
+      botoesDesarquivar.forEach(botao => {
+        botao.addEventListener("click", async () => {
+          const cod = botao.dataset.cod;
+          try {
+            const response = await fetch(`/turmas/${cod}/arquivar?_method=PUT`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: "arquivada=0"
+            });
+            if (response.ok) {
+              botao.closest(".turma-item").remove();
+              mostrarMensagem("Turma desarquivada com sucesso!", "success");
+            } else {
+              mostrarMensagem("Erro ao desarquivar a turma.", "error");
+            }
+          } catch (err) {
+            console.error(err);
+            mostrarMensagem("Erro na requisição.", "error");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

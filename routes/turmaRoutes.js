@@ -56,14 +56,24 @@ router.put("/arquivar-todas", verificarFuncionario, (req, res) => {
   });
 });
 
-// GET /turmas/arquivadas - listar turmas arquivadas
+// GET /turmas/arquivadas - mostra apenas os anos disponíveis
 router.get("/arquivadas", (req, res) => {
-  db.query("SELECT cod, nome, ano, arquivada FROM turma WHERE arquivada = 1 ORDER BY ano DESC, nome", (err, turmas) => {
-    if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
+  db.query("SELECT DISTINCT ano FROM turma WHERE arquivada = 1 ORDER BY ano DESC", (err, anos) => {
+    if (err) return res.status(500).json("Erro ao buscar anos das turmas arquivadas");
+    // Montamos um array fake de turmas apenas com ano para reaproveitar o EJS
+    const turmas = anos.map(a => ({ ano: a.ano }));
     res.render("turmas/arquivadas", { turmas, usuario: req.session.usuario });
   });
 });
 
+// GET /turmas/arquivadas/:ano - lista turmas arquivadas de um ano
+router.get("/arquivadas/:ano", (req, res) => {
+  const ano = req.params.ano;
+  db.query("SELECT cod, nome, ano FROM turma WHERE arquivada = 1 AND ano = ? ORDER BY nome", [ano], (err, turmas) => {
+    if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
+    res.render("turmas/arquivadas-ano", { turmas, ano, usuario: req.session.usuario });
+  });
+});
 
 // PUT /turmas/:cod/arquivar - arquivar/desarquivar turma
 router.put("/:cod/arquivar", verificarFuncionario, (req, res) => {
