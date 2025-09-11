@@ -48,13 +48,22 @@ router.get("/", (req, res) => {
   });
 });
 
+// PUT /turmas/arquivar-todas - arquiva todas as turmas ativas
+router.put("/arquivar-todas", verificarFuncionario, (req, res) => {
+  db.query("UPDATE turma SET arquivada = 1 WHERE arquivada = 0", (err, result) => {
+    if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao arquivar turmas" });
+    res.status(200).json({ sucesso: true, modificadas: result.affectedRows });
+  });
+});
+
 // GET /turmas/arquivadas - listar turmas arquivadas
 router.get("/arquivadas", (req, res) => {
-  db.query("SELECT cod, nome, arquivada FROM turma WHERE arquivada = 1 ORDER BY nome", (err, turmas) => {
+  db.query("SELECT cod, nome, ano, arquivada FROM turma WHERE arquivada = 1 ORDER BY ano DESC, nome", (err, turmas) => {
     if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
     res.render("turmas/arquivadas", { turmas, usuario: req.session.usuario });
   });
 });
+
 
 // PUT /turmas/:cod/arquivar - arquivar/desarquivar turma
 router.put("/:cod/arquivar", verificarFuncionario, (req, res) => {

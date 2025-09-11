@@ -22,46 +22,28 @@
       <% }) %>
     </div>
 
-<div class="botoes-finais">
-  <button onclick="voltar()" class="botaodevoltar">Voltar</button>
+    <div class="botoes-finais">
+      <button onclick="voltar()" class="botaodevoltar">Voltar</button>
 
-  <% if (usuario?.tipo === "funcionario") { %>
-    <button id="abrirCriarTurmaModal" class="criar">Criar Turma</button>
-    <button id="abrirArquivarModal" class="arquivar">Arquivar Turmas</button>
-    <a href="/turmas/arquivadas">
-      <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
-    </a>
-  <% } %>
-</div>
-
-    <!-- Modal -->
-    <div id="modalArquivar" class="modal">
-      <div class="modal-conteudo">
-        <h2>Selecionar Turmas para Arquivar</h2>
-        <div id="listaTurmasModal">
-          <% turmas.forEach(turma => { %>
-            <div>
-              <input type="checkbox" class="turma-modal" value="<%= turma.cod %>">
-              <label><%= turma.nome %></label>
-            </div>
-          <% }) %>
-        </div>
-        <button id="confirmarArquivar">Arquivar Selecionadas</button>
-        <button id="fecharModal">Cancelar</button>
-      </div>
+      <% if (usuario?.tipo === "funcionario") { %>
+        <button id="abrirCriarTurmaModal" class="criar">Criar Turma</button>
+        <button id="arquivarTodas" class="arquivar">Arquivar Todas</button>
+        <a href="/turmas/arquivadas">
+          <button class="botaoverarquivadas">Ver Turmas Arquivadas</button>
+        </a>
+      <% } %>
     </div>
   </div>
 
   <!-- Modal Criar Turma -->
-<div id="modalCriarTurma" class="modal">
-  <div class="modal-conteudo">
-    <h2>Criar Nova Turma</h2>
-    <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" />
-    <button id="confirmarCriarTurma">Criar</button>
-    <button id="fecharCriarTurma">Cancelar</button>
+  <div id="modalCriarTurma" class="modal">
+    <div class="modal-conteudo">
+      <h2>Criar Nova Turma</h2>
+      <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" />
+      <button id="confirmarCriarTurma">Criar</button>
+      <button id="fecharCriarTurma">Cancelar</button>
+    </div>
   </div>
-</div>
-
 
   <!-- Popup de mensagem -->
   <div id="mensagem-popup"></div>
@@ -70,10 +52,6 @@
   <div id="logo"></div>
 
 <script>
-const abrirModal = document.getElementById("abrirArquivarModal");
-const modal = document.getElementById("modalArquivar");
-const fecharModal = document.getElementById("fecharModal");
-const confirmarArquivar = document.getElementById("confirmarArquivar");
 const mensagemPopup = document.getElementById("mensagem-popup");
 
 // Criar turma
@@ -113,7 +91,6 @@ confirmarCriar?.addEventListener("click", () => {
     mostrarMensagem("Turma criada com sucesso!");
     modalCriar.style.display = "none";
 
-    // Adiciona a turma na lista
     const container = document.querySelector(".botoes");
     const div = document.createElement("div");
     div.className = "turma-item";
@@ -131,88 +108,54 @@ confirmarCriar?.addEventListener("click", () => {
   });
 });
 
+// Arquivar todas as turmas
+document.getElementById("arquivarTodas")?.addEventListener("click", () => {
+  const confirmar = confirm("Deseja arquivar TODAS as turmas ativas?");
+  if (!confirmar) return;
+
+  fetch("/turmas/arquivar-todas", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ arquivada: 1 })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.sucesso) {
+      mostrarMensagem("Todas as turmas foram arquivadas!");
+      document.querySelectorAll(".turma-item").forEach(turma => {
+        turma.style.transition = "opacity 0.5s ease";
+        turma.style.opacity = 0;
+        setTimeout(() => turma.remove(), 500);
+      });
+    } else {
+      mostrarMensagem("Erro ao arquivar as turmas", "error");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    mostrarMensagem("Erro na requisição", "error");
+  });
+});
 
 function mostrarMensagem(texto, tipo = "success") {
   mensagemPopup.textContent = texto;
   mensagemPopup.classList.remove("error");
   if (tipo === "error") mensagemPopup.classList.add("error");
   mensagemPopup.classList.add("show");
-
-  setTimeout(() => {
-    mensagemPopup.classList.remove("show");
-  }, 3000);
+  setTimeout(() => mensagemPopup.classList.remove("show"), 3000);
 }
 
-abrirModal?.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
-
-fecharModal?.addEventListener("click", () => {
-  modal.style.display = "none";
-});
-
-confirmarArquivar?.addEventListener("click", () => {
-  const selecionadas = document.querySelectorAll(".turma-modal:checked");
-  if (selecionadas.length === 0) {
-    mostrarMensagem("Selecione ao menos uma turma.", "error");
-    return;
-  }
-
-  const confirmar = confirm(`Deseja arquivar ${selecionadas.length} turma(s)?`);
-  if (!confirmar) return;
-
-  // Fecha o modal imediatamente após confirmação
-  modal.style.display = "none";
-
-  // Processa cada turma arquivada
-  selecionadas.forEach(cb => {
-    fetch(`/turmas/${cb.value}/arquivar`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ arquivada: 1 })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.sucesso) {
-        // Remove a turma da lista principal suavemente
-        const turmaItemPrincipal = document.querySelector(`.turma-item[data-cod='${cb.value}']`);
-        if (turmaItemPrincipal) {
-          turmaItemPrincipal.style.transition = "opacity 0.5s ease, height 0.5s ease, margin 0.5s ease";
-          turmaItemPrincipal.style.opacity = 0;
-          turmaItemPrincipal.style.height = 0;
-          turmaItemPrincipal.style.margin = 0;
-          setTimeout(() => {
-            turmaItemPrincipal.remove();
-          }, 500);
-        }
-
-        mostrarMensagem("Turma(s) arquivada(s) com sucesso!", "success");
-      } else {
-        mostrarMensagem("Erro ao arquivar a turma.", "error");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      mostrarMensagem("Erro na requisição.", "error");
-    });
-  });
-});
-
 function voltar() {
-      const paginaAnterior = sessionStorage.getItem("voltarPara");
-
-      // Se for diferente da página atual, volta para ela
-      if (paginaAnterior && paginaAnterior !== location.pathname) {
-        window.location.href = paginaAnterior;
-      } else {
-        // Se não houver registro ou for a mesma, redireciona para login ou outra rota segura
-        window.location.href = "/";
-      }
-    }
-
+  const paginaAnterior = sessionStorage.getItem("voltarPara");
+  if (paginaAnterior && paginaAnterior !== location.pathname) {
+    window.location.href = paginaAnterior;
+  } else {
+    window.location.href = "/";
+  }
+}
 </script>
 
-  <script src="/js/footer.js"></script>
-  <script src="/js/logo.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/logo.js"></script>
 </body>
 </html>
