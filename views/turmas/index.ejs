@@ -35,27 +35,27 @@
     </div>
   </div>
 
-  <!-- Modal Criar Turma -->
+<!-- Modal Criar Turma -->
 <div id="modalCriarTurma" class="modal">
   <div class="modal-conteudo">
     <h2>Criar Nova Turma</h2>
     <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" maxlength="3" />
     
-    <label for="anoNovaTurma">Ano da turma:</label>
     <select id="anoNovaTurma">
-      <option value="">Sem ano</option>
+      <option value="">Selecione o ano</option>
       <option value="2025">2025</option>
-      <option value="2026">2026</option>
-      <option value="2027">2027</option>
+      <option value="2024">2024</option>
+      <option value="2023">2023</option>
+      <option value="2022">2022</option>
+      <option value="Sem ano">Sem ano</option>
     </select>
 
-    <button id="confirmarCriarTurma" class="botaofinal">Criar</button>
-    <button id="fecharCriarTurma" class="botaofinal">Cancelar</button>
+    <button id="confirmarCriarTurma">Criar</button>
+    <button id="fecharCriarTurma">Cancelar</button>
   </div>
 </div>
 
-
-  <!-- Popup de mensagem -->
+<!-- Popup de mensagem -->
   <div id="mensagem-popup"></div>
 
   <div id="footer"></div>
@@ -96,7 +96,7 @@ function mostrarMensagem(texto, tipo = "success") {
 // Criar turma
 confirmarCriar?.addEventListener("click", () => {
   const nome = inputNomeTurma.value.trim().toUpperCase();
-  const ano = selectAnoTurma.value;
+  const ano = document.getElementById("anoNovaTurma").value;
 
   // Validação
   if (!nome) {
@@ -109,9 +109,9 @@ confirmarCriar?.addEventListener("click", () => {
   }
 
   fetch("/turmas/criar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome, ano })
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ nome, ano }) // envia nome e ano
   })
   .then(async res => {
     const data = await res.json().catch(() => ({}));
