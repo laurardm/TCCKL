@@ -36,14 +36,24 @@
   </div>
 
   <!-- Modal Criar Turma -->
-  <div id="modalCriarTurma" class="modal">
-    <div class="modal-conteudo">
-      <h2>Criar Nova Turma</h2>
-      <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" />
-      <button id="confirmarCriarTurma" class="botaofinal">Criar</button>
-      <button id="fecharCriarTurma" class="botaofinal">Cancelar</button>
-    </div>
+<div id="modalCriarTurma" class="modal">
+  <div class="modal-conteudo">
+    <h2>Criar Nova Turma</h2>
+    <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" maxlength="3" />
+    
+    <label for="anoNovaTurma">Ano da turma:</label>
+    <select id="anoNovaTurma">
+      <option value="">Sem ano</option>
+      <option value="2025">2025</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+    </select>
+
+    <button id="confirmarCriarTurma" class="botaofinal">Criar</button>
+    <button id="fecharCriarTurma" class="botaofinal">Cancelar</button>
   </div>
+</div>
+
 
   <!-- Popup de mensagem -->
   <div id="mensagem-popup"></div>
@@ -54,22 +64,27 @@
 <script>
 const mensagemPopup = document.getElementById("mensagem-popup");
 
-// Criar turma
+// Elementos do modal
 const abrirCriarModal = document.getElementById("abrirCriarTurmaModal");
 const modalCriar = document.getElementById("modalCriarTurma");
 const fecharCriar = document.getElementById("fecharCriarTurma");
 const confirmarCriar = document.getElementById("confirmarCriarTurma");
 const inputNomeTurma = document.getElementById("nomeNovaTurma");
+const selectAnoTurma = document.getElementById("anoNovaTurma");
 
+// Abrir modal
 abrirCriarModal?.addEventListener("click", () => {
   modalCriar.style.display = "flex";
 });
 
+// Fechar modal
 fecharCriar?.addEventListener("click", () => {
   modalCriar.style.display = "none";
   inputNomeTurma.value = "";
+  selectAnoTurma.value = "";
 });
 
+// Função para mostrar popup
 function mostrarMensagem(texto, tipo = "success") {
   mensagemPopup.textContent = texto;
   mensagemPopup.classList.remove("error");
@@ -78,10 +93,12 @@ function mostrarMensagem(texto, tipo = "success") {
   setTimeout(() => mensagemPopup.classList.remove("show"), 3000);
 }
 
+// Criar turma
 confirmarCriar?.addEventListener("click", () => {
   const nome = inputNomeTurma.value.trim().toUpperCase();
+  const ano = selectAnoTurma.value;
 
-  // Validação do nome da turma
+  // Validação
   if (!nome) {
     mostrarMensagem("Digite um nome válido para a turma.", "error");
     return;
@@ -94,19 +111,18 @@ confirmarCriar?.addEventListener("click", () => {
   fetch("/turmas/criar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome })
+    body: JSON.stringify({ nome, ano })
   })
   .then(async res => {
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.sucesso) {
-      throw new Error(data.erro || "Erro ao criar turma");
-    }
+    if (!res.ok || !data.sucesso) throw new Error(data.erro || "Erro ao criar turma");
     return data;
   })
   .then(data => {
     mostrarMensagem("Turma criada com sucesso!");
     modalCriar.style.display = "none";
     inputNomeTurma.value = "";
+    selectAnoTurma.value = "";
 
     const container = document.querySelector(".botoes");
     const div = document.createElement("div");

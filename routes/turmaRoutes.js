@@ -29,14 +29,24 @@ const upload = multer({ storage });
 
 // POST /turmas/criar
 router.post("/criar", verificarFuncionario, (req, res) => {
-  const { nome } = req.body;
+  const { nome, ano } = req.body; // agora pegamos o ano também
   if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: "Nome inválido" });
 
-  db.query("INSERT INTO turma (nome, arquivada) VALUES (?, 0)", [nome.trim()], (err, result) => {
-    if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao criar turma" });
-    res.status(200).json({ sucesso: true, cod: result.insertId, nome: nome.trim() });
-  });
+  const anoFinal = ano?.trim() || null; // caso não selecione, fica NULL
+
+  db.query(
+    "INSERT INTO turma (nome, arquivada, ano) VALUES (?, 0, ?)",
+    [nome.trim(), anoFinal],
+    (err, result) => {
+      if (err) {
+        console.error("Erro ao criar turma:", err); // log para debug
+        return res.status(500).json({ sucesso: false, erro: "Erro ao criar turma" });
+      }
+      res.status(200).json({ sucesso: true, cod: result.insertId, nome: nome.trim() });
+    }
+  );
 });
+
 
 // GET /turmas - listar turmas ativas
 router.get("/", (req, res) => {
