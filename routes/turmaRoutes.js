@@ -7,7 +7,7 @@ const fs = require("fs");
 
 // --- Middleware ---
 function verificarFuncionario(req, res, next) {
-  if (req.session.usuario && req.session.usuario.tipo === "funcionario") {
+  if (req.session && req.session.usuario && req.session.usuario.tipo === "funcionario") {
     return next();
   }
   return res.status(403).json("Acesso negado: apenas funcionários podem realizar esta ação.");
@@ -25,20 +25,18 @@ const upload = multer({ storage });
 
 /* ===========================
    ROTAS DE TURMAS
-=========================== */
+   =========================== */
 
-// POST /turmas/criar - criar nova turma
+// POST /turmas/criar
 router.post("/criar", verificarFuncionario, (req, res) => {
   const { nome } = req.body;
   if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: "Nome inválido" });
 
   db.query("INSERT INTO turma (nome, arquivada) VALUES (?, 0)", [nome.trim()], (err, result) => {
     if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao criar turma" });
-
     res.status(200).json({ sucesso: true, cod: result.insertId, nome: nome.trim() });
   });
 });
-
 
 // GET /turmas - listar turmas ativas
 router.get("/", (req, res) => {
@@ -68,14 +66,41 @@ router.get("/arquivadas", (req, res) => {
 
 // GET /turmas/arquivadas/:ano - lista turmas arquivadas de um ano
 router.get("/arquivadas/:ano", (req, res) => {
-  const ano = req.params.ano;
-  db.query("SELECT cod, nome, ano FROM turma WHERE arquivada = 1 AND ano = ? ORDER BY nome", [ano], (err, turmas) => {
-    if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
-    res.render("turmas/arquivadas-ano", { turmas, ano, usuario: req.session.usuario });
-  });
+  const anoRaw = req.params.ano;
+  const ano = decodeURIComponent(anoRaw);
+
+  if (ano === "Sem ano") {
+    db.query("SELECT cod, nome, ano FROM turma WHERE arquivada = 1 AND (ano IS NULL OR ano = '') ORDER BY nome", (err, turmas) => {
+      if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
+      res.render("turmas/arquivadas-ano", { turmas, ano, usuario: req.session.usuario });
+    });
+  } else {
+    db.query("SELECT cod, nome, ano FROM turma WHERE arquivada = 1 AND ano = ? ORDER BY nome", [ano], (err, turmas) => {
+      if (err) return res.status(500).json("Erro ao buscar turmas arquivadas");
+      res.render("turmas/arquivadas-ano", { turmas, ano, usuario: req.session.usuario });
+    });
+  }
 });
 
-// PUT /turmas/:cod/arquivar - arquivar/desarquivar turma
+// PUT /turmas/arquivadas/:ano/desarquivar-todas - desarquiva todas as turmas DO ANO especificado
+router.put("/arquivadas/:ano/desarquivar-todas", verificarFuncionario, (req, res) => {
+  const anoRaw = req.params.ano;
+  const ano = decodeURIComponent(anoRaw);
+
+  if (ano === "Sem ano") {
+    db.query("UPDATE turma SET arquivada = 0 WHERE arquivada = 1 AND (ano IS NULL OR ano = '')", (err, result) => {
+      if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao desarquivar turmas" });
+      return res.status(200).json({ sucesso: true, modificadas: result.affectedRows });
+    });
+  } else {
+    db.query("UPDATE turma SET arquivada = 0 WHERE arquivada = 1 AND ano = ?", [ano], (err, result) => {
+      if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao desarquivar turmas" });
+      return res.status(200).json({ sucesso: true, modificadas: result.affectedRows });
+    });
+  }
+});
+
+// PUT /turmas/:cod/arquivar - arquivar/desarquivar turma (mantive sua rota original)
 router.put("/:cod/arquivar", verificarFuncionario, (req, res) => {
   const { cod } = req.params;
   const { arquivada } = req.body; // 1 = arquivar, 0 = desarquivar
@@ -144,6 +169,7 @@ router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
     });
   });
 });
+
 // PUT /turmas/:nomeTurma - editar aluno
 router.put("/:nomeTurma", verificarFuncionario, (req, res) => {
   const { cod, nome } = req.body;
@@ -180,7 +206,7 @@ router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"),
 
 /* ===========================
    ROTAS DE FOTOS DA TURMA
-=========================== */
+   =========================== */
 
 // GET /turmas/:nomeTurma/fotos
 router.get("/:nomeTurma/fotos", (req, res) => {
@@ -216,17 +242,14 @@ router.get("/:nomeTurma/fotos", (req, res) => {
 });
 
 // POST /turmas/:nomeTurma/fotos - adicionar foto
-
 router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
   const arquivo = req.file;
 
   if (!arquivo) return res.status(400).json({ sucesso: false, erro: "Nenhum arquivo enviado" });
 
-  // pega a data enviada pelo front-end ou usa a data atual
   let dataf;
   if (req.body.dataf) {
-    // transforma a string enviada em 'YYYY-MM-DD'
     const dateObj = new Date(req.body.dataf);
     dataf = dateObj.toISOString().split("T")[0];
   } else {
@@ -240,7 +263,6 @@ router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (r
     const codTurma = turmaResults[0].cod;
     const linkFoto = "/uploads/" + arquivo.filename;
 
-    // INSERT com a string da data correta
     db.query(
       "INSERT INTO fotos_turma (turma_id, link, dataf) VALUES (?, ?, ?)",
       [codTurma, linkFoto, dataf],
@@ -257,6 +279,7 @@ router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (r
     );
   });
 });
+
 // DELETE /turmas/:nomeTurma/fotos/:cod - excluir foto
 router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
   const { cod } = req.params;
@@ -278,7 +301,9 @@ router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
   });
 });
 
-//recados turma
+/* ===========================
+   RECADOS / AGENDA
+   =========================== */
 
 // GET agenda de um aluno
 router.get("/aluno/:cod", (req, res) => {

@@ -1,5 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
 
+:root{
+  --card-bg: #fff;
+  --accent-pink: #fddde6;
+  --accent-pink-hover: #fbbcca;
+  --accent-green: #d9fdd9;
+  --accent-yellow: #ffe1a8;
+  --shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: "Questrial", sans-serif;
@@ -14,7 +25,7 @@ body {
   padding: 20px;
 }
 
-/* Caixa principal */
+/* Caixa principal - centralizada */
 .caixabotao {
   display: flex;
   flex-direction: column;   
@@ -22,154 +33,182 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 850px;
-  background: white;
-  border-radius: 25px;
-  box-shadow: 0 0 40px rgba(0,0,0,1);
-  padding: 10px 20px;
+  width: 90%;
+  max-width: 980px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 22px;
   text-align: center;
-  overflow: hidden;
   border: 2px solid #d6d6d6;
 }
 
 /* Título */
 h1 {
   color: #222;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 15px 30px;
-  border-radius: 15px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  margin-top: 30px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  margin-top: 18px;
 }
 
-/* Lista de turmas e anos */
-.botoes, .anos {
+/* Lista de anos lado a lado */
+.anos {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 18px 0;
 }
 
-/* Item de turma */
-.turma-item {
+/* Botões de ano */
+.botao-ano {
+  background: var(--accent-pink);
+  border: 2px solid #d9d9d9;
+  border-radius: 22px;
+  padding: 10px 20px;
+  font-size: 1.05em;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.botao-ano:hover {
+  transform: translateY(-3px);
+  background: var(--accent-pink-hover);
+}
+
+/* Grid de turmas (na página do ano) */
+.turmas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: start;
+  justify-items: center;
+  margin: 10px 0 6px 0;
+}
+
+/* Card de turma */
+.turma-card {
+  width: 100%;
+  max-width: 300px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: center;
 }
 
-/* Botões principais */
+.nome-turma-card {
+  font-weight: 700;
+  font-size: 1.04em;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #f0f0f0;
+}
+
+/* Ações dentro do card */
+.acoes-turma {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Botões comuns */
 .botao {
   background: #f6f6f6;
   border: 2px solid #d9d9d9;
-  border-radius: 25px;
-  padding: 12px 20px;
-  font-size: 1.1em;
-  width: 160px;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 0.98em;
+  width: auto;
   cursor: pointer;
-  font-family: "Questrial", sans-serif;
-  transition: transform 0.2s, background 0.2s;
+  transition: transform 0.12s, background 0.12s;
 }
 
 .botao:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px);
   background: #ececec;
 }
 
-/* Botões de desarquivar e anos arquivados */
+/* Botões de desarquivar (individual e todos) */
 .botao-desarquivar,
-.botao-ano,
-.botao-desarquivar-selecionadas {
-  background: #fddde6;
+.botao-desarquivar-todas {
+  background: var(--accent-pink);
   border: 2px solid #d9d9d9;
-  border-radius: 25px;
-  padding: 12px 25px;
-  font-size: 1.1em;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s, background 0.2s;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 700;
 }
 
 .botao-desarquivar:hover,
-.botao-ano:hover,
-.botao-desarquivar-selecionadas:hover {
-  transform: scale(1.05);
-  background: #fbbcca;
+.botao-desarquivar-todas:hover {
+  background: var(--accent-pink-hover);
 }
 
-/* Botão voltar às ativas / anos */
-.ver-ativas,
-.ver-anos {
-  margin-top: 15px;
+/* Botão voltar */
+.botao-ativas {
+  background: var(--accent-green);
+  border: 2px solid #b8d9b8;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 700;
+}
+
+.botao-ativas:hover { transform: translateY(-3px); }
+
+/* Área dos botões finais (no rodapé da caixa) */
+.acoes-finais {
   display: flex;
   justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.ver-ativas .botao-ativas,
-.ver-anos .botao {
-  margin: 0;
+/* Nenhuma turma */
+.nenhuma {
+  color: #666;
+  padding: 20px;
+  font-size: 1em;
 }
 
-/* Botão voltar para turmas ativas */
-.botao-ativas {
-  background: #d9fdd9;
-  border: 2px solid #b8d9b8;
-  border-radius: 25px;
-  padding: 12px 25px;
-  font-size: 1.1em;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.botao-ativas:hover {
-  transform: scale(1.05);
-  background: #c0f0c0;
-}
-
-/* Checkboxes e nomes de turmas */
-.turma-item label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.1em;
-  cursor: pointer;
-}
-
-.nome-turma {
-  background: #f6f6f6;
-  border: 2px solid #d9d9d9;
-  border-radius: 20px;
-  padding: 8px 15px;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.turma-item input[type="checkbox"]:checked + .nome-turma {
-  background: #d9fdd9;
-  transform: scale(1.05);
-}
-
-/* Mensagem popup no canto superior direito */
+/* Mensagem popup */
 #mensagem-sucesso {
   position: fixed;
-  top: 0;
+  top: 12px;
   right: 20px;
-  background-color: #4CAF50; /* verde padrão */
+  background-color: #4CAF50;
   color: white;
-  padding: 15px 25px;
+  padding: 12px 18px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
   opacity: 0;
-  transform: translateY(-50px); /* começa acima da tela */
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  z-index: 1000;
+  transform: translateY(-20px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  z-index: 2000;
 }
 
 #mensagem-sucesso.show {
   opacity: 1;
-  transform: translateY(20px); /* desliza suavemente para baixo */
+  transform: translateY(0);
 }
 
 #mensagem-sucesso.error {
-  background-color: #f44336; /* vermelho para erro */
+  background-color: #f44336;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .caixabotao { width: 95%; padding: 16px; border-radius: 14px; }
+  .turmas-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .botao-ano { padding: 8px 14px; font-size: 0.97em; }
 }
