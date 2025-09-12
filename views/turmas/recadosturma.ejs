@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
 </head>
 
-<body data-nome-turma="<%= encodedNomeTurma %>">
+<body data-nome-turma="<%= encodedNomeTurma %>" data-usuario="<%= tipoUsuario %>">
 
   <div class="painel-turma">
     <span class="nome-turma">Turma <%= nomeTurma || "Nome da turma" %></span>
@@ -28,9 +28,13 @@
     <button class="btn-navegacao" onclick="voltarPagina()">
       <i class="fa-solid fa-arrow-left"></i> Página anterior
     </button>
-    <button class="btn-adicionar" onclick="abrirModalRecado()">
-      <i class="fa-solid fa-pen"></i> Adicionar recado
-    </button>
+
+    <% if(tipoUsuario === "funcionario") { %>
+      <button class="btn-adicionar" onclick="abrirModalRecado()">
+        <i class="fa-solid fa-pen"></i> Adicionar recado
+      </button>
+    <% } %>
+
     <button class="btn-navegacao" onclick="avancarPagina()">
       Próxima página <i class="fa-solid fa-arrow-right"></i>
     </button>
@@ -54,7 +58,7 @@
     </div>
   </div>
 
-  <!-- Modal de alerta -->
+  <!-- Alerta -->
   <div id="alerta-bg" class="alerta-bg">
     <div class="alerta-box">
       <p id="alerta-msg"></p>
@@ -62,13 +66,7 @@
     </div>
   </div>
 
-  <!-- Dados da turma/recados injetados pelo servidor -->
-  <div id="agenda-data"
-       data-recados='<%- JSON.stringify(conteudos || []) %>'>
-  </div>
-
-  <div id="footer"></div>
-  <div id="logo"></div>
+  <div id="agenda-data" data-recados='<%- JSON.stringify(conteudos || []) %>'></div>
 
   <script>
     const el = document.getElementById("agenda-data");

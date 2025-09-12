@@ -335,6 +335,9 @@ router.get("/:nomeTurma/recados", (req, res) => {
     db.query("SELECT * FROM recados_turma WHERE turma_id = ?", [turmaId], (err, recados) => {
       if (err) return res.status(500).send("Erro ao buscar recados");
 
+      const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "funcionario" :
+                          req.session.usuario?.tipo === "responsavel" ? "responsavel" : null;
+
       res.render("turmas/recadosTurma", {
         encodedNomeTurma: encodeURIComponent(turmaResults[0].nome.trim()),
         nomeTurma: turmaResults[0].nome.trim(),
@@ -345,6 +348,7 @@ router.get("/:nomeTurma/recados", (req, res) => {
           texto: r.descricao
         })),
         dataAtual: new Date().toISOString().split("T")[0],
+        tipoUsuario
       });
     });
   });
@@ -361,11 +365,14 @@ router.post("/:nomeTurma/recados", verificarFuncionario, (req, res) => {
 
     const turmaId = turmaResults[0].cod;
 
-    db.query("INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)", 
-      [turmaId, descricao, datar], (err) => {
-      if (err) return res.status(500).send("Erro ao salvar recado");
-      res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
-    });
+    db.query(
+      "INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)",
+      [turmaId, descricao, datar],
+      (err) => {
+        if (err) return res.status(500).send("Erro ao salvar recado");
+        res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+      }
+    );
   });
 });
 
@@ -384,8 +391,10 @@ router.post("/:nomeTurma/recados/:cod/edit", verificarFuncionario, (req, res) =>
   const { nomeTurma, cod } = req.params;
   const { descricao, datar } = req.body;
 
-  db.query("UPDATE recados_turma SET descricao = ?, datar = ? WHERE cod = ?", 
-    [descricao, datar, cod], (err) => {
+  db.query(
+    "UPDATE recados_turma SET descricao = ?, datar = ? WHERE cod = ?",
+    [descricao, datar, cod],
+    (err) => {
       if (err) return res.status(500).send("Erro ao atualizar recado");
       res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
     }
