@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Turma <%= nomeTurma %></title>
+  <title>Turma <%= nomeTurma %>
+  </title>
   <link rel="stylesheet" href="/css/turmas.css" />
   <link rel="stylesheet" href="/css/logo.css" />
   <link rel="stylesheet" href="/css/footer.css" />
@@ -42,16 +43,17 @@
     window.tipoUsuario = "<%= tipoUsuario || '' %>";
   </script>
 
-  <h1 class="turma-titulo">Turma <%= nomeTurma %></h1>
+  <h1 class="turma-titulo">Turma <%= nomeTurma %>
+  </h1>
 
   <div class="container-alunos">
     <div class="grade-alunos" id="lista-alunos">
-      <% if (alunos.length > 0) { %>
-        <% alunos.forEach((aluno) => { %>
+      <% if (alunos.length> 0) { %>
+        <% alunos.forEach((aluno)=> { %>
           <div class="aluno" data-cod="<%= aluno.cod %>">
             <div class="foto-wrapper">
               <img src="<%= aluno.foto || '/imagens/perfil.png' %>" alt="Foto do aluno">
-              <% if (tipoUsuario === 'func') { %>
+              <% if (tipoUsuario==='func' ) { %>
                 <label class="camera-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path fill="white"
@@ -59,113 +61,84 @@
                   </svg>
                   <input type="file" accept="image/*" class="input-foto" data-cod="<%= aluno.cod %>">
                 </label>
-              <% } %>
+                <% } %>
             </div>
-            <span><%= aluno.nome %></span>
+            <span>
+              <%= aluno.nome %>
+            </span>
           </div>
-        <% }) %>
-      <% } else { %>
-        <p>Nenhum aluno encontrado para esta turma.</p>
+          <% }) %>
+            <% } else { %>
+              <p>Nenhum aluno encontrado para esta turma.</p>
+              <% } %>
+    </div>
+  </div>
+
+  <% const turmaArquivada=Boolean(arquivada); %>
+
+    <div class="botoes">
+      <a href="/turmas">
+        <button class="btn-fofo">Voltar</button>
+      </a>
+      <a href="/turmas/<%= nomeTurma %>/fotos">
+        <button class="btn-fofo">Fotos da turma</button>
+      </a>
+      <a href="/turmas/<%= nomeTurma %>/recados">
+        <button class="btn-fofo">Recados da turma</button>
+      </a>
+
+      <% if (tipoUsuario==='func' && !turmaArquivada) { %>
+        <button id="btnAdicionar" class="btn-fofo">Adicionar aluno</button>
+        <button id="btnEditar" class="btn-fofo">Editar alunos</button>
+        <button id="btnSalvar" class="btn-fofo" style="display:none;">Salvar</button>
+        <% } %>
+    </div>
+
+    <% if (tipoUsuario==='func' && !turmaArquivada) { %>
+      <form id="formAdicionarAluno" style="margin-top: 20px; display:none;">
+        <input type="text" id="nomeAluno" name="nomeAluno" placeholder="Nome do aluno" required />
+        <input type="text" id="agendaAluno" name="agendaAluno" placeholder="Agenda (opcional)" />
+        <button type="submit" class="btn-fofo">Adicionar Aluno</button>
+      </form>
       <% } %>
-    </div>
-  </div>
 
-  <div class="botoes">
-    <a href="/turmas">
-      <button class="btn-fofo">
-        </svg>
-        Voltar
-      </button>
-    </a>
-    <a href="/turmas/<%= nomeTurma %>/fotos">
-      <button class="btn-fofo">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M5 7h14v10H5z"></path>
-        </svg>
-        Fotos da turma
-      </button>
-    </a>
-    <a href="/turmas/<%= nomeTurma %>/recados">
-      <button class="btn-fofo">
-        <svg viewBox="0 0 24 24">
-          <path d="M4 4h16v16H4z"></path>
-          <path d="M4 8h16"></path>
-          <path d="M4 12h16"></path>
-        </svg>
-        Recados da turma
-      </button>
-    </a>
+        <div id="custom-alert" style="display: none;">
+          <div class="alert-content"></div>
+          <span id="alert-message"></span>
+          <button id="alert-ok-button"></button>
+        </div>
 
-    <% if (tipoUsuario === 'func') { %>
-      <button id="btnAdicionar" class="btn-fofo">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 5v14M5 12h14"></path>
-        </svg>
-        Adicionar aluno
-      </button>
-      <button id="btnEditar" class="btn-fofo">
-        <svg viewBox="0 0 24 24">
-          <path d="M4 21v-4l12-12 4 4-12 12H4z"></path>
-        </svg>
-        Editar alunos
-      </button>
-      <button id="btnSalvar" class="btn-fofo" style="display:none;">
-        <svg viewBox="0 0 24 24">
-          <path d="M5 4h14v16H5z"></path>
-          <path d="M12 4v16"></path>
-        </svg>
-        Salvar
-      </button>
-    <% } %>
-  </div>
+        <div id="modalConfirm"
+          style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:10000;">
+          <div
+            style="background:#fff; padding:20px; border: 2px solid #d9d9d9; border-radius:40px; max-width:320px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.3); font-family:Arial, sans-serif;">
+            <p id="modalConfirmMessage" style="margin-bottom:20px; font-size:16px;"></p>
+            <button id="modalConfirmYes"
+              style="margin-right:15px; padding:8px 15px; border-radius:4px; cursor:pointer;">Sim</button>
+            <button id="modalConfirmNo" style="padding:8px 15px; border-radius:4px; cursor:pointer;">Não</button>
+          </div>
+        </div>
 
-  <% if (tipoUsuario === 'func') { %>
-    <form id="formAdicionarAluno" style="margin-top: 20px; display:none;">
-      <input type="text" id="nomeAluno" name="nomeAluno" placeholder="Nome do aluno" required />
-      <input type="text" id="agendaAluno" name="agendaAluno" placeholder="Agenda (opcional)" />
-      <button type="submit" class="btn-fofo">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 5v14M5 12h14"></path>
-        </svg>
-        Adicionar Aluno
-      </button>
-    </form>
-  <% } %>
+        <div id="footer"></div>
+        <div id="logo"></div>
 
-  <div id="custom-alert" style="display: none;">
-    <div class="alert-content"></div>
-    <span id="alert-message"></span>
-    <button id="alert-ok-button"></button>
-  </div>
+        <script src="/js/turmas.js"></script>
+        <script src="/js/footer.js"></script>
+        <script src="/js/logo.js"></script>
 
-  <div id="modalConfirm" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:10000;">
-    <div style="background:#fff; padding:20px; border: 2px solid #d9d9d9; border-radius:40px; max-width:320px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.3); font-family:Arial, sans-serif;">
-      <p id="modalConfirmMessage" style="margin-bottom:20px; font-size:16px;"></p>
-      <button id="modalConfirmYes" style="margin-right:15px; padding:8px 15px; border-radius:4px; cursor:pointer;">Sim</button>
-      <button id="modalConfirmNo" style="padding:8px 15px; border-radius:4px; cursor:pointer;">Não</button>
-    </div>
-  </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const alunos = document.querySelectorAll('.aluno');
 
-  <div id="footer"></div>
-  <div id="logo"></div>
-
-  <script src="/js/turmas.js"></script>
-  <script src="/js/footer.js"></script>
-  <script src="/js/logo.js"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const alunos = document.querySelectorAll('.aluno');
-
-      alunos.forEach(function (aluno) {
-        aluno.addEventListener('click', function (event) {
-          if (event.target.closest('.camera-icon') || event.target.closest('.input-foto')) return;
-          const codAluno = this.dataset.cod;
-          window.location.href = `/agenda/aluno/${codAluno}`;
-        });
-      });
-    });
-  </script>
+            alunos.forEach(function (aluno) {
+              aluno.addEventListener('click', function (event) {
+                if (event.target.closest('.camera-icon') || event.target.closest('.input-foto')) return;
+                const codAluno = this.dataset.cod;
+                window.location.href = `/agenda/aluno/${codAluno}`;
+              });
+            });
+          });
+        </script>
 </body>
+
 </html>

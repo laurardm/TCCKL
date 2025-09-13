@@ -245,7 +245,8 @@ router.get("/:nomeTurma/fotos", (req, res) => {
         dataTitulo: `Fotos da turma ${turmaResults[0].nome.trim()}`,
         conteudos,
         dataAtual: new Date().toISOString().split("T")[0],
-        tipoUsuario
+        tipoUsuario,
+          arquivada: turmaResults[0].arquivada
       });
     });
   });

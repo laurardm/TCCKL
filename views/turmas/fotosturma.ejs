@@ -27,11 +27,11 @@
     <button class="btn-navegacao" onclick="voltarPagina()">
       <i class="fa-solid fa-arrow-left"></i> Página Anterior
     </button>
-    <% if (tipoUsuario==='func' ) { %>
-      <button class="btn-adicionar" onclick="abrirModalImagem()">
-        <i class="fa-solid fa-image"></i> Adicionar Imagem
-      </button>
-    <% } %>
+  <% if (tipoUsuario === 'func' && !arquivada) { %>
+    <button class="btn-adicionar" onclick="abrirModalImagem()">
+      <i class="fa-solid fa-image"></i> Adicionar Imagem
+    </button>
+  <% } %>
     <button class="btn-navegacao" onclick="avancarPagina()">
       Próxima Página <i class="fa-solid fa-arrow-right"></i>
     </button>

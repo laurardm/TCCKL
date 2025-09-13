@@ -3,36 +3,29 @@
 :root{
   --card-bg: #fff;
   --accent-pink: #fddde6;
-  --accent-pink-hover: #fbbcca;
-  --accent-green: #d9fdd9;
   --accent-yellow: #ffe1a8;
   --shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
   font-family: "Questrial", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
   background-image: url('../imagens/fotofundo2.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   padding: 20px;
+  min-height: 100vh;
 }
 
-/* Caixa principal - centralizada */
+/* Caixa principal */
 .caixabotao {
   display: flex;
-  flex-direction: column;   
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  flex-direction: column;
   width: 90%;
   max-width: 980px;
   background: var(--card-bg);
@@ -41,14 +34,18 @@ body {
   padding: 22px;
   text-align: center;
   border: 2px solid #d6d6d6;
-}
 
+  /* fluxo natural */
+  position: relative; 
+  margin-top: 160px; /* deixa espaço para a logo no topo */
+}
 /* Título */
 h1 {
   color: #222;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 1);
   padding: 12px 20px;
-  border-radius: 12px;
+  font-size: 30px;
+  border-radius: 40px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   margin-top: 18px;
 }
@@ -70,13 +67,7 @@ h1 {
   padding: 10px 20px;
   font-size: 1.05em;
   cursor: pointer;
-  font-weight: 700;
   transition: transform 0.15s, background 0.15s;
-}
-
-.botao-ano:hover {
-  transform: translateY(-3px);
-  background: var(--accent-pink-hover);
 }
 
 /* Grid de turmas (na página do ano) */
@@ -132,39 +123,51 @@ h1 {
   font-size: 0.98em;
   width: auto;
   cursor: pointer;
-  transition: transform 0.12s, background 0.12s;
-}
-
-.botao:hover {
-  transform: translateY(-3px);
-  background: #ececec;
+  transition: transform 0.12s;
 }
 
 /* Botões de desarquivar (individual e todos) */
 .botao-desarquivar,
-.botao-desarquivar-todas {
+.botao-desarquivar-todas,
+.botoesbaixo {
   background: var(--accent-pink);
   border: 2px solid #d9d9d9;
   border-radius: 20px;
   padding: 8px 16px;
-  font-weight: 700;
+  font-weight: 600;
+  transition: transform 0.2s;
+  cursor: pointer;
+  font-family: "Questrial", sans-serif;
+}
+
+.botoesbaixo{
+  font-size: 15px;
+
+}
+
+.botao-desarquivar-todas,
+.botoesbaixo {
+  margin-top: 50px;
 }
 
 .botao-desarquivar:hover,
-.botao-desarquivar-todas:hover {
-  background: var(--accent-pink-hover);
+.botao-desarquivar-todas:hover,
+.botoesbaixo:hover,
+.botao:hover,
+.botao-ano:hover {
+  transform: scale(1.05);
 }
 
 /* Botão voltar */
 .botao-ativas {
-  background: var(--accent-green);
-  border: 2px solid #b8d9b8;
+  background-color: #fddde6;
+  border: 2px solid #d9d9d9;
   border-radius: 20px;
   padding: 8px 16px;
-  font-weight: 700;
+  margin-top: 15px;
+  font-weight: 600;
+  font-family: "Questrial", sans-serif;
 }
-
-.botao-ativas:hover { transform: translateY(-3px); }
 
 /* Área dos botões finais (no rodapé da caixa) */
 .acoes-finais {

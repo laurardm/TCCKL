@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/css/logo.css">
 </head>
 <body>
+
   <h1>Turmas Arquivadas — <%= ano %></h1>
 
   <div class="caixabotao">
@@ -22,11 +23,7 @@
 
             <div class="acoes-turma">
               <!-- Desarquivar individual: usamos data-cod e classe para bindar no JS -->
-              <button
-                class="botao botao-desarquivar desarquivar-btn"
-                type="button"
-                data-cod="<%= t.cod %>"
-              >Desarquivar</button>
+              <button class="botao botao-desarquivar desarquivar-btn" type="button" data-cod="<%= t.cod %>">Desarquivar</button>
 
               <!-- Abrir turma -->
               <a href="/turmas/<%= encodeURIComponent(t.nome) %>">
@@ -40,14 +37,10 @@
 
     <div class="acoes-finais">
       <!-- Botão "Desarquivar Todas" usa data-ano -->
-      <button
-        class="botao botao-desarquivar-todas desarquivar-todas-btn"
-        type="button"
-        data-ano="<%= ano %>"
-      >Desarquivar Todas</button>
+      <button class="botoesbaixo desarquivar-todas-btn" type="button" data-ano="<%= ano %>">Desarquivar todas</button>
 
       <a href="/turmas/arquivadas">
-        <button class="botao botao-ativas" type="button">Voltar aos Anos</button>
+        <button class="botoesbaixo" type="button">Voltar</button>
       </a>
     </div>
   </div>
@@ -55,86 +48,92 @@
   <div id="mensagem-sucesso"></div>
   <div id="footer"></div>
   <div id="logo"></div>
-
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
 
   <script>
-    // Popup reutilizável
-    function mostrarMensagem(texto, erro = false) {
-      const msg = document.getElementById("mensagem-sucesso");
-      msg.textContent = texto;
-      msg.className = erro ? "error show" : "show";
-      setTimeout(() => msg.classList.remove("show"), 3000);
-    }
+ // Popup reutilizável
+function mostrarMensagem(texto, erro = false) {
+  const msg = document.getElementById("mensagem-sucesso");
+  msg.textContent = texto;
+  msg.className = erro ? "error show" : "show";
+  setTimeout(() => msg.classList.remove("show"), 3000);
+}
 
-    // Bind de eventos depois que o DOM carrega
-    document.addEventListener('DOMContentLoaded', () => {
-      // Desarquivar individual
-      document.querySelectorAll('.desarquivar-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const cod = btn.dataset.cod;
-          if (!cod) return;
-          if (!confirm('Deseja desarquivar esta turma?')) return;
+// Bind de eventos depois que o DOM carrega
+document.addEventListener('DOMContentLoaded', () => {
+  // Desarquivar individual
+  document.querySelectorAll('.desarquivar-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const cod = btn.dataset.cod;
+      if (!cod) return;
+      if (!confirm('Deseja desarquivar esta turma?')) return;
 
-          try {
-            const res = await fetch('/turmas/' + encodeURIComponent(String(cod)) + '/arquivar', {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'same-origin',
-              body: JSON.stringify({ arquivada: 0 })
-            });
-
-            const isJson = res.headers.get('content-type')?.includes('application/json');
-            const json = isJson ? await res.json() : null;
-
-            if (res.ok) {
-              mostrarMensagem('Turma desarquivada.');
-              const card = btn.closest('.turma-card');
-              if (card) card.remove();
-            } else {
-              mostrarMensagem(json?.erro || 'Erro ao desarquivar turma.', true);
-              console.error('desarquivarTurma error', json);
-            }
-          } catch (err) {
-            console.error(err);
-            mostrarMensagem('Erro de conexão.', true);
-          }
+      try {
+        const res = await fetch('/turmas/' + encodeURIComponent(String(cod)) + '/arquivar', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ arquivada: 0 })
         });
-      });
 
-      // Desarquivar todas do ano
-      const btnTodas = document.querySelector('.desarquivar-todas-btn');
-      if (btnTodas) {
-        btnTodas.addEventListener('click', async () => {
-          const ano = btnTodas.dataset.ano ?? '';
-          if (!confirm('Deseja desarquivar todas as turmas do ano "' + ano + '"?')) return;
+        const isJson = res.headers.get('content-type')?.includes('application/json');
+        const json = isJson ? await res.json() : null;
 
-          try {
-            const url = '/turmas/arquivadas/' + encodeURIComponent(String(ano)) + '/desarquivar-todas';
-            const res = await fetch(url, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'same-origin'
-            });
-
-            const isJson = res.headers.get('content-type')?.includes('application/json');
-            const json = isJson ? await res.json() : null;
-
-            if (res.ok && json && json.sucesso) {
-              mostrarMensagem((json.modificadas || 0) + ' turmas desarquivadas.');
-              setTimeout(() => window.location.href = '/turmas/arquivadas', 1200);
-            } else {
-              mostrarMensagem(json?.erro || 'Erro ao desarquivar turmas.', true);
-              console.error('desarquivarTodasAno error', json);
-            }
-          } catch (err) {
-            console.error(err);
-            mostrarMensagem('Erro de conexão.', true);
-          }
-        });
+        if (res.ok) {
+          mostrarMensagem('Turma desarquivada.');
+          const card = btn.closest('.turma-card');
+          if (card) card.remove();
+        } else {
+          mostrarMensagem(json?.erro || 'Erro ao desarquivar turma.', true);
+          console.error('desarquivarTurma error', json);
+        }
+      } catch (err) {
+        console.error(err);
+        mostrarMensagem('Erro de conexão.', true);
       }
     });
+  });
+
+  // Desarquivar todas do ano
+  const btnTodas = document.querySelector('.desarquivar-todas-btn');
+  if (btnTodas) {
+    btnTodas.addEventListener('click', async () => {
+      const ano = btnTodas.dataset.ano ?? '';
+      if (!confirm('Deseja desarquivar todas as turmas do ano "' + ano + '"?')) return;
+
+      try {
+        const url = '/turmas/arquivadas/' + encodeURIComponent(String(ano)) + '/desarquivar-todas';
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin'
+        });
+
+        const isJson = res.headers.get('content-type')?.includes('application/json');
+        const json = isJson ? await res.json() : null;
+
+        if (res.ok && json && json.sucesso) {
+          mostrarMensagem((json.modificadas || 0) + ' turmas desarquivadas.');
+          setTimeout(() => window.location.href = '/turmas/arquivadas', 1200);
+        } else {
+          mostrarMensagem(json?.erro || 'Erro ao desarquivar turmas.', true);
+          console.error('desarquivarTodasAno error', json);
+        }
+      } catch (err) {
+        console.error(err);
+        mostrarMensagem('Erro de conexão.', true);
+      }
+    });
+  }
+
+  // Botão de voltar (classe nova, se você mudou)
+  const btnVoltar = document.querySelector('.botoesbaixo.voltar-btn'); // coloquei uma classe exemplo
+  btnVoltar?.addEventListener('click', () => {
+    window.history.back();
+  });
+});
+
   </script>
 </body>
 </html>

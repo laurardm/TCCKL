@@ -1,186 +1,235 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Turmas</title>
   <link rel="stylesheet" href="css/telaturmas.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/logo.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Questrial&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
+  <!-- Pra deixar o confirm bonito -->
+  <div id="modalConfirmacao" class="modal">
+    <div class="modal-conteudo">
+      <p id="confirmMensagem">Tem certeza que deseja arquivar TODAS as turmas?</p>
+      <div class="botoes-confirmacao">
+        <button id="confirmSim">Sim</button>
+        <button id="confirmNao">Cancelar</button>
+      </div>
+    </div>
+  </div>
   <div class="caixabotao" id="turmasContainer">
     <div class="botoes">
-      <% turmas.forEach(turma => { %>
+      <% turmas.forEach(turma=> { %>
         <div class="turma-item" data-cod="<%= turma.cod %>">
           <a href="/turmas/<%= turma.nome %>">
-            <button class="botao"><%= turma.nome %></button>
+            <button class="botao">
+              <%= turma.nome %>
+            </button>
           </a>
         </div>
-      <% }) %>
+        <% }) %>
     </div>
 
     <div class="botoes-finais">
       <button onclick="voltar()" class="botaofinal">Voltar</button>
 
-      <% if (usuario?.tipo === "funcionario") { %>
-        <button id="abrirCriarTurmaModal" class="botaofinal">Criar Turma</button>
-        <button id="arquivarTodas" class="botaofinal">Arquivar Todas</button>
+      <% if (usuario?.tipo==="funcionario" ) { %>
+        <button id="abrirCriarTurmaModal" class="botaofinal">Criar turma</button>
+        <button id="arquivarTodas" class="botaofinal">Arquivar todas</button>
+                <% } %>
         <a href="/turmas/arquivadas">
-          <button class="botaofinal">Ver Turmas Arquivadas</button>
+          <button class="botaofinal">Ver turmas arquivadas</button>
         </a>
-      <% } %>
+
     </div>
   </div>
 
-<!-- Modal Criar Turma -->
-<div id="modalCriarTurma" class="modal">
-  <div class="modal-conteudo">
-    <h2>Criar Nova Turma</h2>
-    <input type="text" id="nomeNovaTurma" placeholder="Digite o nome da turma" maxlength="3" />
-    
-    <select id="anoNovaTurma">
-      <option value="">Selecione o ano</option>
-      <option value="2025">2025</option>
-      <option value="2024">2024</option>
-      <option value="2023">2023</option>
-      <option value="2022">2022</option>
-      <option value="Sem ano">Sem ano</option>
-    </select>
+  <!-- Modal Criar Turma -->
+  <div id="modalCriarTurma" class="modal">
+    <div class="modal-conteudo">
+      <h2>Criar nova turma</h2>
+      <label for="nomeNovaTurma">Selecione o nome da turma:</label>
+      <select id="nomeNovaTurma">
+        <option value="B1">B1</option>
+        <option value="B2A">B2A</option>
+        <option value="B2B">B2B</option>
+        <option value="M1A">M1A</option>
+        <option value="M1B">M1B</option>
+        <option value="M2A">M2A</option>
+        <option value="M2B">M2B</option>
+        <option value="Pré1A">Pré1A</option>
+        <option value="Pré1B">Pré1B</option>
+        <option value="Pré2A">Pré2A</option>
+        <option value="Pré2B">Pré2B</option>
+      </select>
 
-    <button id="confirmarCriarTurma">Criar</button>
-    <button id="fecharCriarTurma">Cancelar</button>
+      <label for="anoNovaTurma">Digite o ano letivo:</label>
+      <input type="number" id="anoNovaTurma" name="anoNovaTurma" placeholder="Ex: 2025" min="2000" max="2050">
+
+      <button id="confirmarCriarTurma">Criar</button>
+      <button id="fecharCriarTurma">Cancelar</button>
+    </div>
   </div>
-</div>
 
-<!-- Popup de mensagem -->
+  <!-- Popup de mensagem -->
   <div id="mensagem-popup"></div>
 
   <div id="footer"></div>
   <div id="logo"></div>
 
-<script>
-const mensagemPopup = document.getElementById("mensagem-popup");
+  <script>
+    const mensagemPopup = document.getElementById("mensagem-popup");
 
-// Elementos do modal
-const abrirCriarModal = document.getElementById("abrirCriarTurmaModal");
-const modalCriar = document.getElementById("modalCriarTurma");
-const fecharCriar = document.getElementById("fecharCriarTurma");
-const confirmarCriar = document.getElementById("confirmarCriarTurma");
-const inputNomeTurma = document.getElementById("nomeNovaTurma");
-const selectAnoTurma = document.getElementById("anoNovaTurma");
+    // Elementos do modal
+    const abrirCriarModal = document.getElementById("abrirCriarTurmaModal");
+    const modalCriar = document.getElementById("modalCriarTurma");
+    const fecharCriar = document.getElementById("fecharCriarTurma");
+    const confirmarCriar = document.getElementById("confirmarCriarTurma");
+    const inputNomeTurma = document.getElementById("nomeNovaTurma");
+    const selectAnoTurma = document.getElementById("anoNovaTurma");
 
-// Abrir modal
-abrirCriarModal?.addEventListener("click", () => {
-  modalCriar.style.display = "flex";
-});
+    // Abrir modal
+    abrirCriarModal?.addEventListener("click", () => {
+      modalCriar.style.display = "flex";
+    });
 
-// Fechar modal
-fecharCriar?.addEventListener("click", () => {
-  modalCriar.style.display = "none";
-  inputNomeTurma.value = "";
-  selectAnoTurma.value = "";
-});
+    // Fechar modal
+    fecharCriar?.addEventListener("click", () => {
+      modalCriar.style.display = "none";
+      inputNomeTurma.value = "";
+      selectAnoTurma.value = "";
+    });
 
-// Função para mostrar popup
-function mostrarMensagem(texto, tipo = "success") {
-  mensagemPopup.textContent = texto;
-  mensagemPopup.classList.remove("error");
-  if (tipo === "error") mensagemPopup.classList.add("error");
-  mensagemPopup.classList.add("show");
-  setTimeout(() => mensagemPopup.classList.remove("show"), 3000);
-}
+    // Função para mostrar popup
+    function mostrarMensagem(texto, tipo = "success") {
+      mensagemPopup.textContent = texto;
+      mensagemPopup.classList.remove("error");
+      if (tipo === "error") mensagemPopup.classList.add("error");
+      mensagemPopup.classList.add("show");
+      setTimeout(() => mensagemPopup.classList.remove("show"), 3000);
+    }
 
-// Criar turma
-confirmarCriar?.addEventListener("click", () => {
-  const nome = inputNomeTurma.value.trim().toUpperCase();
-  const ano = document.getElementById("anoNovaTurma").value;
+    // Criar turma
+    confirmarCriar?.addEventListener("click", () => {
+      const nome = inputNomeTurma.value.trim().toUpperCase();
+      const ano = document.getElementById("anoNovaTurma").value;
 
-  // Validação
-  if (!nome) {
-    mostrarMensagem("Digite um nome válido para a turma.", "error");
-    return;
-  }
-  if (nome.length > 3) {
-    mostrarMensagem("O nome da turma não pode ter mais de 3 caracteres.", "error");
-    return;
-  }
+      // Validação
+      if (!nome) {
+        mostrarMensagem("Digite um nome válido para a turma.", "error");
+        return;
+      }
+      if (nome.length > 3) {
+        mostrarMensagem("O nome da turma não pode ter mais de 3 caracteres.", "error");
+        return;
+      }
 
-  fetch("/turmas/criar", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ nome, ano }) // envia nome e ano
-  })
-  .then(async res => {
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.sucesso) throw new Error(data.erro || "Erro ao criar turma");
-    return data;
-  })
-  .then(data => {
-    mostrarMensagem("Turma criada com sucesso!");
-    modalCriar.style.display = "none";
-    inputNomeTurma.value = "";
-    selectAnoTurma.value = "";
+      fetch("/turmas/criar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, ano }) // envia nome e ano
+      })
+        .then(async res => {
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.sucesso) throw new Error(data.erro || "Erro ao criar turma");
+          return data;
+        })
+        .then(data => {
+          mostrarMensagem("Turma criada com sucesso!");
+          modalCriar.style.display = "none";
+          inputNomeTurma.value = "";
+          selectAnoTurma.value = "";
 
-    const container = document.querySelector(".botoes");
-    const div = document.createElement("div");
-    div.className = "turma-item";
-    div.setAttribute("data-cod", data.cod);
-    div.innerHTML = `
+          const container = document.querySelector(".botoes");
+          const div = document.createElement("div");
+          div.className = "turma-item";
+          div.setAttribute("data-cod", data.cod);
+          div.innerHTML = `
       <a href="/turmas/${encodeURIComponent(data.nome)}">
         <button class="botao">${data.nome}</button>
       </a>
     `;
-    container.appendChild(div);
-  })
-  .catch(err => {
-    console.error(err);
-    mostrarMensagem(err.message, "error");
-  });
-});
+          container.appendChild(div);
+        })
+        .catch(err => {
+          console.error(err);
+          mostrarMensagem(err.message, "error");
+        });
+    });
 
-// Arquivar todas as turmas
-document.getElementById("arquivarTodas")?.addEventListener("click", () => {
-  const confirmar = confirm("Deseja arquivar TODAS as turmas ativas?");
-  if (!confirmar) return;
+    // Arquivar todas as turmas
+    // Função para abrir modal de confirmação
+    function confirmarAcao(mensagem) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("modalConfirmacao");
+        const texto = document.getElementById("confirmMensagem");
+        const btnSim = document.getElementById("confirmSim");
+        const btnNao = document.getElementById("confirmNao");
 
-  fetch("/turmas/arquivar-todas", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ arquivada: 1 })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.sucesso) {
-      mostrarMensagem("Todas as turmas foram arquivadas!");
-      document.querySelectorAll(".turma-item").forEach(turma => {
-        turma.style.transition = "opacity 0.5s ease";
-        turma.style.opacity = 0;
-        setTimeout(() => turma.remove(), 500);
+        texto.textContent = mensagem;
+        modal.style.display = "flex";
+
+        btnSim.onclick = () => {
+          modal.style.display = "none";
+          resolve(true);
+        };
+        btnNao.onclick = () => {
+          modal.style.display = "none";
+          resolve(false);
+        };
       });
-    } else {
-      mostrarMensagem("Erro ao arquivar as turmas", "error");
     }
-  })
-  .catch(err => {
-    console.error(err);
-    mostrarMensagem("Erro na requisição", "error");
-  });
-});
 
-function voltar() {
-  const paginaAnterior = sessionStorage.getItem("voltarPara");
-  if (paginaAnterior && paginaAnterior !== location.pathname) {
-    window.location.href = paginaAnterior;
-  } else {
-    window.location.href = "/";
-  }
-}
-</script>
+    // Arquivar todas as turmas com modal bonitão
+    document.getElementById("arquivarTodas")?.addEventListener("click", () => {
+      confirmarAcao("Deseja arquivar TODAS as turmas ativas?").then(confirmar => {
+        if (!confirmar) return;
 
-<script src="/js/footer.js"></script>
-<script src="/js/logo.js"></script>
+        fetch("/turmas/arquivar-todas", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ arquivada: 1 })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.sucesso) {
+              mostrarMensagem("Todas as turmas foram arquivadas!");
+              document.querySelectorAll(".turma-item").forEach(turma => {
+                turma.style.transition = "opacity 0.5s ease";
+                turma.style.opacity = 0;
+                setTimeout(() => turma.remove(), 500);
+              });
+            } else {
+              mostrarMensagem("Erro ao arquivar as turmas", "error");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            mostrarMensagem("Erro na requisição", "error");
+          });
+      });
+    });
+
+
+    function voltar() {
+      const paginaAnterior = sessionStorage.getItem("voltarPara");
+      if (paginaAnterior && paginaAnterior !== location.pathname) {
+        window.location.href = paginaAnterior;
+      } else {
+        window.location.href = "/";
+      }
+    }
+  </script>
+
+  <script src="/js/footer.js"></script>
+  <script src="/js/logo.js"></script>
 </body>
+
 </html>
