@@ -23,9 +23,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-/* ===========================
-   ROTAS DE TURMAS
-   =========================== */
+//ROTAS DE TURMAS
 
 // POST /turmas/criar
 router.post("/criar", verificarFuncionario, (req, res) => {
@@ -110,10 +108,10 @@ router.put("/arquivadas/:ano/desarquivar-todas", verificarFuncionario, (req, res
   }
 });
 
-// PUT /turmas/:cod/arquivar - arquivar/desarquivar turma (mantive sua rota original)
+// PUT /turmas/:cod/arquivar - arquivar/desarquivar turma 
 router.put("/:cod/arquivar", verificarFuncionario, (req, res) => {
   const { cod } = req.params;
-  const { arquivada } = req.body; // 1 = arquivar, 0 = desarquivar
+  const { arquivada } = req.body; 
 
   db.query("UPDATE turma SET arquivada = ? WHERE cod = ?", [arquivada, cod], (err) => {
     if (err) return res.status(500).json("Erro ao atualizar status da turma");
@@ -214,9 +212,7 @@ router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"),
   });
 });
 
-/* ===========================
-   ROTAS DE FOTOS DA TURMA
-   =========================== */
+/* ROTAS DE FOTOS DA TURMA*/
 
 // GET /turmas/:nomeTurma/fotos
 router.get("/:nomeTurma/fotos", (req, res) => {
@@ -312,9 +308,7 @@ router.delete("/:nomeTurma/fotos/:cod", verificarFuncionario, (req, res) => {
   });
 });
 
-/* ===========================
-   RECADOS / AGENDA
-   =========================== */
+/*RECADOS / AGENDA */
 
 // GET agenda de um aluno
 router.get("/aluno/:cod", (req, res) => {
