@@ -26,9 +26,10 @@
                 <button class="botao botao-desarquivar desarquivar-btn" type="button" data-cod="<%= t.cod %>">Desarquivar</button>
               <% } %>
 
-              <a href="/turmas/<%= encodeURIComponent(t.nome) %>">
-                <button class="botao" type="button">Abrir</button>
-              </a>
+              <a href="/turmas/arquivadas/<%= encodeURIComponent(ano) %>/<%= encodeURIComponent(t.nome) %>">
+              <button class="botao" type="button">Abrir</button>
+            </a>
+
             </div>
           </div>
         <% }); %>

@@ -90,6 +90,38 @@ router.get("/arquivadas/:ano", (req, res) => {
   }
 });
 
+// GET /turmas/arquivadas/:ano/:nomeTurma - exibir alunos de turma arquivada
+router.get("/arquivadas/:ano/:nomeTurma", (req, res) => {
+  const { ano, nomeTurma } = req.params;
+  const nomeTurmaUpper = nomeTurma.trim().toUpperCase();
+
+  db.query(
+    "SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? AND (ano = ? OR (ano IS NULL AND ? = 'Sem ano')) AND arquivada = 1 LIMIT 1",
+    [nomeTurmaUpper, ano, ano],
+    (err, turmaResults) => {
+      if (err || turmaResults.length === 0) {
+        return res.render("turmas/turmanome", { nomeTurma, alunos: [], tipoUsuario: null });
+      }
+
+      const codTurma = turmaResults[0].cod;
+
+      db.query("SELECT cod, nome, agenda, foto FROM aluno WHERE turma = ? ORDER BY nome", [codTurma], (err2, alunos) => {
+        if (err2) return res.render("turmas/turmanome", { nomeTurma: turmaResults[0].nome.trim(), alunos: [], tipoUsuario: null });
+
+        const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" :
+                            req.session.usuario?.tipo === "responsavel" ? "resp" : null;
+
+        res.render("turmas/turmanome", {
+          nomeTurma: turmaResults[0].nome.trim(),
+          alunos,
+          tipoUsuario,
+          arquivada: turmaResults[0].arquivada
+        });
+      });
+    }
+  );
+});
+
 // PUT /turmas/arquivadas/:ano/desarquivar-todas - desarquiva todas as turmas DO ANO especificado
 router.put("/arquivadas/:ano/desarquivar-todas", verificarFuncionario, (req, res) => {
   const anoRaw = req.params.ano;
