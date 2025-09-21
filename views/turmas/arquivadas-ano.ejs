@@ -22,14 +22,10 @@
             <div class="nome-turma-card"><%= t.nome %></div>
 
             <div class="acoes-turma">
-              <% if (usuario.tipo !== 'responsavel') { %>
-                <button class="botao botao-desarquivar desarquivar-btn" type="button" data-cod="<%= t.cod %>">Desarquivar</button>
-              <% } %>
-
+              <!-- Botão desarquivar removido -->
               <a href="/turmas/arquivadas/<%= encodeURIComponent(ano) %>/<%= encodeURIComponent(t.nome) %>">
-              <button class="botao" type="button">Abrir</button>
-            </a>
-
+                <button class="botao" type="button">Abrir</button>
+              </a>
             </div>
           </div>
         <% }); %>
@@ -37,10 +33,7 @@
     </div>
 
     <div class="acoes-finais">
-      <% if (usuario.tipo !== 'responsavel') { %>
-        <button class="botoesbaixo desarquivar-todas-btn" type="button" data-ano="<%= ano %>">Desarquivar todas</button>
-      <% } %>
-
+      <!-- Botão desarquivar todas removido -->
       <a href="/turmas/arquivadas">
         <button class="botoesbaixo" type="button">Voltar</button>
       </a>
@@ -53,80 +46,5 @@
 
   <script src="/js/footer.js"></script>
   <script src="/js/logo.js"></script>
-
-  <script>
-    function mostrarMensagem(texto, erro = false) {
-      const msg = document.getElementById("mensagem-sucesso");
-      msg.textContent = texto;
-      msg.className = erro ? "error show" : "show";
-      setTimeout(() => msg.classList.remove("show"), 3000);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const desarquivarBtns = document.querySelectorAll('.desarquivar-btn');
-      if (desarquivarBtns.length > 0) {
-        desarquivarBtns.forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const cod = btn.dataset.cod;
-            if (!cod || !confirm('Deseja desarquivar esta turma?')) return;
-
-            try {
-              const res = await fetch('/turmas/' + encodeURIComponent(String(cod)) + '/arquivar', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify({ arquivada: 0 })
-              });
-
-              const isJson = res.headers.get('content-type')?.includes('application/json');
-              const json = isJson ? await res.json() : null;
-
-              if (res.ok) {
-                mostrarMensagem('Turma desarquivada.');
-                const card = btn.closest('.turma-card');
-                if (card) card.remove();
-              } else {
-                mostrarMensagem(json?.erro || 'Erro ao desarquivar turma.', true);
-                console.error('desarquivarTurma error', json);
-              }
-            } catch (err) {
-              console.error(err);
-              mostrarMensagem('Erro de conexão.', true);
-            }
-          });
-        });
-
-        const btnTodas = document.querySelector('.desarquivar-todas-btn');
-        if (btnTodas) {
-          btnTodas.addEventListener('click', async () => {
-            const ano = btnTodas.dataset.ano;
-            if (!ano || !confirm('Deseja desarquivar todas as turmas do ano "' + ano + '"?')) return;
-
-            try {
-              const res = await fetch('/turmas/arquivadas/' + encodeURIComponent(String(ano)) + '/desarquivar-todas', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin'
-              });
-
-              const isJson = res.headers.get('content-type')?.includes('application/json');
-              const json = isJson ? await res.json() : null;
-
-              if (res.ok && json && json.sucesso) {
-                mostrarMensagem((json.modificadas || 0) + ' turmas desarquivadas.');
-                setTimeout(() => window.location.href = '/turmas/arquivadas', 1200);
-              } else {
-                mostrarMensagem(json?.erro || 'Erro ao desarquivar turmas.', true);
-                console.error('desarquivarTodasAno error', json);
-              }
-            } catch (err) {
-              console.error(err);
-              mostrarMensagem('Erro de conexão.', true);
-            }
-          });
-        }
-      }
-    });
-  </script>
 </body>
 </html>

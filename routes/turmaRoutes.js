@@ -23,21 +23,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-//ROTAS DE TURMAS
+// --- ROTAS DE TURMAS ---
 
 // POST /turmas/criar
 router.post("/criar", verificarFuncionario, (req, res) => {
-  const { nome, ano } = req.body; // agora pegamos o ano também
+  const { nome, ano } = req.body;
   if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: "Nome inválido" });
 
-  const anoFinal = ano?.trim() || null; // caso não selecione, fica NULL
+  const anoFinal = ano?.trim() || null;
 
   db.query(
     "INSERT INTO turma (nome, arquivada, ano) VALUES (?, 0, ?)",
     [nome.trim(), anoFinal],
     (err, result) => {
       if (err) {
-        console.error("Erro ao criar turma:", err); // log para debug
+        console.error("Erro ao criar turma:", err);
         return res.status(500).json({ sucesso: false, erro: "Erro ao criar turma" });
       }
       res.status(200).json({ sucesso: true, cod: result.insertId, nome: nome.trim() });
@@ -45,13 +45,15 @@ router.post("/criar", verificarFuncionario, (req, res) => {
   );
 });
 
-
 // GET /turmas - listar turmas ativas
 router.get("/", (req, res) => {
-  db.query("SELECT cod, nome, arquivada FROM turma WHERE arquivada = 0 ORDER BY nome", (err, turmas) => {
-    if (err) return res.status(500).json("Erro ao buscar turmas");
-    res.render("turmas/index", { turmas, usuario: req.session.usuario });
-  });
+  db.query(
+    "SELECT cod, nome, ano, arquivada FROM turma WHERE arquivada = 0 ORDER BY ano DESC, nome",
+    (err, turmas) => {
+      if (err) return res.status(500).json("Erro ao buscar turmas");
+      res.render("turmas/index", { turmas, usuario: req.session.usuario });
+    }
+  );
 });
 
 // PUT /turmas/arquivar-todas - arquiva todas as turmas ativas
@@ -66,7 +68,6 @@ router.put("/arquivar-todas", verificarFuncionario, (req, res) => {
 router.get("/arquivadas", (req, res) => {
   db.query("SELECT DISTINCT ano FROM turma WHERE arquivada = 1 ORDER BY ano DESC", (err, anos) => {
     if (err) return res.status(500).json("Erro ao buscar anos das turmas arquivadas");
-    // Montamos um array fake de turmas apenas com ano para reaproveitar o EJS
     const turmas = anos.map(a => ({ ano: a.ano }));
     res.render("turmas/arquivadas", { turmas, usuario: req.session.usuario });
   });
@@ -120,24 +121,6 @@ router.get("/arquivadas/:ano/:nomeTurma", (req, res) => {
       });
     }
   );
-});
-
-// PUT /turmas/arquivadas/:ano/desarquivar-todas - desarquiva todas as turmas DO ANO especificado
-router.put("/arquivadas/:ano/desarquivar-todas", verificarFuncionario, (req, res) => {
-  const anoRaw = req.params.ano;
-  const ano = decodeURIComponent(anoRaw);
-
-  if (ano === "Sem ano") {
-    db.query("UPDATE turma SET arquivada = 0 WHERE arquivada = 1 AND (ano IS NULL OR ano = '')", (err, result) => {
-      if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao desarquivar turmas" });
-      return res.status(200).json({ sucesso: true, modificadas: result.affectedRows });
-    });
-  } else {
-    db.query("UPDATE turma SET arquivada = 0 WHERE arquivada = 1 AND ano = ?", [ano], (err, result) => {
-      if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao desarquivar turmas" });
-      return res.status(200).json({ sucesso: true, modificadas: result.affectedRows });
-    });
-  }
 });
 
 // PUT /turmas/:cod/arquivar - arquivar/desarquivar turma 
