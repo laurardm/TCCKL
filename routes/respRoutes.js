@@ -43,13 +43,18 @@ router.get('/', (req, res) => {
 
     const resp = results[0];
 
+    // Se houver foto no banco, monta o caminho /uploads/ + nome do arquivo
+    const caminhoFoto = resp.foto
+      ? (resp.foto.startsWith('/uploads/') ? resp.foto : '/uploads/' + resp.foto)
+      : '/imagens/perfil.png';
+
     res.render('resp/index', {
       erro: null,
       nome: resp.nome,
       email: resp.email,
       data_nasc: resp.data_nasc ? resp.data_nasc.toISOString().split('T')[0] : '',
       parentesco: resp.parentesco || '',
-      foto: resp.foto || '/imagens/perfil.png'
+      foto: caminhoFoto
     });
   });
 });
@@ -57,7 +62,7 @@ router.get('/', (req, res) => {
 // Upload de nova foto de perfil
 router.post('/foto', upload.single('foto'), (req, res) => {
   const responsavel = req.session.usuario;
-
+  
   if (!responsavel || !responsavel.cod) {
     return res.redirect('/');
   }
@@ -66,11 +71,12 @@ router.post('/foto', upload.single('foto'), (req, res) => {
     return res.redirect('/perfilr');
   }
 
-  const caminhoFoto = '/uploads/' + req.file.filename;
+  // Salva apenas o nome do arquivo no banco (sem /uploads/)
+  const nomeArquivo = req.file.filename;
 
   const sql = 'UPDATE responsaveis SET foto = ? WHERE cod = ?';
 
-  db.query(sql, [caminhoFoto, responsavel.cod], (err) => {
+  db.query(sql, [nomeArquivo, responsavel.cod], (err) => {
     if (err) {
       console.error('Erro ao atualizar foto:', err);
     }

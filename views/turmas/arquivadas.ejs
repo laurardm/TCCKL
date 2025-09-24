@@ -14,7 +14,7 @@
   <div class="caixabotao">
     <div class="anos">
       <% 
-        // turmas aqui vem do route /turmas/arquivadas como array de objetos { ano: value }
+
         const anos = [...new Set(turmas.map(t => (t.ano === null || t.ano === undefined || t.ano === "") ? "Sem ano" : t.ano))].sort((a, b) => {
           // ordena anos numericamente quando possível, senão alfabeticamente descendente
           const na = isNaN(Number(a)) ? a : Number(a);

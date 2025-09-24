@@ -20,7 +20,16 @@ router.get('/', (req, res) => {
       });
     }
 
-    const foto = results[0].foto || '/imagens/perfil.png';
+    let foto = results[0].foto;
+
+    // 🔧 Se o banco só tem o nome do arquivo, monta o caminho /uploads/
+    if (foto) {
+      foto = foto.startsWith('/uploads/')
+        ? foto
+        : '/uploads/' + foto;
+    } else {
+      foto = '/imagens/perfil.png';
+    }
 
     res.render('func/index', {
       erro: null,
