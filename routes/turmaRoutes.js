@@ -97,7 +97,7 @@ router.get("/arquivadas/:ano/:nomeTurma", (req, res) => {
   const nomeTurmaUpper = nomeTurma.trim().toUpperCase();
 
   db.query(
-    "SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? AND (ano = ? OR (ano IS NULL AND ? = 'Sem ano')) AND arquivada = 1 LIMIT 1",
+    "SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? AND (ano = ? OR (ano IS NULL AND ? = 'Sem ano')) AND arquivada = 1 ORDER BY cod DESC LIMIT 1",
     [nomeTurmaUpper, ano, ano],
     (err, turmaResults) => {
       if (err || turmaResults.length === 0) {
@@ -123,42 +123,35 @@ router.get("/arquivadas/:ano/:nomeTurma", (req, res) => {
   );
 });
 
-// PUT /turmas/:cod/arquivar - arquivar/desarquivar turma 
-router.put("/:cod/arquivar", verificarFuncionario, (req, res) => {
-  const { cod } = req.params;
-  const { arquivada } = req.body; 
-
-  db.query("UPDATE turma SET arquivada = ? WHERE cod = ?", [arquivada, cod], (err) => {
-    if (err) return res.status(500).json("Erro ao atualizar status da turma");
-    res.status(200).json({ sucesso: true, arquivada });
-  });
-});
-
-// GET /turmas/:nomeTurma - exibir alunos da turma
+// GET /turmas/:nomeTurma - exibir alunos da turma ativa ou não arquivada
 router.get("/:nomeTurma", (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
-  db.query("SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
-    if (err || turmaResults.length === 0) {
-      return res.render("turmas/turmanome", { nomeTurma: req.params.nomeTurma, alunos: [], tipoUsuario: null });
-    }
+  db.query(
+    "SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? ORDER BY arquivada ASC, cod DESC LIMIT 1",
+    [nomeTurma],
+    (err, turmaResults) => {
+      if (err || turmaResults.length === 0) {
+        return res.render("turmas/turmanome", { nomeTurma: req.params.nomeTurma, alunos: [], tipoUsuario: null });
+      }
 
-    const codTurma = turmaResults[0].cod;
+      const codTurma = turmaResults[0].cod;
 
-    db.query("SELECT cod, nome, agenda, foto FROM aluno WHERE turma = ? ORDER BY nome", [codTurma], (err2, alunos) => {
-      if (err2) return res.render("turmas/turmanome", { nomeTurma: turmaResults[0].nome.trim(), alunos: [], tipoUsuario: null });
+      db.query("SELECT cod, nome, agenda, foto FROM aluno WHERE turma = ? ORDER BY nome", [codTurma], (err2, alunos) => {
+        if (err2) return res.render("turmas/turmanome", { nomeTurma: turmaResults[0].nome.trim(), alunos: [], tipoUsuario: null });
 
-      const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" :
-                          req.session.usuario?.tipo === "responsavel" ? "resp" : null;
+        const tipoUsuario = req.session.usuario?.tipo === "funcionario" ? "func" :
+                            req.session.usuario?.tipo === "responsavel" ? "resp" : null;
 
-      res.render("turmas/turmanome", {
-        nomeTurma: turmaResults[0].nome.trim(),
-        alunos,
-        tipoUsuario,
-        arquivada: turmaResults[0].arquivada
+        res.render("turmas/turmanome", {
+          nomeTurma: turmaResults[0].nome.trim(),
+          alunos,
+          tipoUsuario,
+          arquivada: turmaResults[0].arquivada
+        });
       });
-    });
-  });
+    }
+  );
 });
 
 // POST /turmas/:nomeTurma - adicionar aluno
@@ -167,7 +160,7 @@ router.post("/:nomeTurma", verificarFuncionario, (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
   if (!nome?.trim()) return res.status(400).json("Nome inválido");
 
-  db.query("SELECT cod, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, result) => {
+  db.query("SELECT cod, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? ORDER BY arquivada ASC, cod DESC LIMIT 1", [nomeTurma], (err, result) => {
     if (err || result.length === 0) return res.status(400).json("Turma não encontrada");
     if (result[0].arquivada) return res.status(400).json("Turma arquivada: não é possível adicionar alunos");
 
@@ -233,7 +226,7 @@ router.post("/alunos/alterar-foto", verificarFuncionario, upload.single("foto"),
 router.get("/:nomeTurma/fotos", (req, res) => {
   const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
-  db.query("SELECT cod, nome FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
+  db.query("SELECT cod, nome, arquivada FROM turma WHERE TRIM(UPPER(nome)) = ? ORDER BY arquivada ASC, cod DESC LIMIT 1", [nomeTurma], (err, turmaResults) => {
     if (err || turmaResults.length === 0) return res.status(404).json("Turma não encontrada");
 
     const codTurma = turmaResults[0].cod;
@@ -257,7 +250,7 @@ router.get("/:nomeTurma/fotos", (req, res) => {
         conteudos,
         dataAtual: new Date().toISOString().split("T")[0],
         tipoUsuario,
-          arquivada: turmaResults[0].arquivada
+        arquivada: turmaResults[0].arquivada
       });
     });
   });
@@ -278,7 +271,7 @@ router.post("/:nomeTurma/fotos", verificarFuncionario, upload.single("foto"), (r
     dataf = new Date().toISOString().split("T")[0];
   }
 
-  db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? LIMIT 1", [nomeTurma], (err, turmaResults) => {
+  db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? AND arquivada = 0 ORDER BY cod DESC LIMIT 1", [nomeTurma], (err, turmaResults) => {
     if (err || turmaResults.length === 0) 
       return res.status(404).json({ sucesso: false, erro: "Turma não encontrada" });
 
@@ -344,9 +337,9 @@ router.get("/aluno/:cod", (req, res) => {
 
 // GET recados da turma
 router.get("/:nomeTurma/recados", (req, res) => {
-  const { nomeTurma } = req.params;
+  const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
-  db.query("SELECT * FROM turma WHERE nome = ?", [nomeTurma], (err, turmaResults) => {
+  db.query("SELECT * FROM turma WHERE TRIM(UPPER(nome)) = ? AND arquivada = 0 ORDER BY cod DESC LIMIT 1", [nomeTurma], (err, turmaResults) => {
     if (err) return res.status(500).send("Erro ao buscar turma");
     if (turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
 
@@ -374,51 +367,43 @@ router.get("/:nomeTurma/recados", (req, res) => {
   });
 });
 
-// POST adicionar recado
+// POST recado
 router.post("/:nomeTurma/recados", verificarFuncionario, (req, res) => {
-  const { nomeTurma } = req.params;
   const { descricao, datar } = req.body;
+  const nomeTurma = req.params.nomeTurma.trim().toUpperCase();
 
-  db.query("SELECT * FROM turma WHERE nome = ?", [nomeTurma], (err, turmaResults) => {
-    if (err) return res.status(500).send("Erro ao buscar turma");
-    if (turmaResults.length === 0) return res.status(404).send("Turma não encontrada");
+  if (!descricao?.trim()) return res.status(400).json({ sucesso: false, erro: "Descrição inválida" });
+
+  db.query("SELECT cod FROM turma WHERE TRIM(UPPER(nome)) = ? AND arquivada = 0 ORDER BY cod DESC LIMIT 1", [nomeTurma], (err, turmaResults) => {
+    if (err || turmaResults.length === 0) return res.status(404).json({ sucesso: false, erro: "Turma não encontrada" });
 
     const turmaId = turmaResults[0].cod;
 
     db.query(
       "INSERT INTO recados_turma (turma_id, descricao, datar) VALUES (?, ?, ?)",
-      [turmaId, descricao, datar],
-      (err) => {
-        if (err) return res.status(500).send("Erro ao salvar recado");
-        res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+      [turmaId, descricao.trim(), datar || new Date().toISOString().split("T")[0]],
+      (err2, result) => {
+        if (err2) return res.status(500).json({ sucesso: false, erro: "Erro ao salvar recado" });
+
+        res.status(200).json({ 
+          sucesso: true, 
+          cod: result.insertId,
+          descricao: descricao.trim(),
+          datar: datar || new Date().toISOString().split("T")[0]
+        });
       }
     );
   });
 });
 
 // DELETE recado
-router.post("/:nomeTurma/recados/:cod/delete", verificarFuncionario, (req, res) => {
-  const { nomeTurma, cod } = req.params;
+router.delete("/:nomeTurma/recados/:cod", verificarFuncionario, (req, res) => {
+  const { cod } = req.params;
 
   db.query("DELETE FROM recados_turma WHERE cod = ?", [cod], (err) => {
-    if (err) return res.status(500).send("Erro ao excluir recado");
-    res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
+    if (err) return res.status(500).json({ sucesso: false, erro: "Erro ao excluir recado" });
+    res.status(200).json({ sucesso: true });
   });
-});
-
-// PUT atualizar recado
-router.post("/:nomeTurma/recados/:cod/edit", verificarFuncionario, (req, res) => {
-  const { nomeTurma, cod } = req.params;
-  const { descricao, datar } = req.body;
-
-  db.query(
-    "UPDATE recados_turma SET descricao = ?, datar = ? WHERE cod = ?",
-    [descricao, datar, cod],
-    (err) => {
-      if (err) return res.status(500).send("Erro ao atualizar recado");
-      res.redirect(`/turmas/${encodeURIComponent(nomeTurma)}/recados`);
-    }
-  );
 });
 
 module.exports = router;
