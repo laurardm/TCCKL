@@ -34,10 +34,8 @@ body {
   padding: 22px;
   text-align: center;
   border: 2px solid #d6d6d6;
-
-  /* fluxo natural */
-  position: relative; 
-  margin-top: 160px; /* deixa espaço para a logo no topo */
+  position: absolute; 
+  margin-top: 160px;
 }
 /* Título */
 h1 {
