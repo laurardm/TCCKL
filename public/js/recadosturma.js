@@ -58,6 +58,10 @@ function abrirModalRecado() {
   document.getElementById("modal-text").value = "";
   document.getElementById("modal-date").value = new Date().toISOString().split("T")[0];
   document.getElementById("modal-bg").classList.add("active");
+
+  // Garante que o form envia para o endpoint de adicionar
+  const form = document.getElementById("modal-form");
+  form.action = `/turmas/${document.body.dataset.nomeTurma}/recados/add`;
 }
 
 function abrirModalEditar(cod, data, texto) {
@@ -79,6 +83,51 @@ function fecharAlerta() { document.getElementById("alerta-bg").style.display = "
 
 function avancarPagina() { if(currentPageIndex < pagesData.length -1){ currentPageIndex++; renderPage(); } }
 function voltarPagina() { if(currentPageIndex > 0){ currentPageIndex--; renderPage(); } }
+
+// Mostra o alerta com uma mensagem
+function mostrarAlerta(mensagem, tipo = "sucesso") {
+  const alertaBg = document.getElementById("alerta-bg");
+  const alertaMsg = document.getElementById("alerta-msg");
+  
+  alertaMsg.textContent = mensagem;
+
+  // Adiciona classe de sucesso ou erro
+  const alertaBox = alertaBg.querySelector(".alerta-box");
+  alertaBox.classList.remove("success", "error");
+  alertaBox.classList.add(tipo);
+
+  alertaBg.style.display = "flex";
+}
+
+// Exemplo: chamar quando o recado for adicionado com sucesso
+function recadoAdicionadoComSucesso() {
+  mostrarAlerta("Recado adicionado com sucesso!", "sucesso");
+}
+
+// Intercepta o envio do formulário do modal
+document.getElementById("modal-form").addEventListener("submit", function(e) {
+  e.preventDefault(); // impede reload da página
+
+  const form = e.target;
+  const data = form.querySelector("#modal-date").value;
+  const texto = form.querySelector("#modal-text").value;
+
+  // Gera um cod temporário
+  const cod = Date.now();
+
+  // Adiciona ao array pagesData (substitua por requisição real se quiser)
+  pagesData.push({ cod, data, texto });
+
+  // Fecha modal
+  fecharModal();
+
+  // Vai para a última página adicionada
+  currentPageIndex = pagesData.length - 1;
+  renderPage();
+
+  // Mostra alerta de sucesso
+  recadoAdicionadoComSucesso();
+});
 
 window.onload = () => {
   renderPage();
