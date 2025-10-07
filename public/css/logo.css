@@ -25,3 +25,8 @@
   object-fit: cover;
   border-radius: 40px;
 }
+
+.logo,
+.logo * {
+  box-sizing: content-box;
+}

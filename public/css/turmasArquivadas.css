@@ -34,9 +34,10 @@ body {
   padding: 22px;
   text-align: center;
   border: 2px solid #d6d6d6;
-  position: absolute; 
-  margin-top: 160px;
+  position: relative; 
+  margin-top: 80px; 
 }
+
 /* Título */
 h1 {
   color: #222;
@@ -212,4 +213,12 @@ h1 {
   .caixabotao { width: 95%; padding: 16px; border-radius: 14px; }
   .turmas-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
   .botao-ano { padding: 8px 14px; font-size: 0.97em; }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 }

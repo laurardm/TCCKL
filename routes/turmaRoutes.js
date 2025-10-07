@@ -68,10 +68,15 @@ router.put("/arquivar-todas", verificarFuncionario, (req, res) => {
 router.get("/arquivadas", (req, res) => {
   db.query("SELECT DISTINCT ano FROM turma WHERE arquivada = 1 ORDER BY ano DESC", (err, anos) => {
     if (err) return res.status(500).json("Erro ao buscar anos das turmas arquivadas");
-    const turmas = anos.map(a => ({ ano: a.ano }));
+
+    const turmas = Array.isArray(anos) && anos.length > 0
+      ? anos.map(a => ({ ano: a.ano }))
+      : [];
+
     res.render("turmas/arquivadas", { turmas, usuario: req.session.usuario });
   });
 });
+
 
 // GET /turmas/arquivadas/:ano - lista turmas arquivadas de um ano
 router.get("/arquivadas/:ano", (req, res) => {
