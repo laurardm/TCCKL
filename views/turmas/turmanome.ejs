@@ -77,9 +77,7 @@
   <% const turmaArquivada=Boolean(arquivada); %>
 
     <div class="botoes">
-      <a href="/turmas">
-        <button class="btn-fofo">Voltar</button>
-      </a>
+      <button id="btnVoltar" class="btn-fofo">Voltar</button>
       <a href="/turmas/<%= nomeTurma %>/fotos">
         <button class="btn-fofo">Fotos da turma</button>
       </a>
@@ -137,6 +135,16 @@
                 window.location.href = `/agenda/aluno/${codAluno}`;
               });
             });
+          });
+
+        document.getElementById("btnVoltar").addEventListener("click", function () {
+            // Se houver histórico de navegação anterior, volta
+            if (document.referrer && document.referrer !== window.location.href) {
+              history.back();
+            } else {
+              // Caso contrário, vai direto para a página principal de turmas
+              window.location.href = "/turmas";
+            }
           });
         </script>
 </body>
