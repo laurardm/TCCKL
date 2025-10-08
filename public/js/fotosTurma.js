@@ -2,6 +2,7 @@ const turmaDataEl = document.getElementById("turma-data");
 const encodedNomeTurma = turmaDataEl.getAttribute("data-nome");
 const conteudosServidor = JSON.parse(turmaDataEl.getAttribute("data-conteudos"));
 const tipoUsuario = turmaDataEl.getAttribute("data-tipo") || null; // 'func' ou 'resp'
+const arquivada = turmaDataEl.getAttribute("data-arquivada") === "true";
 
 let today = new Date().toISOString().split('T')[0];
 
@@ -71,25 +72,27 @@ function renderPage() {
     let textosHTML = '';
     let imagensHTML = '';
 
-    pagina.contents.forEach((conteudo, index) => {
-      const btnExcluirHTML = tipoUsuario === 'func' 
-        ? `<button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
-             <i class="fa-solid fa-trash"></i>
-           </button>` 
-        : '';
+    const podeEditar = (tipoUsuario === 'func' && !arquivada);
 
-      if (conteudo.tipo === 'imagem') {
-        imagensHTML += `<div class="imagem-item">
-                          <img src="${conteudo.valor}" data-cod="${conteudo.cod}" class="conteudo-img"/>
-                          ${btnExcluirHTML}
-                        </div>`;
-      } else {
-        textosHTML += `<div class="conteudo-item">
-                         <span class="conteudo-text">${conteudo.valor}</span>
-                         ${btnExcluirHTML}
-                       </div>`;
-      }
-    });
+pagina.contents.forEach((conteudo, index) => {
+  const btnExcluirHTML = podeEditar 
+    ? `<button class="btn-excluir" title="Excluir" onclick="excluirConteudo(${index})">
+         <i class="fa-solid fa-trash"></i>
+       </button>` 
+    : '';
+
+  if (conteudo.tipo === 'imagem') {
+    imagensHTML += `<div class="imagem-item">
+                      <img src="${conteudo.valor}" data-cod="${conteudo.cod}" class="conteudo-img"/>
+                      ${btnExcluirHTML}
+                    </div>`;
+  } else {
+    textosHTML += `<div class="conteudo-item">
+                     <span class="conteudo-text">${conteudo.valor}</span>
+                     ${btnExcluirHTML}
+                   </div>`;
+  }
+});
 
     conteudoDiv.innerHTML = textosHTML + (imagensHTML ? `<div class="imagens-container">${imagensHTML}</div>` : '');
   }
@@ -99,12 +102,18 @@ function renderPage() {
 // Modal
 // ---------------------------
 function abrirModalImagem() {
+  if (tipoUsuario !== 'func' || arquivada) {
+    alert('Você não tem permissão para adicionar imagens nesta turma.');
+    return;
+  }
+
   document.getElementById('modal-title').textContent = 'Adicionar Imagem';
   document.getElementById('modal-file').style.display = 'block';
   document.getElementById('modal-file').value = '';
   document.getElementById('modal-date').value = pagesData[currentPageIndex]?.date || today;
   document.getElementById('modal-bg').classList.add('active');
 }
+
 
 function fecharModal() {
   document.getElementById('modal-bg').classList.remove('active');
@@ -147,27 +156,36 @@ function confirmarAdicao() {
 // Excluir conteúdo
 // ---------------------------
 function excluirConteudo(index) {
+  if (tipoUsuario !== 'func' || arquivada) {
+    alert('Você não tem permissão para excluir este conteúdo.');
+    return;
+  }
+
   const pagina = pagesData[currentPageIndex];
   if (!pagina) return;
-
+  
   const conteudo = pagina.contents[index];
-  if (conteudo.tipo === 'imagem') {
-    fetch(`/turmas/${encodedNomeTurma}/fotos/${conteudo.cod}`, { method: "DELETE" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.sucesso) {
-          pagina.contents.splice(index, 1);
-          renderPage();
-        } else {
-          alert("Erro ao excluir a foto: " + (data.erro || ""));
-        }
-      })
-      .catch(err => alert("Erro ao excluir a foto: " + err));
-  } else {
-    pagina.contents.splice(index, 1);
-    renderPage();
-  }
+    if (conteudo.tipo === 'imagem') {
+      fetch(`/turmas/${encodedNomeTurma}/fotos/${conteudo.cod}`, { method: "DELETE" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            pagina.contents.splice(index, 1);
+            renderPage();
+          } else {
+            alert("Erro ao excluir a foto: " + (data.erro || ""));
+          }
+        })
+        .catch(err => alert("Erro ao excluir a foto: " + err));
+    } else {
+      pagina.contents.splice(index, 1);
+      renderPage();
+    }
 }
+
+
+  
+
 
 // ---------------------------
 // Paginação

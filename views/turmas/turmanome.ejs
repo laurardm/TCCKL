@@ -75,13 +75,14 @@
   </div>
 
   <% const turmaArquivada=Boolean(arquivada); %>
-
-    <div class="botoes">
+  <% const prefixoRota = arquivada ? `/turmas/arquivadas/${ano}/${nomeTurma}` : `/turmas/${nomeTurma}`; %>
+  
+  <div class="botoes">
       <button id="btnVoltar" class="btn-fofo">Voltar</button>
-      <a href="/turmas/<%= nomeTurma %>/fotos">
+      <a href="<%= prefixoRota %>/fotos">
         <button class="btn-fofo">Fotos da turma</button>
       </a>
-      <a href="/turmas/<%= nomeTurma %>/recados">
+      <a href="<%= prefixoRota %>/recados">
         <button class="btn-fofo">Recados da turma</button>
       </a>
 
