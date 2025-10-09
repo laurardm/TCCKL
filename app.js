@@ -6,15 +6,15 @@ const session = require('express-session');
 const path = require('path');
 
 // Rotas principais
-const loginRoutes = require('./routes/loginRoutes');
-const cadastroRoutes = require('./routes/cadastroRoutes');
-const perfilfuncRoutes = require('./routes/perfilfuncRoutes');
-const perfilrespRoutes = require('./routes/perfilrespRoutes');
-const respRoutes = require('./routes/respRoutes');
-const funcRoutes = require('./routes/funcRoutes');
-const turmaRoutes = require('./routes/turmas'); // Roteador unificado de turmas
-const agendaRoutes = require('./routes/agendaRoutes');
-const esquecisenhaRoutes = require('./routes/esquecisenhaRoutes');
+const login = require('./backend/login');
+const cadastro = require('./backend/cadastro');
+const perfilfunc = require('./backend/perfilfunc');
+const perfilresp = require('./backend/perfilresp');
+const resp = require('./backend/resp');
+const func = require('./backend/func');
+const turma = require('./backend/turmas'); 
+const agenda = require('./backend/agenda');
+const esquecisenha = require('./backend/esquecisenha');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,7 +30,7 @@ app.use(session({
   secret: 'escolinha270380',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 1000 * 60 * 60 } // 1h
+  cookie: { secure: false, maxAge: 1000 * 60 * 60 } 
 }));
 
 // Middlewares
@@ -40,22 +40,19 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 
 // Rotas
-app.use('/', loginRoutes);
-app.use('/cadastro', cadastroRoutes);
-app.use('/func', funcRoutes);
-app.use('/perfilf', perfilfuncRoutes);
-app.use('/perfilr', perfilrespRoutes);
-app.use('/resp', respRoutes);
-
-// ✅ Rotas de Turmas (Ativas, Arquivadas, Fotos, Recados, Alunos)
-app.use('/turmas', turmaRoutes);
-
-app.use('/agenda', agendaRoutes);
-app.use('/esqueci-senha', esquecisenhaRoutes);
+app.use('/', login);
+app.use('/cadastro', cadastro);
+app.use('/func', func);
+app.use('/perfilf', perfilfunc);
+app.use('/perfilr', perfilresp);
+app.use('/resp', resp);
+app.use('/turmas', turma);
+app.use('/agenda', agenda);
+app.use('/esqueci-senha', esquecisenha);
 
 // Middleware de erro global
 app.use((err, req, res, next) => {
-  console.error("Erro capturado no servidor:", err); // Mostra o erro completo no terminal
+  console.error("Erro capturado no servidor:", err); 
   res.status(500).send({
     message: "Ocorreu um erro no servidor!",
     error: err.message,
