@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// GET AGENDA
+// ================= GET AGENDA =================
 router.get('/aluno/:cod', (req, res) => {
   const codAluno = req.params.cod;
 
@@ -104,7 +104,7 @@ router.get('/aluno/:cod', (req, res) => {
   });
 });
 
-//  POST AGENDA 
+// ================= POST AGENDA =================
 
 // Adicionar recado
 router.post('/adicionar-recado', verificarFuncionario, (req, res) => {
@@ -148,7 +148,7 @@ router.post('/adicionar-foto', verificarFuncionario, upload.single("imagem"), (r
   });
 });
 
-//  PUT AGENDA 
+// ================= PUT AGENDA =================
 
 // Editar recado
 router.put('/recados/:cod', verificarFuncionario, (req, res) => {
@@ -176,7 +176,7 @@ router.put('/eventos/:cod', verificarFuncionario, (req, res) => {
   });
 });
 
-//  DELETE AGENDA 
+// ================= DELETE AGENDA =================
 
 // Excluir recado
 router.delete('/recados/:cod', verificarFuncionario, (req, res) => {
