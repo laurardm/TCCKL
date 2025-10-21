@@ -26,7 +26,7 @@ body {
 .caixabotao {
   display: flex;
   flex-direction: column;
-  width: 90%;
+  width: 65%;
   max-width: 980px;
   background: var(--card-bg);
   border-radius: 20px;
@@ -35,7 +35,7 @@ body {
   text-align: center;
   border: 2px solid #d6d6d6;
   position: relative; 
-  margin-top: 80px; 
+  margin-top: 10px; 
 }
 
 /* Título */
@@ -163,7 +163,7 @@ h1 {
   border: 2px solid #d9d9d9;
   border-radius: 20px;
   padding: 8px 16px;
-  margin-top: 15px;
+  
   font-weight: 600;
   font-family: "Questrial", sans-serif;
 }
@@ -173,7 +173,7 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 12px;
+  
 }
 
 /* Nenhuma turma */
