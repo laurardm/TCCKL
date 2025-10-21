@@ -13,6 +13,7 @@ body {
 /* Container principal da tela de login */
 .page {
     display: flex;
+    margin-top: -15px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -29,7 +30,7 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #fff;
-    border-radius: 20px;
+    border-radius: 40px;
     padding: 15px 25px; /* menos espaço interno */
     margin-top: 15px;
     margin-bottom: 80px; /* separa do rodapé */
@@ -41,7 +42,7 @@ body {
 }
 
 
-/* Título do formulário (se houver) */
+/* Título do formulário */
 .formLogin h1 {
     margin: 0 0 20px;
     font-weight: 500;
@@ -133,10 +134,11 @@ body {
 
 /*logo*/
 img {
-    width: 360px;
+    width: 500px;
     height: auto;
-    border-radius: 25px;
-    margin-bottom: 8px;
+    margin-bottom: -30px;
+    margin-top: -55px;
+    padding-left: 27px;
 }
 
 
@@ -219,3 +221,4 @@ img {
     from { opacity: 1; top: 20px; }
     to { opacity: 0; top: 0; }
 }
+

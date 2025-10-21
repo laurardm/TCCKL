@@ -31,9 +31,7 @@
 
     <div class="rodape">
         <div class="carrossel">
-            <span id="frase">
-                A educação infantil é o primeiro passo para um futuro brilhante.
-            </span>
+            <span id="frase" aria-live="polite"></span>
         </div>
     </div>
 
@@ -46,30 +44,66 @@
 
     <!-- Script do carrossel de frases -->
     <script>
-        // Evita execução duplicada
-        if (!window.carrosselIniciado) {
-            window.carrosselIniciado = true;
-
+        document.addEventListener("DOMContentLoaded", () => {
             const frases = [
-                "A natureza estimula a curiosidade e o aprendizado...",
-                "O brincar é essencial para o desenvolvimento infantil...",
-                "Educar e cuidar são inseparáveis na educação infantil...",
-                "A curiosidade infantil impulsiona o aprendizado...",
-                "Segundo o artigo 4º inciso II do ECA..."
+                "“Não se pode falar de educação sem amor.” — Paulo Freire.",
+                "“A infância é a idade das interrogações, a juventude a das afirmações, a velhice a das negações.” — George Sand.",
+                "“Brincar é o trabalho da infância.” — Jean Piaget.",
+                "“Ensinar não é transferir conhecimento, mas criar as possibilidades para a sua própria produção ou a sua construção.” — Paulo Freire.",
+                "“São as crianças, que sem falar, nos ensinam as razões para viver. Elas não têm saberes a transmitir. No entanto, elas sabem o essencial da vida.” — Rubem Alves.",
+                "“A fim de que a educação seja eficaz e afetiva, deve-se respeitar o tempo e o ritmo de cada criança.” — Jean Piaget."
             ];
 
-            let fraseAtual = 0;
-            const fraseElemento = document.getElementById('frase');
+            const fraseElemento = document.getElementById("frase");
+            if (!fraseElemento) return;
 
-            if (fraseElemento) {
-                setInterval(() => {
-                    fraseAtual = (fraseAtual + 1) % frases.length;
-                    fraseElemento.innerText = frases[fraseAtual];
-                }, 2000); // 5 segundos
-            } else {
-                console.error("Elemento #frase não encontrado!");
+            // Função para "normalizar" texto (remove espaços extras e unifica aspas)
+            const normaliza = (s) => String(s || "")
+                .replace(/[“”"]/g, '"')
+                .replace(/\s+/g, " ")
+                .trim()
+                .toLowerCase();
+
+            // Se o array estiver vazio, nada a fazer
+            if (frases.length === 0) {
+                fraseElemento.textContent = "";
+                return;
             }
-        }
+
+            // Inicializa o elemento com a primeira frase do array (fonte única de verdade)
+            fraseElemento.textContent = frases[0];
+            fraseElemento.classList.add("mostrar");
+
+            // índice aponta para próxima frase a ser exibida
+            let idx = 1 % frases.length;
+
+            // troca com fade; pula frases iguais à exibida atualmente
+            function proxima(fraseIndex) {
+                // prepara próximo índice que não duplica o texto atual
+                let tentativas = 0;
+                const textoAtualNorm = normaliza(fraseElemento.textContent);
+                while (normaliza(frases[fraseIndex]) === textoAtualNorm && tentativas < frases.length) {
+                    fraseIndex = (fraseIndex + 1) % frases.length;
+                    tentativas++;
+                }
+                // se todas as frases são iguais (caso limite), não faz nada
+                if (tentativas >= frases.length && normaliza(frases[fraseIndex]) === textoAtualNorm) return (idx = (fraseIndex + 1) % frases.length);
+
+                // fade out -> troca -> fade in
+                fraseElemento.classList.remove("mostrar");
+                setTimeout(() => {
+                    fraseElemento.textContent = frases[fraseIndex];
+                    fraseElemento.classList.add("mostrar");
+                }, 600); // tem que bater com a transição CSS (600ms)
+
+                // atualiza índice para próxima chamada
+                idx = (fraseIndex + 1) % frases.length;
+            }
+
+            // Inicia ciclo: troca a cada 10s, a primeira troca após 10s
+            const intervalo = 10000;
+            setInterval(() => proxima(idx), intervalo);
+        });
     </script>
 
     <script>
