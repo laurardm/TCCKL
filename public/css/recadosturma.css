@@ -82,19 +82,11 @@ h2 {
   color: #333;
 }
 
-/* Hover para destaque */
 .botao-group button:hover i,
 .botao-group form button:hover i {
   transform: scale(1.2);
 }
 
-/* Excluir específico: vermelho */
-.botao-group form button i {
-  color: #cc0000;
-}
-.botao-group form button:hover i {
-  color: #ff4c4c;
-}
 
 /* Botões gerais */
 button {

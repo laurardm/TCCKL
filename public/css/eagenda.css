@@ -95,13 +95,6 @@ h2 {
   transform: scale(1.2);
 }
 
-.botao-group form button i {
-  color: #cc0000; /* cor padrão da lixeira */
-}
-.botao-group form button:hover i {
-  color: #ff4c4c; /* vermelho mais forte ao passar o mouse */
-  transform: scale(1.2); /* efeito de leve aumento */
-}
 
 /* Botões gerais */
 button {
