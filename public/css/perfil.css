@@ -24,6 +24,21 @@ body {
   border-radius: 40px;
 }
 
+#foto {
+  font-family: 'Questrial', sans-serif;
+  color: #333;
+}
+
+#foto::file-selector-button {
+  color: #333;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Questrial', sans-serif;
+}
+
 /* Estilo do quadro com a imagem e nome */
 .fotoperfil {
   display: flex;

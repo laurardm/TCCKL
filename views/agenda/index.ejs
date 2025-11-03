@@ -52,7 +52,7 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button class="modal-close" aria-label="Fechar modal" onclick="fecharModal()">&times;</button>
       <h3 id="modal-title"></h3>
-      <input type="date" id="modal-date" />
+      <input type="date" id="modal-date" value="<%= new Date().toISOString().slice(0,10) %>" />
       <textarea id="modal-text" placeholder="Digite aqui..."></textarea>
       <input type="file" id="modal-file" style="display:none;" accept="image/*" />
       <div class="modal-buttons">
