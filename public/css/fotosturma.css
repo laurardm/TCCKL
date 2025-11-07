@@ -295,6 +295,7 @@ button:hover {
 
 #modal-file::file-selector-button {
   color: #333;
+  background-color: #f8d3e0;
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
