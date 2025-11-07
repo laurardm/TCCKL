@@ -24,9 +24,5 @@
   height: 220px;
   object-fit: cover;
   border-radius: 40px;
-}
-
-.logo,
-.logo * {
-  box-sizing: content-box;
+  margin-top: -15px;
 }
