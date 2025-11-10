@@ -288,11 +288,14 @@ button:hover {
 }
 
 .foto-perfil {
+  background-color: #e4e6e7;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
   object-fit: cover;
+  border-radius: 50%;
+  overflow: hidden;
   border: 2px solid #ccc;
+  display: block;
 }
 
 .nome-usuario {

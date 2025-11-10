@@ -35,6 +35,18 @@
       stroke-width: 2;
       fill: none;
     }
+
+    .foto-wrapper img{
+      background-color: #e4e6e7;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #ccc;
+      display: block;
+    }
+
   </style>
 </head>
 
@@ -52,7 +64,7 @@
         <% alunos.forEach((aluno)=> { %>
           <div class="aluno" data-cod="<%= aluno.cod %>">
             <div class="foto-wrapper">
-              <img src="<%= aluno.foto || '/imagens/perfil.png' %>" alt="Foto do aluno">
+              <img src="<%= aluno.foto || '/imagens/perfilnormal.png' %>" alt="Foto do aluno">
               <% if (tipoUsuario==='func' ) { %>
                 <label class="camera-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
