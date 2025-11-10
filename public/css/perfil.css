@@ -57,6 +57,7 @@ body {
 
 /* Imagem do avatar */
 .fotoperfil img {
+  background-color: #e4e6e7;
   width: 150px;
   height: 150px;
   object-fit: cover;
