@@ -42,8 +42,6 @@ body {
   gap: 15px;
   margin-top: 40px;
   max-height: 250px; /* altura máxima do container */
-  overflow-y: auto;  /* scroll só aparece se ultrapassar o max-height */
-  padding-right: 10px; /* evita corte da barra de scroll */
 }
 
 /* Barra de rolagem estilizada (opcional) */
